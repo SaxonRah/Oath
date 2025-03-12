@@ -74,7 +74,7 @@ public:
     bool bUseGlobalState;
     
     // Value to compare against
-    FVariant CompareValue;
+    FTAVariant CompareValue;
     
     // Comparison operator
     EComparisonOperator ComparisonType;
@@ -86,7 +86,7 @@ public:
     virtual void Serialize(FArchive& Ar) override;
     
     // Compare two variants based on the operator
-    bool CompareVariants(const FVariant& A, const FVariant& B) const;
+    bool CompareVariants(const FTAVariant& A, const FTAVariant& B) const;
 };
 
 /**

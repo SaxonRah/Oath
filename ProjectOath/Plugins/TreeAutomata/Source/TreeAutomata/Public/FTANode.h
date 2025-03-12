@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "TATypes.h"
-#include "TAAction.h"
+#include "FTAAction.h"
 #include "TATransition.h"
 #include "TAContext.h"
 #include "FTANode.generated.h"
@@ -33,7 +33,7 @@ public:
     FString NodeType;
     
     // Custom state data - flexible container for any system-specific data
-    TMap<FString, FVariant> StateData;
+    TMap<FString, FTAVariant> StateData;
     
     // Condition-based transitions to other nodes
     TArray<FTATransition> Transitions;

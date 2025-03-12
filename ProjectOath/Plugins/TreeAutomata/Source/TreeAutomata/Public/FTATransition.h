@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "TATypes.h"
-#include "TACondition.h"
+#include "FTACondition.h"
 #include "TAContext.h"
 #include "FTATransition.generated.h"
 

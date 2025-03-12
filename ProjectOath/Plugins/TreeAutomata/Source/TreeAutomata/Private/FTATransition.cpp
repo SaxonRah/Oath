@@ -103,7 +103,7 @@ void FTATransition::Serialize(FArchive& Ar)
         for (int32 i = 0; i < StateCount; ++i)
         {
             FString Key;
-            FVariant Value;
+            FTAVariant Value;
             Ar << Key;
             Ar << Value;
             StateData.Add(Key, Value);
@@ -261,8 +261,8 @@ void FTATransition::Serialize(FArchive& Ar)
             if (Ar.IsLoading())
             {
                 // Store in state data
-                StateData.Add(TEXT("IsSilent"), FVariant(bIsSilent));
-                StateData.Add(TEXT("Delay"), FVariant(Delay));
+                StateData.Add(TEXT("IsSilent"), FTAVariant(bIsSilent));
+                StateData.Add(TEXT("Delay"), FTAVariant(Delay));
             }
         }
         else if (TransitionType == TEXT("Quest"))
@@ -284,8 +284,8 @@ void FTATransition::Serialize(FArchive& Ar)
             if (Ar.IsLoading())
             {
                 // Store in state data
-                StateData.Add(TEXT("AutoComplete"), FVariant(bAutoComplete));
-                StateData.Add(TEXT("ReputationChange"), FVariant(ReputationChange));
+                StateData.Add(TEXT("AutoComplete"), FTAVariant(bAutoComplete));
+                StateData.Add(TEXT("ReputationChange"), FTAVariant(ReputationChange));
             }
         }
     }

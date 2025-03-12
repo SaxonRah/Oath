@@ -197,7 +197,7 @@ void FTANode::Serialize(FArchive& Ar)
         for (int32 i = 0; i < StateCount; ++i)
         {
             FString Key;
-            FVariant Value;
+            FTAVariant Value;
             Ar << Key;
             Ar << Value;
             StateData.Add(Key, Value);
@@ -234,7 +234,7 @@ void FTANode::Serialize(FArchive& Ar)
             Ar << TargetNodeID;
             
             // Store target ID for later resolution
-            Transition.StateData.Add(TEXT("TargetNodeID"), FVariant(TargetNodeID.ToString()));
+            Transition.StateData.Add(TEXT("TargetNodeID"), FTAVariant(TargetNodeID.ToString()));
             
             // Serialize conditions
             int32 ConditionCount;
@@ -591,7 +591,7 @@ void FTANode::ResolveNodeReferences(TMap<FGuid, TSharedPtr<FTANode>>& NodeMap)
     for (FTATransition& Transition : Transitions)
     {
         // Get stored target node ID
-        const FVariant* TargetIDVar = Transition.StateData.Find(TEXT("TargetNodeID"));
+        const FTAVariant* TargetIDVar = Transition.StateData.Find(TEXT("TargetNodeID"));
         if (TargetIDVar && TargetIDVar->IsType<FString>())
         {
             FString TargetIDStr = TargetIDVar->AsString();

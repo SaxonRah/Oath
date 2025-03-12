@@ -54,37 +54,48 @@ UTAInstance* UTAController::CreateInstance(UObject* Template, const FString& Ins
 
 UTAInstance* UTAController::CreateInstanceFromNodes(TSharedPtr<FTANode> RootNode, const FString& InstanceName)
 {
-    // Check if instance name already exists
-    if (ActiveInstances.Contains(InstanceName))
-    {
-        UE_LOG(LogTreeAutomata, Warning, TEXT("Tree Automata instance '%s' already exists"), *InstanceName);
-        return nullptr;
-    }
-    
-    // Check for valid root node
-    if (!RootNode.IsValid())
-    {
-        UE_LOG(LogTreeAutomata, Error, TEXT("Cannot create Tree Automata instance '%s' with invalid root node"), *InstanceName);
-        return nullptr;
-    }
-    
-    // Create new instance
-    UTAInstance* NewInstance = NewObject<UTAInstance>(this);
-    NewInstance->Initialize(InstanceName, nullptr, OwnerActor);
-    NewInstance->SetRootNode(RootNode);
-    
-    // Add to active instances
-    ActiveInstances.Add(InstanceName, NewInstance);
-    
-    // Broadcast creation event
-    OnAutomatonCreated.Broadcast(InstanceName);
-    
-    UE_LOG(LogTreeAutomata, Display, TEXT("Created Tree Automata instance '%s' from node hierarchy"), *InstanceName);
-    
-    return NewInstance;
+   // Check if instance name already exists
+   if (ActiveInstances.Contains(InstanceName))
+   {
+       UE_LOG(LogTreeAutomata, Warning, TEXT("Tree Automata instance '%s' already exists"), *InstanceName);
+       return nullptr;
+   }
+   
+   // Check for valid root node
+   if (!RootNode.IsValid())
+   {
+       UE_LOG(LogTreeAutomata, Error, TEXT("Cannot create Tree Automata instance '%s' with invalid root node"), *InstanceName);
+       return nullptr;
+   }
+   
+   // Create new instance
+   UTAInstance* NewInstance = NewObject<UTAInstance>(this);
+   NewInstance->Initialize(InstanceName, nullptr, OwnerActor);
+   NewInstance->SetRootNode(RootNode);
+   
+   // Add to active instances
+   ActiveInstances.Add(InstanceName, NewInstance);
+   
+   // Broadcast creation event
+   OnAutomatonCreated.Broadcast(InstanceName);
+   
+   UE_LOG(LogTreeAutomata, Display, TEXT("Created Tree Automata instance '%s' from node hierarchy"), *InstanceName);
+   
+   return NewInstance;
 }
 
-bool UTAController::ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FVariant>& Params)
+UTAInstance* UTAController::CreateInstanceFromNodeWrapper(UTANodeWrapper* NodeWrapper, const FString& InstanceName)
+{
+    if (!NodeWrapper || !NodeWrapper->InternalNode.IsValid())
+    {
+        UE_LOG(LogTreeAutomata, Warning, TEXT("CreateInstanceFromNodeWrapper: Invalid node wrapper"));
+        return nullptr;
+    }
+    
+    return CreateInstanceFromNodes(NodeWrapper->InternalNode, InstanceName);
+}
+
+bool UTAController::ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FTAVariant>& Params)
 {
     // Find the instance
     UTAInstance* Instance = ActiveInstances.FindRef(InstanceName);
@@ -232,7 +243,7 @@ bool UTAController::LoadAutomataState(const FString& SaveSlot)
     // Load global state
     for (const auto& Pair : SaveGame->GlobalVariables)
     {
-        GlobalState.Add(Pair.Key, FVariant(Pair.Value));
+        GlobalState.Add(Pair.Key, FTAVariant(Pair.Value));
     }
     
     // Load each instance
@@ -402,7 +413,7 @@ bool UTAController::ForceTransitionToNodeByName(const FString& InstanceName, con
    return ForceTransitionToNode(InstanceName, TargetNode->NodeID);
 }
 
-void UTAController::SetGlobalVariable(const FString& VariableName, const FVariant& Value)
+void UTAController::SetGlobalVariable(const FString& VariableName, const FTAVariant& Value)
 {
    GlobalState.Add(VariableName, Value);
    
@@ -413,9 +424,9 @@ void UTAController::SetGlobalVariable(const FString& VariableName, const FVarian
    }
 }
 
-FVariant UTAController::GetGlobalVariable(const FString& VariableName, const FVariant& DefaultValue)
+FTAVariant UTAController::GetGlobalVariable(const FString& VariableName, const FTAVariant& DefaultValue)
 {
-   const FVariant* Found = GlobalState.Find(VariableName);
+   const FTAVariant* Found = GlobalState.Find(VariableName);
    return Found ? *Found : DefaultValue;
 }
 
@@ -431,7 +442,7 @@ void UTAController::Serialize(FArchive& Ar)
        for (int32 i = 0; i < GlobalStateCount; ++i)
        {
            FString Key;
-           FVariant Value;
+           FTAVariant Value;
            Ar << Key;
            Ar << Value;
            GlobalState.Add(Key, Value);

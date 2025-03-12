@@ -12,23 +12,26 @@ public class TreeAutomata : ModuleRules
 			new string[] {
 				// ... add public include paths required here ...
 			}
-			);
+		);
 				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
 			}
-			);
+		);
 			
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core",
+                "CoreUObject",
+                "Engine",
+                "InputCore",
 				// ... add other public dependencies that you statically link with here ...
 			}
-			);
+		);
 			
 		
 		PrivateDependencyModuleNames.AddRange(
@@ -40,7 +43,7 @@ public class TreeAutomata : ModuleRules
 				"SlateCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
-			);
+		);
 		
 		
 		DynamicallyLoadedModuleNames.AddRange(
@@ -48,6 +51,6 @@ public class TreeAutomata : ModuleRules
 			{
 				// ... add any modules that your module loads dynamically here ...
 			}
-			);
+		);
 	}
 }

@@ -47,7 +47,7 @@ UTAController* UTreeAutomataFunctionLibrary::CreateTreeAutomataController(AActor
     return NewController;
 }
 
-bool UTreeAutomataFunctionLibrary::ProcessAutomatonInput(AActor* Actor, const FString& AutomatonName, const FString& InputID, const TMap<FString, FVariant>& Params)
+bool UTreeAutomataFunctionLibrary::ProcessAutomatonInput(AActor* Actor, const FString& AutomatonName, const FString& InputID, const TMap<FString, FTAVariant>& Params)
 {
     UTAController* Controller = GetTreeAutomataController(Actor);
     if (!Controller)
@@ -73,7 +73,7 @@ TArray<FTAActionInfo> UTreeAutomataFunctionLibrary::GetAvailablePlayerActions(AA
     return Controller->GetAvailableActions(AutomatonName);
 }
 
-void UTreeAutomataFunctionLibrary::SetGlobalVariable(AActor* Actor, const FString& VariableName, const FVariant& Value)
+void UTreeAutomataFunctionLibrary::SetGlobalVariable(AActor* Actor, const FString& VariableName, const FTAVariant& Value)
 {
     UTAController* Controller = GetTreeAutomataController(Actor);
     if (!Controller)
@@ -86,7 +86,7 @@ void UTreeAutomataFunctionLibrary::SetGlobalVariable(AActor* Actor, const FStrin
     Controller->SetGlobalVariable(VariableName, Value);
 }
 
-FVariant UTreeAutomataFunctionLibrary::GetGlobalVariable(AActor* Actor, const FString& VariableName, const FVariant& DefaultValue)
+FTAVariant UTreeAutomataFunctionLibrary::GetGlobalVariable(AActor* Actor, const FString& VariableName, const FTAVariant& DefaultValue)
 {
     UTAController* Controller = GetTreeAutomataController(Actor);
     if (!Controller)
@@ -99,13 +99,13 @@ FVariant UTreeAutomataFunctionLibrary::GetGlobalVariable(AActor* Actor, const FS
     return Controller->GetGlobalVariable(VariableName, DefaultValue);
 }
 
-TMap<FString, FVariant> UTreeAutomataFunctionLibrary::ConvertBlueprintMapToVariantMap(const TMap<FString, FString>& BlueprintMap)
+TMap<FString, FTAVariant> UTreeAutomataFunctionLibrary::ConvertBlueprintMapToVariantMap(const TMap<FString, FString>& BlueprintMap)
 {
-    TMap<FString, FVariant> Result;
+    TMap<FString, FTAVariant> Result;
     
     for (const auto& Pair : BlueprintMap)
     {
-        Result.Add(Pair.Key, FVariant(Pair.Value));
+        Result.Add(Pair.Key, FTAVariant(Pair.Value));
     }
     
     return Result;

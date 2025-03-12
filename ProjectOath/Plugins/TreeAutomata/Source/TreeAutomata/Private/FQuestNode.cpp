@@ -70,7 +70,7 @@ void FQuestNode::ExecuteEntryActions(const FTAContext& Context)
             UE_LOG(LogTreeAutomata, Display, TEXT("Quest completed! Awarding %d XP to player"), XPReward);
             
             // Example of how rewards would be processed
-            const_cast<FTAContext&>(Context).SetGlobal(TEXT("LastQuestXPReward"), FVariant(XPReward));
+            const_cast<FTAContext&>(Context).SetGlobal(TEXT("LastQuestXPReward"), FTAVariant(XPReward));
         }
         
         // Award items
@@ -79,7 +79,7 @@ void FQuestNode::ExecuteEntryActions(const FTAContext& Context)
             UE_LOG(LogTreeAutomata, Display, TEXT("Quest completed! Awarding %d items to player"), ItemRewards.Num());
             
             // Example of how item rewards would be processed
-            const_cast<FTAContext&>(Context).SetGlobal(TEXT("LastQuestItemRewards"), FVariant(ItemRewards.Num()));
+            const_cast<FTAContext&>(Context).SetGlobal(TEXT("LastQuestItemRewards"), FTAVariant(ItemRewards.Num()));
         }
     }
     
@@ -400,7 +400,7 @@ TSharedPtr<FQuestNode> FQuestObjectiveCompletedCondition::FindQuestNode(const FT
     // For this example, we'll assume the current node is available in the context
     
     // Try to get the current node from context
-    const FVariant* CurrentNodeVar = Context.GlobalState.Find(TEXT("CurrentNode"));
+    const FTAVariant* CurrentNodeVar = Context.GlobalState.Find(TEXT("CurrentNode"));
     if (CurrentNodeVar && CurrentNodeVar->IsType<void*>())
     {
         FTANode* NodePtr = static_cast<FTANode*>(CurrentNodeVar->AsPtr());
@@ -427,7 +427,7 @@ FQuestStatusCondition::FQuestStatusCondition()
 bool FQuestStatusCondition::Evaluate(const FTAContext& Context) const
 {
     // Try to get the current node status
-    const FVariant* StatusVar = Context.GlobalState.Find(TEXT("QuestStatus"));
+    const FTAVariant* StatusVar = Context.GlobalState.Find(TEXT("QuestStatus"));
     if (StatusVar && StatusVar->IsType<int32>())
     {
         EQuestStatus CurrentStatus = (EQuestStatus)StatusVar->AsInt();
@@ -535,7 +535,7 @@ FCompleteObjectiveAction::FCompleteObjectiveAction()
 void FCompleteObjectiveAction::Execute(const FTAContext& Context) const
 {
     // Get the current node from context
-    const FVariant* CurrentNodeVar = Context.GlobalState.Find(TEXT("CurrentNode"));
+    const FTAVariant* CurrentNodeVar = Context.GlobalState.Find(TEXT("CurrentNode"));
     if (CurrentNodeVar && CurrentNodeVar->IsType<void*>())
     {
         FTANode* NodePtr = static_cast<FTANode*>(CurrentNodeVar->AsPtr());

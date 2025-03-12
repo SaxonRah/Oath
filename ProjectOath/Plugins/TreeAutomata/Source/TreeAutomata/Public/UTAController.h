@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Templates/SharedPointer.h"
 #include "TATypes.h"
 #include "UTAInstance.h"
 #include "UTAController.generated.h"
@@ -51,12 +52,14 @@ public:
     UTAInstance* CreateInstance(UObject* Template, const FString& InstanceName);
     
     // Create a new automaton instance from a node hierarchy
-    UFUNCTION(BlueprintCallable, Category = "Tree Automata")
     UTAInstance* CreateInstanceFromNodes(TSharedPtr<FTANode> RootNode, const FString& InstanceName);
-    
+
+    UFUNCTION(BlueprintCallable, Category = "Tree Automata")
+    UTAInstance* CreateInstanceFromNodeWrapper(UTANodeWrapper* NodeWrapper, const FString& InstanceName);
+
     // Process input on a specific automaton instance
     UFUNCTION(BlueprintCallable, Category = "Tree Automata")
-    bool ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FVariant>& Params);
+    bool ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FTAVariant>& Params);
     
     // Get all available actions from current state
     UFUNCTION(BlueprintCallable, Category = "Tree Automata")
@@ -108,11 +111,11 @@ public:
     
     // Set a global variable
     UFUNCTION(BlueprintCallable, Category = "Tree Automata")
-    void SetGlobalVariable(const FString& VariableName, const FVariant& Value);
+    void SetGlobalVariable(const FString& VariableName, const FTAVariant& Value);
     
     // Get a global variable
     UFUNCTION(BlueprintCallable, Category = "Tree Automata")
-    FVariant GetGlobalVariable(const FString& VariableName, const FVariant& DefaultValue);
+    FTAVariant GetGlobalVariable(const FString& VariableName, const FTAVariant& DefaultValue);
     
     // Delegates
     UPROPERTY(BlueprintAssignable, Category = "Tree Automata|Events")
@@ -129,7 +132,7 @@ public:
     
 protected:
     // Global state data shared across all automata
-    TMap<FString, FVariant> GlobalState;
+    TMap<FString, FTAVariant> GlobalState;
     
     // Recursively find node by ID
     TSharedPtr<FTANode> FindNodeByID(TSharedPtr<FTANode> StartNode, const FGuid& TargetID);

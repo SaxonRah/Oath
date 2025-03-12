@@ -75,7 +75,7 @@ void FSetVariableAction::Serialize(FArchive& Ar)
     Ar << VariableName;
     Ar << bUseGlobalState;
     
-    // Value serialization would depend on FVariant implementation
+    // Value serialization would depend on FTAVariant implementation
 }
 
 //------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void FLogMessageAction::Execute(const FTAContext& Context) const
     while (GlobalMatcher.FindNext())
     {
         FString VarName = GlobalMatcher.GetCaptureGroup(1);
-        const FVariant* Value = Context.GlobalState.Find(VarName);
+        const FTAVariant* Value = Context.GlobalState.Find(VarName);
         if (Value)
         {
             FString ValueStr = Value->ToString();
@@ -122,7 +122,7 @@ void FLogMessageAction::Execute(const FTAContext& Context) const
     while (InputMatcher.FindNext())
     {
         FString ParamName = InputMatcher.GetCaptureGroup(1);
-        const FVariant* Value = Context.InputParams.Find(ParamName);
+        const FTAVariant* Value = Context.InputParams.Find(ParamName);
         if (Value)
         {
             FString ValueStr = Value->ToString();
@@ -244,13 +244,13 @@ void FSpawnActorAction::Execute(const FTAContext& Context) const
            
        case EActorSpawnLocation::CustomLocation:
            // Custom location would be fetched from parameters
-           const FVariant* LocationVar = Context.InputParams.Find(TEXT("SpawnLocation"));
+           const FTAVariant* LocationVar = Context.InputParams.Find(TEXT("SpawnLocation"));
            if (LocationVar && LocationVar->IsType<FVector>())
            {
                SpawnLocation = LocationVar->AsVector();
            }
            
-           const FVariant* RotationVar = Context.InputParams.Find(TEXT("SpawnRotation"));
+           const FTAVariant* RotationVar = Context.InputParams.Find(TEXT("SpawnRotation"));
            if (RotationVar && RotationVar->IsType<FRotator>())
            {
                SpawnRotation = RotationVar->AsRotator();

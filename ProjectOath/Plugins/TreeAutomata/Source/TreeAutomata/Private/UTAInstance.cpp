@@ -473,7 +473,7 @@ void UTAInstance::LoadState(const FTAInstanceSaveData& SaveData)
     for (const auto& Pair : SaveData.Variables)
     {
         // Convert string to appropriate variant type
-        FVariant Value;
+        FTAVariant Value;
         
         // Get type hint if available
         FString TypeHint;
@@ -485,32 +485,32 @@ void UTAInstance::LoadState(const FTAInstanceSaveData& SaveData)
         // Convert based on type hint
         if (TypeHint == TEXT("Integer"))
         {
-            Value = FVariant(FCString::Atoi(*Pair.Value));
+            Value = FTAVariant(FCString::Atoi(*Pair.Value));
         }
         else if (TypeHint == TEXT("Float"))
         {
-            Value = FVariant(FCString::Atof(*Pair.Value));
+            Value = FTAVariant(FCString::Atof(*Pair.Value));
         }
         else if (TypeHint == TEXT("Boolean"))
         {
-            Value = FVariant(Pair.Value.ToBool());
+            Value = FTAVariant(Pair.Value.ToBool());
         }
         else if (TypeHint == TEXT("Vector"))
         {
             FVector Vec;
             Vec.InitFromString(Pair.Value);
-            Value = FVariant(Vec);
+            Value = FTAVariant(Vec);
         }
         else if (TypeHint == TEXT("Rotator"))
         {
             FRotator Rot;
             Rot.InitFromString(Pair.Value);
-            Value = FVariant(Rot);
+            Value = FTAVariant(Rot);
         }
         else
         {
             // Default to string if no type hint or unknown type
-            Value = FVariant(Pair.Value);
+            Value = FTAVariant(Pair.Value);
         }
         
         LocalState.Add(Pair.Key, Value);
@@ -563,7 +563,7 @@ void UTAInstance::ResolveNodeReferences(TSharedPtr<FTANode> Node, TMap<FGuid, TS
     for (FTATransition& Transition : Node->Transitions)
     {
         // Get stored target node ID
-        const FVariant* TargetIDVar = Transition.StateData.Find(TEXT("TargetNodeID"));
+        const FTAVariant* TargetIDVar = Transition.StateData.Find(TEXT("TargetNodeID"));
         if (TargetIDVar && TargetIDVar->IsType<FString>())
         {
             FString TargetIDStr = TargetIDVar->AsString();
@@ -654,13 +654,13 @@ TSharedPtr<FTANode> UTAInstance::GetRootNode() const
     return RootNode;
 }
 
-FVariant UTAInstance::GetLocalVariable(const FString& Name, const FVariant& DefaultValue) const
+FTAVariant UTAInstance::GetLocalVariable(const FString& Name, const FTAVariant& DefaultValue) const
 {
-    const FVariant* Found = LocalState.Find(Name);
+    const FTAVariant* Found = LocalState.Find(Name);
     return Found ? *Found : DefaultValue;
 }
 
-void UTAInstance::SetLocalVariable(const FString& Name, const FVariant& Value)
+void UTAInstance::SetLocalVariable(const FString& Name, const FTAVariant& Value)
 {
     LocalState.Add(Name, Value);
 }
@@ -680,7 +680,7 @@ void UTAInstance::Serialize(FArchive& Ar)
         for (int32 i = 0; i < LocalStateCount; ++i)
         {
             FString Key;
-            FVariant Value;
+            FTAVariant Value;
             Ar << Key;
             Ar << Value;
             LocalState.Add(Key, Value);

@@ -74,11 +74,11 @@ FVariableCondition::FVariableCondition()
 bool FVariableCondition::Evaluate(const FTAContext& Context) const
 {
     // Get the variable value
-    FVariant Value;
+    FTAVariant Value;
     
     if (bUseGlobalState)
     {
-        const FVariant* FoundValue = Context.GlobalState.Find(VariableName);
+        const FTAVariant* FoundValue = Context.GlobalState.Find(VariableName);
         if (FoundValue)
         {
             Value = *FoundValue;
@@ -93,7 +93,7 @@ bool FVariableCondition::Evaluate(const FTAContext& Context) const
     {
         // This would use node state in a real implementation
         // For this example, fallback to input parameters
-        const FVariant* FoundValue = Context.InputParams.Find(VariableName);
+        const FTAVariant* FoundValue = Context.InputParams.Find(VariableName);
         if (FoundValue)
         {
             Value = *FoundValue;
@@ -165,14 +165,14 @@ void FVariableCondition::Serialize(FArchive& Ar)
     Ar << VariableName;
     Ar << bUseGlobalState;
     
-    // CompareValue serialization would depend on FVariant implementation
+    // CompareValue serialization would depend on FTAVariant implementation
     
     int32 OpInt = (int32)ComparisonType;
     Ar << OpInt;
     ComparisonType = (EComparisonOperator)OpInt;
 }
 
-bool FVariableCondition::CompareVariants(const FVariant& A, const FVariant& B) const
+bool FVariableCondition::CompareVariants(const FTAVariant& A, const FTAVariant& B) const
 {
     // Type checking and conversion would be needed in a real implementation
     // Simplified for this example

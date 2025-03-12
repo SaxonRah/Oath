@@ -21,7 +21,7 @@ public:
     FString NodeType;
     
     // Custom state data - flexible container for any system-specific data
-    TMap<FString, FVariant> StateData;
+    TMap<FString, FTAVariant> StateData;
     
     // Condition-based transitions to other nodes
     TArray<FTATransition> Transitions;
@@ -102,10 +102,10 @@ struct TREEAUTOMATA_API FTAContext
     FString InputID;
     
     // Input parameters
-    TMap<FString, FVariant> InputParams;
+    TMap<FString, FTAVariant> InputParams;
     
     // Global state data that persists across all nodes
-    TMap<FString, FVariant> GlobalState;
+    TMap<FString, FTAVariant> GlobalState;
 };
 ```
 
@@ -131,7 +131,7 @@ public:
     
     // Process input on a specific automaton instance
     UFUNCTION(BlueprintCallable)
-    bool ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FVariant>& Params);
+    bool ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FTAVariant>& Params);
     
     // Get all available actions from current state
     UFUNCTION(BlueprintCallable)
@@ -169,10 +169,10 @@ public:
     TArray<TSharedPtr<FTANode>> History;
     
     // Global state data for this automaton instance
-    TMap<FString, FVariant> GlobalState;
+    TMap<FString, FTAVariant> GlobalState;
     
     // Process an input and potentially transition
-    bool ProcessInput(const FString& InputID, const TMap<FString, FVariant>& Params, UWorld* World, AActor* PlayerActor);
+    bool ProcessInput(const FString& InputID, const TMap<FString, FTAVariant>& Params, UWorld* World, AActor* PlayerActor);
     
     // Get all available actions from current state
     TArray<FTAActionInfo> GetAvailableActions();
@@ -425,7 +425,7 @@ public:
     
     // Process player input for a specific automaton
     UFUNCTION(BlueprintCallable, Category = "Tree Automata")
-    static bool ProcessAutomatonInput(AActor* Actor, const FString& AutomatonName, const FString& InputID, const TMap<FString, FVariant>& Params);
+    static bool ProcessAutomatonInput(AActor* Actor, const FString& AutomatonName, const FString& InputID, const TMap<FString, FTAVariant>& Params);
     
     // Get all available actions for a player
     UFUNCTION(BlueprintCallable, Category = "Tree Automata")
@@ -475,9 +475,9 @@ void AQuestGiver::InteractWithQuest(APlayerCharacter* Player)
     UTAController* AutomataController = UTreeAutomataFunctionLibrary::GetTreeAutomataController(Player);
     
     // Build parameters
-    TMap<FString, FVariant> Params;
-    Params.Add("NPCID", FVariant(GetNPCID()));
-    Params.Add("QuestID", FVariant(QuestID));
+    TMap<FString, FTAVariant> Params;
+    Params.Add("NPCID", FTAVariant(GetNPCID()));
+    Params.Add("QuestID", FTAVariant(QuestID));
     
     // Process the interaction
     bool Success = AutomataController->ProcessInput("MainQuest", "AcceptQuest", Params);
@@ -499,8 +499,8 @@ void ADialogueManager::SelectDialogueOption(int32 OptionIndex)
     UTAController* AutomataController = UTreeAutomataFunctionLibrary::GetTreeAutomataController(PlayerCharacter);
     
     // Build parameters
-    TMap<FString, FVariant> Params;
-    Params.Add("OptionIndex", FVariant(OptionIndex));
+    TMap<FString, FTAVariant> Params;
+    Params.Add("OptionIndex", FTAVariant(OptionIndex));
     
     // Process the dialogue selection
     bool Success = AutomataController->ProcessInput("TavernKeeperDialogue", "SelectOption", Params);
@@ -554,7 +554,7 @@ public:
     void RegisterEventListener(const FString& EventType, UObject* Listener, FName FunctionName);
     
     // Broadcast event to all listeners
-    void BroadcastEvent(const FString& EventType, const TMap<FString, FVariant>& EventData);
+    void BroadcastEvent(const FString& EventType, const TMap<FString, FTAVariant>& EventData);
     
     // Event history for debugging
     TArray<FTAEventRecord> EventHistory;
@@ -748,7 +748,7 @@ public:
     FTAReplicationSettings ReplicationSettings;
     
     // Override to handle network replication
-    virtual bool ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FVariant>& Params) override;
+    virtual bool ProcessInput(const FString& InstanceName, const FString& InputID, const TMap<FString, FTAVariant>& Params) override;
     
     // Handle incoming remote inputs from server
     UFUNCTION(Client, Reliable)

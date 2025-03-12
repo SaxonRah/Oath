@@ -45,7 +45,7 @@ public:
     TArray<TSharedPtr<FTANode>> History;
     
     // Global state data for this automaton instance
-    TMap<FString, FVariant> LocalState;
+    TMap<FString, FTAVariant> LocalState;
     
     // Process an input and potentially transition
     bool ProcessInput(const FTAContext& Context);
@@ -93,10 +93,10 @@ public:
     TSharedPtr<FTANode> GetRootNode() const;
     
     // Get a local variable
-    FVariant GetLocalVariable(const FString& Name, const FVariant& DefaultValue = FVariant()) const;
+    FTAVariant GetLocalVariable(const FString& Name, const FTAVariant& DefaultValue = FTAVariant()) const;
     
     // Set a local variable
-    void SetLocalVariable(const FString& Name, const FVariant& Value);
+    void SetLocalVariable(const FString& Name, const FTAVariant& Value);
     
     // Serialize instance state
     void Serialize(FArchive& Ar);

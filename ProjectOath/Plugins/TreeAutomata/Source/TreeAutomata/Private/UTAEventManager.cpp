@@ -8,23 +8,34 @@ UTAEventManager::UTAEventManager()
     : MaxEventHistoryLength(100)
 {
 }
+void UTAEventManager::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
+    UE_LOG(LogTreeAutomata, Display, TEXT("Tree Automata Event Manager initialized"));
+}
 
+void UTAEventManager::Deinitialize()
+{
+    EventListeners.Empty();
+    EventHistory.Empty();
+    Super::Deinitialize();
+}
+
+// Update the Get method
 UTAEventManager* UTAEventManager::Get(UWorld* World)
 {
     if (!World)
     {
         return nullptr;
     }
-    
-    UTAEventManager* EventManager = World->GetGameInstance()->GetSubsystem<UTAEventManager>();
-    if (!EventManager)
+
+    UGameInstance* GameInstance = World->GetGameInstance();
+    if (!GameInstance)
     {
-        // In a real implementation, we would register this as a game instance subsystem
-        // For this example, create a temporary instance
-        EventManager = NewObject<UTAEventManager>(World->GetGameInstance());
+        return nullptr;
     }
-    
-    return EventManager;
+
+    return GameInstance->GetSubsystem<UTAEventManager>();
 }
 
 void UTAEventManager::RegisterEventListener(const FString& EventType, UObject* Listener, FName FunctionName)
@@ -90,24 +101,63 @@ void UTAEventManager::UnregisterEventListener(const FString& EventType, UObject*
         *Listener->GetName(), *EventType);
 }
 
-void UTAEventManager::BroadcastEvent(const FString& EventType, const TMap<FString, FVariant>& EventData)
+//void UTAEventManager::BroadcastEvent(const FString& EventType, const TMap<FString, FTAVariant>& EventData)
+//{
+//    // Add to history
+//    AddEventToHistory(EventType, EventData);
+//    
+//    // Broadcast to dynamic delegate
+//    OnTAEvent.Broadcast(EventType, EventData);
+//    
+//    // Find listeners for this event type
+//    TArray<FTAEventListener>* Listeners = EventListeners.Find(EventType);
+//    if (!Listeners)
+//    {
+//        return;
+//    }
+//    
+//    // Make a copy to handle listeners that might unregister during broadcast
+//    TArray<FTAEventListener> ListenersCopy = *Listeners;
+//    
+//    // Notify each listener
+//    for (const FTAEventListener& Listener : ListenersCopy)
+//    {
+//        if (Listener.Listener.IsValid())
+//        {
+//            // Create parameters for function call
+//            FTAEventParameters Params;
+//            Params.EventType = EventType;
+//            Params.EventData = EventData;
+//            
+//            // Call function
+//            Listener.Listener->ProcessEvent(
+//                Listener.Listener->FindFunction(Listener.FunctionName),
+//                &Params);
+//        }
+//    }
+//    
+//    UE_LOG(LogTreeAutomata, Verbose, TEXT("Broadcast event of type '%s' to %d listeners"), 
+//        *EventType, ListenersCopy.Num());
+//}
+
+void UTAEventManager::BroadcastEvent(const FString& EventType, const TMap<FString, FTAVariant>& EventData)
 {
     // Add to history
     AddEventToHistory(EventType, EventData);
-    
-    // Broadcast to dynamic delegate
-    OnTAEvent.Broadcast(EventType, EventData);
-    
+
+    // Broadcast to dynamic delegate - just the event type since we can't pass TMaps directly
+    OnTAEvent.Broadcast(EventType);
+
     // Find listeners for this event type
     TArray<FTAEventListener>* Listeners = EventListeners.Find(EventType);
     if (!Listeners)
     {
         return;
     }
-    
+
     // Make a copy to handle listeners that might unregister during broadcast
     TArray<FTAEventListener> ListenersCopy = *Listeners;
-    
+
     // Notify each listener
     for (const FTAEventListener& Listener : ListenersCopy)
     {
@@ -117,16 +167,30 @@ void UTAEventManager::BroadcastEvent(const FString& EventType, const TMap<FStrin
             FTAEventParameters Params;
             Params.EventType = EventType;
             Params.EventData = EventData;
-            
+
             // Call function
             Listener.Listener->ProcessEvent(
                 Listener.Listener->FindFunction(Listener.FunctionName),
                 &Params);
         }
     }
-    
-    UE_LOG(LogTreeAutomata, Verbose, TEXT("Broadcast event of type '%s' to %d listeners"), 
+
+    UE_LOG(LogTreeAutomata, Verbose, TEXT("Broadcast event of type '%s' to %d listeners"),
         *EventType, ListenersCopy.Num());
+}
+
+// Add this new method
+TMap<FString, FTAVariant> UTAEventManager::GetLastEventData(const FString& EventType) const
+{
+    for (int32 i = EventHistory.Num() - 1; i >= 0; --i)
+    {
+        if (EventHistory[i].EventType == EventType)
+        {
+            return EventHistory[i].EventData;
+        }
+    }
+
+    return TMap<FString, FTAVariant>();
 }
 
 TArray<FTAEventRecord> UTAEventManager::GetEventsOfType(const FString& EventType) const
@@ -149,7 +213,7 @@ void UTAEventManager::ClearEventHistory()
     EventHistory.Empty();
 }
 
-void UTAEventManager::AddEventToHistory(const FString& EventType, const TMap<FString, FVariant>& EventData)
+void UTAEventManager::AddEventToHistory(const FString& EventType, const TMap<FString, FTAVariant>& EventData)
 {
     // Create event record
     FTAEventRecord EventRecord;

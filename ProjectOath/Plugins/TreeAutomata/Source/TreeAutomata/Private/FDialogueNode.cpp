@@ -229,7 +229,7 @@ FDialogueOptionSelectedCondition::FDialogueOptionSelectedCondition()
 bool FDialogueOptionSelectedCondition::Evaluate(const FTAContext& Context) const
 {
    // Check if the selected option index matches
-   const FVariant* SelectedOptionVar = Context.InputParams.Find(TEXT("SelectedOption"));
+   const FTAVariant* SelectedOptionVar = Context.InputParams.Find(TEXT("SelectedOption"));
    if (SelectedOptionVar && SelectedOptionVar->IsType<int32>())
    {
        int32 SelectedOption = SelectedOptionVar->AsInt();
@@ -278,7 +278,7 @@ bool FRelationshipLevelCondition::Evaluate(const FTAContext& Context) const
    // In a real implementation, this would query a relationship system
    // For this example, check if the relationship level is in the global state
    FString RelationshipKey = FString::Printf(TEXT("Relationship_%s"), *NPCID);
-   const FVariant* RelationshipVar = Context.GlobalState.Find(RelationshipKey);
+   const FTAVariant* RelationshipVar = Context.GlobalState.Find(RelationshipKey);
    
    if (RelationshipVar && RelationshipVar->IsType<int32>())
    {
@@ -376,7 +376,7 @@ void FModifyRelationshipAction::Execute(const FTAContext& Context) const
    
    // Get current relationship value
    int32 CurrentLevel = 0;
-   const FVariant* RelationshipVar = Context.GlobalState.Find(RelationshipKey);
+   const FTAVariant* RelationshipVar = Context.GlobalState.Find(RelationshipKey);
    if (RelationshipVar && RelationshipVar->IsType<int32>())
    {
        CurrentLevel = RelationshipVar->AsInt();
@@ -389,7 +389,7 @@ void FModifyRelationshipAction::Execute(const FTAContext& Context) const
    NewLevel = FMath::Clamp(NewLevel, -100, 100);
    
    // Store updated value
-   const_cast<FTAContext&>(Context).GlobalState.Add(RelationshipKey, FVariant(NewLevel));
+   const_cast<FTAContext&>(Context).GlobalState.Add(RelationshipKey, FTAVariant(NewLevel));
    
    UE_LOG(LogTreeAutomata, Display, TEXT("Modified relationship with %s: %d -> %d (%s%d)"), 
        *NPCID, CurrentLevel, NewLevel, 

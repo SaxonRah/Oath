@@ -18,25 +18,25 @@ FTAContext::FTAContext(UWorld* InWorld, AActor* InPlayerActor)
 {
 }
 
-void FTAContext::AddParam(const FString& Name, const FVariant& Value)
+void FTAContext::AddParam(const FString& Name, const FTAVariant& Value)
 {
     InputParams.Add(Name, Value);
 }
 
-FVariant FTAContext::GetParam(const FString& Name, const FVariant& DefaultValue) const
+FTAVariant FTAContext::GetParam(const FString& Name, const FTAVariant& DefaultValue) const
 {
-    const FVariant* Found = InputParams.Find(Name);
+    const FTAVariant* Found = InputParams.Find(Name);
     return Found ? *Found : DefaultValue;
 }
 
-void FTAContext::SetGlobal(const FString& Name, const FVariant& Value)
+void FTAContext::SetGlobal(const FString& Name, const FTAVariant& Value)
 {
     GlobalState.Add(Name, Value);
 }
 
-FVariant FTAContext::GetGlobal(const FString& Name, const FVariant& DefaultValue) const
+FTAVariant FTAContext::GetGlobal(const FString& Name, const FTAVariant& DefaultValue) const
 {
-    const FVariant* Found = GlobalState.Find(Name);
+    const FTAVariant* Found = GlobalState.Find(Name);
     return Found ? *Found : DefaultValue;
 }
 

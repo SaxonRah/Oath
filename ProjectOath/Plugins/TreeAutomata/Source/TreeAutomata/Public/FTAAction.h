@@ -49,7 +49,7 @@ public:
     FString VariableName;
     
     // New value
-    FVariant Value;
+    FTAVariant Value;
     
     // Set in global state
     bool bUseGlobalState;

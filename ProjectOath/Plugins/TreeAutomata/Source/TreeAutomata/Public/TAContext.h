@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TAVariant.h"
+#include "TATypes.h"
 #include "TAContext.generated.h"
 
 /**
@@ -10,6 +10,8 @@
  */
 struct TREEAUTOMATA_API FTAContext
 {
+    GENERATED_BODY()
+
     // Constructor
     FTAContext();
     
@@ -26,25 +28,25 @@ struct TREEAUTOMATA_API FTAContext
     FString InputID;
     
     // Input parameters
-    TMap<FString, FVariant> InputParams;
+    TMap<FString, FTAVariant> InputParams;
     
     // Global state data that persists across all nodes
-    TMap<FString, FVariant> GlobalState;
+    TMap<FString, FTAVariant> GlobalState;
     
     // Debug trace enabled
     bool bDebugTraceEnabled;
     
     // Add an input parameter
-    void AddParam(const FString& Name, const FVariant& Value);
+    void AddParam(const FString& Name, const FTAVariant& Value);
     
     // Get a parameter value
-    FVariant GetParam(const FString& Name, const FVariant& DefaultValue = FVariant()) const;
+    FTAVariant GetParam(const FString& Name, const FTAVariant& DefaultValue = FTAVariant()) const;
     
     // Add a global state variable
-    void SetGlobal(const FString& Name, const FVariant& Value);
+    void SetGlobal(const FString& Name, const FTAVariant& Value);
     
     // Get a global state variable
-    FVariant GetGlobal(const FString& Name, const FVariant& DefaultValue = FVariant()) const;
+    FTAVariant GetGlobal(const FString& Name, const FTAVariant& DefaultValue = FTAVariant()) const;
     
     // Debug trace
     void DebugTrace(const FString& Message) const;
