@@ -7,8 +7,10 @@ public class TreeAutomata : ModuleRules
 	public TreeAutomata(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
+        bLegacyPublicIncludePaths = false;
+        ShadowVariableWarningLevel = WarningLevel.Warning;
+
+        PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
 			}
@@ -36,8 +38,9 @@ public class TreeAutomata : ModuleRules
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
-			{
-				"CoreUObject",
+            {
+                "Core",
+                "CoreUObject",
 				"Engine",
 				"Slate",
 				"SlateCore",

@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 #include "TATypes.h"
 #include "FTAAction.h"
-#include "TATransition.h"
+#include "FTATransition.h"
 #include "TAContext.h"
 #include "FTANode.generated.h"
 

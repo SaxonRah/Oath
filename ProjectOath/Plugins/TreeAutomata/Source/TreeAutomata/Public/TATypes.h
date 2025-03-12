@@ -253,8 +253,8 @@ struct TREEAUTOMATA_API FTAPath
 
 // Forward declarations of all major classes for header includes
 class FTANode;
-class FTATransition;
-class FTACondition;
+struct FTATransition;
+struct FTACondition;
 class FTAAction;
 class UTAController;
 class UTAInstance;

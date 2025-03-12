@@ -8,6 +8,7 @@
 /**
  * Context object passed during evaluation and execution
  */
+USTRUCT(BlueprintType)
 struct TREEAUTOMATA_API FTAContext
 {
     GENERATED_BODY()
@@ -25,15 +26,19 @@ struct TREEAUTOMATA_API FTAContext
     AActor* PlayerActor;
     
     // Current input triggering evaluation
+    UPROPERTY(BlueprintReadWrite, Category = "Tree Automata")
     FString InputID;
     
     // Input parameters
+    UPROPERTY(BlueprintReadWrite, Category = "Tree Automata")
     TMap<FString, FTAVariant> InputParams;
     
     // Global state data that persists across all nodes
+    UPROPERTY(BlueprintReadWrite, Category = "Tree Automata")
     TMap<FString, FTAVariant> GlobalState;
     
     // Debug trace enabled
+    UPROPERTY(BlueprintReadWrite, Category = "Tree Automata")
     bool bDebugTraceEnabled;
     
     // Add an input parameter

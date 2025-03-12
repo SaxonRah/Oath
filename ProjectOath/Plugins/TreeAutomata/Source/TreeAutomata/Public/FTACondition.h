@@ -8,8 +8,10 @@
 /**
  * Abstract base class for conditions
  */
-class TREEAUTOMATA_API FTACondition
+USTRUCT(BlueprintType)
+struct TREEAUTOMATA_API FTACondition
 {
+    GENERATED_BODY()
 public:
     // Constructor
     FTACondition();

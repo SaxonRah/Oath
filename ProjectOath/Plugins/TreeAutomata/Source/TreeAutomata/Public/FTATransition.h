@@ -14,7 +14,9 @@ class FTANode;
  * Transition between nodes with conditions
  */
 struct TREEAUTOMATA_API FTATransition
-{
+{   
+    GENERATED_BODY()
+
     // Default constructor
     FTATransition();
     
