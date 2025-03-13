@@ -234,10 +234,10 @@ FString UTreeAutomata::SerializeToJson() const
     {
         TSharedPtr<FJsonObject> NodeObject = MakeShareable(new FJsonObject);
         
-        NodeObject->SetStringField("NodeId", NodePair.Value.NodeId.ToString());
-        NodeObject->SetStringField("Name", NodePair.Value.Name);
-        NodeObject->SetStringField("ParentId", NodePair.Value.ParentId.ToString());
-        NodeObject->SetStringField("State", NodePair.Value.State);
+        NodeObject->SetStringField(TEXT("NodeId"), NodePair.Value.NodeId.ToString());
+        NodeObject->SetStringField(TEXT("Name"), NodePair.Value.Name);
+        NodeObject->SetStringField(TEXT("ParentId"), NodePair.Value.ParentId.ToString());
+        NodeObject->SetStringField(TEXT("State"), NodePair.Value.State);
         
         // Serialize children
         TArray<TSharedPtr<FJsonValue>> ChildrenArray;
@@ -245,7 +245,7 @@ FString UTreeAutomata::SerializeToJson() const
         {
             ChildrenArray.Add(MakeShareable(new FJsonValueString(ChildId.ToString())));
         }
-        NodeObject->SetArrayField("ChildrenIds", ChildrenArray);
+        NodeObject->SetArrayField(TEXT("ChildrenIds"), ChildrenArray);
         
         // Serialize metadata
         TSharedPtr<FJsonObject> MetadataObject = MakeShareable(new FJsonObject);
@@ -253,11 +253,11 @@ FString UTreeAutomata::SerializeToJson() const
         {
             MetadataObject->SetStringField(MetaPair.Key, MetaPair.Value);
         }
-        NodeObject->SetObjectField("Metadata", MetadataObject);
+        NodeObject->SetObjectField(TEXT("Metadata"), MetadataObject);
         
         NodeArray.Add(MakeShareable(new FJsonValueObject(NodeObject)));
     }
-    RootObject->SetArrayField("Nodes", NodeArray);
+    RootObject->SetArrayField(TEXT("Nodes"), NodeArray);
     
     // Serialize transitions
     TArray<TSharedPtr<FJsonValue>> TransitionArray;
@@ -265,9 +265,9 @@ FString UTreeAutomata::SerializeToJson() const
     {
         TSharedPtr<FJsonObject> TransitionObject = MakeShareable(new FJsonObject);
         
-        TransitionObject->SetStringField("FromState", Transition.FromState);
-        TransitionObject->SetStringField("ToState", Transition.ToState);
-        TransitionObject->SetStringField("TriggerEvent", Transition.TriggerEvent);
+        TransitionObject->SetStringField(TEXT("FromState"), Transition.FromState);
+        TransitionObject->SetStringField(TEXT("ToState"), Transition.ToState);
+        TransitionObject->SetStringField(TEXT("TriggerEvent"), Transition.TriggerEvent);
         
         // Serialize conditions
         TArray<TSharedPtr<FJsonValue>> ConditionsArray;
@@ -275,7 +275,7 @@ FString UTreeAutomata::SerializeToJson() const
         {
             ConditionsArray.Add(MakeShareable(new FJsonValueString(Condition)));
         }
-        TransitionObject->SetArrayField("Conditions", ConditionsArray);
+        TransitionObject->SetArrayField(TEXT("Conditions"), ConditionsArray);
         
         // Serialize actions
         TArray<TSharedPtr<FJsonValue>> ActionsArray;
@@ -283,14 +283,14 @@ FString UTreeAutomata::SerializeToJson() const
         {
             ActionsArray.Add(MakeShareable(new FJsonValueString(Action)));
         }
-        TransitionObject->SetArrayField("Actions", ActionsArray);
+        TransitionObject->SetArrayField(TEXT("Actions"), ActionsArray);
         
         TransitionArray.Add(MakeShareable(new FJsonValueObject(TransitionObject)));
     }
-    RootObject->SetArrayField("Transitions", TransitionArray);
+    RootObject->SetArrayField(TEXT("Transitions"), TransitionArray);
     
     // Set root node ID
-    RootObject->SetStringField("RootNodeId", RootNodeId.ToString());
+    RootObject->SetStringField(TEXT("RootNodeId"), RootNodeId.ToString());
     
     // Serialize to string
     FString OutputString;
@@ -316,30 +316,45 @@ bool UTreeAutomata::DeserializeFromJson(const FString& JsonString)
     TransitionRules.Empty();
     
     // Deserialize root node ID
-    FString RootIdStr = RootObject->GetStringField("RootNodeId");
-    RootNodeId = FGuid(RootIdStr);
+    // FString RootIdStr = RootObject->GetStringField("RootNodeId");
+	FString RootIdStr = RootObject->GetStringField(TEXT("RootNodeId"));
+    
+	RootNodeId = FGuid(RootIdStr);
     
     // Deserialize nodes
-    TArray<TSharedPtr<FJsonValue>> NodeArray = RootObject->GetArrayField("Nodes");
+    // TArray<TSharedPtr<FJsonValue>> NodeArray = RootObject->GetArrayField("Nodes");
+	TArray<TSharedPtr<FJsonValue>> NodeArray = RootObject->GetArrayField(TEXT("Nodes"));
+
     for (const TSharedPtr<FJsonValue>& NodeValue : NodeArray)
     {
         TSharedPtr<FJsonObject> NodeObject = NodeValue->AsObject();
         
         FAutomatonNode Node;
-        Node.NodeId = FGuid(NodeObject->GetStringField("NodeId"));
-        Node.Name = NodeObject->GetStringField("Name");
-        Node.ParentId = FGuid(NodeObject->GetStringField("ParentId"));
-        Node.State = NodeObject->GetStringField("State");
+        // Node.NodeId = FGuid(NodeObject->GetStringField("NodeId"));
+		Node.NodeId = FGuid(NodeObject->GetStringField(TEXT("NodeId")));
+        
+		// Node.Name = NodeObject->GetStringField("Name");
+		Node.Name = NodeObject->GetStringField(TEXT("Name"));
+        
+		// Node.ParentId = FGuid(NodeObject->GetStringField("ParentId"));
+		Node.ParentId = FGuid(NodeObject->GetStringField(TEXT("ParentId")));
+        
+		// Node.State = NodeObject->GetStringField("State");
+		Node.State = NodeObject->GetStringField(TEXT("State"));
         
         // Deserialize children
-        TArray<TSharedPtr<FJsonValue>> ChildrenArray = NodeObject->GetArrayField("ChildrenIds");
+        // TArray<TSharedPtr<FJsonValue>> ChildrenArray = NodeObject->GetArrayField("ChildrenIds");
+		TArray<TSharedPtr<FJsonValue>> ChildrenArray = NodeObject->GetArrayField(TEXT("ChildrenIds"));
+
         for (const TSharedPtr<FJsonValue>& ChildValue : ChildrenArray)
         {
             Node.ChildrenIds.Add(FGuid(ChildValue->AsString()));
         }
         
         // Deserialize metadata
-        TSharedPtr<FJsonObject> MetadataObject = NodeObject->GetObjectField("Metadata");
+        // TSharedPtr<FJsonObject> MetadataObject = NodeObject->GetObjectField("Metadata");
+		TSharedPtr<FJsonObject> MetadataObject = NodeObject->GetObjectField(TEXT("Metadata"));
+
         for (const auto& MetaPair : MetadataObject->Values)
         {
             Node.Metadata.Add(MetaPair.Key, MetaPair.Value->AsString());
@@ -349,25 +364,37 @@ bool UTreeAutomata::DeserializeFromJson(const FString& JsonString)
     }
     
     // Deserialize transitions
-    TArray<TSharedPtr<FJsonValue>> TransitionArray = RootObject->GetArrayField("Transitions");
+    // TArray<TSharedPtr<FJsonValue>> TransitionArray = RootObject->GetArrayField("Transitions");
+	TArray<TSharedPtr<FJsonValue>> TransitionArray = RootObject->GetArrayField(TEXT("Transitions"));
+
     for (const TSharedPtr<FJsonValue>& TransitionValue : TransitionArray)
     {
         TSharedPtr<FJsonObject> TransitionObject = TransitionValue->AsObject();
         
         FStateTransition Transition;
-        Transition.FromState = TransitionObject->GetStringField("FromState");
-        Transition.ToState = TransitionObject->GetStringField("ToState");
-        Transition.TriggerEvent = TransitionObject->GetStringField("TriggerEvent");
+        // Transition.FromState = TransitionObject->GetStringField("FromState");
+		Transition.FromState = TransitionObject->GetStringField(TEXT("FromState"));
+
+        // Transition.ToState = TransitionObject->GetStringField("ToState");
+		Transition.ToState = TransitionObject->GetStringField(TEXT("ToState"));
+
+        // Transition.TriggerEvent = TransitionObject->GetStringField("TriggerEvent");
+		Transition.TriggerEvent = TransitionObject->GetStringField(TEXT("TriggerEvent"));
+
         
         // Deserialize conditions
-        TArray<TSharedPtr<FJsonValue>> ConditionsArray = TransitionObject->GetArrayField("Conditions");
+        // TArray<TSharedPtr<FJsonValue>> ConditionsArray = TransitionObject->GetArrayField("Conditions");
+		TArray<TSharedPtr<FJsonValue>> ConditionsArray = TransitionObject->GetArrayField(TEXT("Conditions"));
+
         for (const TSharedPtr<FJsonValue>& ConditionValue : ConditionsArray)
         {
             Transition.Conditions.Add(ConditionValue->AsString());
         }
         
         // Deserialize actions
-        TArray<TSharedPtr<FJsonValue>> ActionsArray = TransitionObject->GetArrayField("Actions");
+        // TArray<TSharedPtr<FJsonValue>> ActionsArray = TransitionObject->GetArrayField("Actions");
+		TArray<TSharedPtr<FJsonValue>> ActionsArray = TransitionObject->GetArrayField(TEXT("Actions"));
+
         for (const TSharedPtr<FJsonValue>& ActionValue : ActionsArray)
         {
             Transition.Actions.Add(ActionValue->AsString());
