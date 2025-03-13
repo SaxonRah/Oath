@@ -1,6 +1,4 @@
-// ReligionDeitySystem.cpp
-// Extension for RawOathFull.cpp implementing a Religion and Deity System
-
+// System_ReligionDeity.cpp
 #include <algorithm>
 #include <ctime>
 #include <fstream>

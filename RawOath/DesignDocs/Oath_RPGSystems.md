@@ -1,6 +1,6 @@
-# RawOath: Comprehensive RPG Game Systems
+# Oath_RPGSystems: Comprehensive RPG Game Systems
 
-RawOath is a C++ implementation of interconnected RPG game systems using a tree automata architecture.
+Oath_RPGSystems is a C++ implementation of interconnected RPG game systems using a tree automata architecture.
 
 ## Core Architecture
 

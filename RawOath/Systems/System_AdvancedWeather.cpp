@@ -1,6 +1,4 @@
-// AdvancedWeatherSystem.cpp
-// An extension to the RawOathFull engine that implements a detailed weather simulation
-
+// System_AdvancedWeather.cpp
 #include <algorithm>
 #include <ctime>
 #include <fstream>

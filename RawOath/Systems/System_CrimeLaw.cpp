@@ -1,7 +1,4 @@
-// CrimeLawSystem.cpp
-// Implements a comprehensive crime and law system for a Daggerfall-like game
-// using the Tree Automata framework from RawOathFull.cpp
-
+// System_CrimeLaw.cpp
 #include <algorithm>
 #include <ctime>
 #include <fstream>

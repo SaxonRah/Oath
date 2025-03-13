@@ -1,3 +1,5 @@
+// System_System_SpellCrafting2.cpp
+
 // SpellbookNode for managing learned spells and quick access
 class SpellbookNode : public TANode {
 public:
