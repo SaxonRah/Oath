@@ -17,6 +17,17 @@
 // Forward declarations
 class TANode;
 class TAController;
+class Inventory;
+class NPC;
+class Recipe;
+
+class QuestNode;
+class DialogueNode;
+class SkillNode;
+class ClassNode;
+class CraftingNode;
+class LocationNode;
+class TimeNode;
 
 // A unique identifier for nodes (replaces FGuid)
 struct NodeID {
@@ -403,7 +414,15 @@ public:
     // Generate a path-based ID for this node
     void generatePersistentID(const std::string& parentPath = "")
     {
-        std::string path = parentPath.empty() ? nodeName : parentPath + "/" + nodeName;
+        std::string path;
+        if (parentPath.empty()) {
+            // Root node case
+            path = nodeName;
+        } else {
+            // Child node case - include parent path
+            path = parentPath + "/" + nodeName;
+        }
+
         nodeID.persistentID = path;
 
         // Update child nodes recursively
@@ -583,6 +602,1099 @@ public:
     }
 };
 
+//----------------------------------------
+// QUEST SYSTEM
+//----------------------------------------
+
+// Quest-specific node implementation
+class QuestNode : public TANode {
+public:
+    // Quest state (Available, Active, Completed, Failed)
+    std::string questState;
+
+    // Quest details
+    std::string questTitle;
+    std::string questDescription;
+
+    // Rewards for completion
+    struct QuestReward {
+        std::string type;
+        int amount;
+        std::string itemId;
+    };
+    std::vector<QuestReward> rewards;
+
+    // Requirements to access this quest
+    struct QuestRequirement {
+        std::string type; // skill, item, faction, etc.
+        std::string target; // skill name, item id, faction name, etc.
+        int value; // required value
+
+        bool check(const GameContext& context) const
+        {
+            if (type == "skill") {
+                return context.playerStats.hasSkill(target, value);
+            } else if (type == "item") {
+                return context.playerInventory.hasItem(target, value);
+            } else if (type == "faction") {
+                return context.playerStats.hasFactionReputation(target, value);
+            } else if (type == "knowledge") {
+                return context.playerStats.hasKnowledge(target);
+            } else if (type == "worldflag") {
+                return context.worldState.hasFlag(target);
+            }
+            return false;
+        }
+    };
+    std::vector<QuestRequirement> requirements;
+
+    QuestNode(const std::string& name)
+        : TANode(name)
+        , questState("Available")
+    {
+    }
+
+    // Process player action and return next state
+    bool processAction(const std::string& playerAction, TANode*& outNextNode)
+    {
+        return evaluateTransition({ "action", { { "name", playerAction } } },
+            outNextNode);
+    }
+
+    // Check if player can access this quest
+    bool canAccess(const GameContext& context) const
+    {
+        for (const auto& req : requirements) {
+            if (!req.check(context)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Activate child quests when this node is entered
+    void onEnter(GameContext* context) override
+    {
+        // Mark quest as active
+        questState = "Active";
+
+        // Activate all child quests/objectives
+        for (TANode* childNode : childNodes) {
+            if (auto* questChild = dynamic_cast<QuestNode*>(childNode)) {
+                questChild->questState = "Available";
+            }
+        }
+
+        // Update quest journal
+        if (context) {
+            context->questJournal[nodeName] = "Active";
+        }
+
+        std::cout << "Quest activated: " << questTitle << std::endl;
+        std::cout << questDescription << std::endl;
+    }
+
+    // Award rewards when completing quest
+    void onExit(GameContext* context) override
+    {
+        // Only award rewards if moving to a completion state
+        if (isAcceptingState) {
+            questState = "Completed";
+
+            if (context) {
+                context->questJournal[nodeName] = "Completed";
+
+                // Award rewards to player
+                std::cout << "Quest completed: " << questTitle << std::endl;
+                std::cout << "Rewards:" << std::endl;
+
+                for (const auto& reward : rewards) {
+                    if (reward.type == "experience") {
+                        std::cout << "  " << reward.amount << " experience points"
+                                  << std::endl;
+                    } else if (reward.type == "gold") {
+                        std::cout << "  " << reward.amount << " gold coins" << std::endl;
+                    } else if (reward.type == "item") {
+                        context->playerInventory.addItem(Item(reward.itemId, reward.itemId,
+                            "quest_reward", 1,
+                            reward.amount));
+                        std::cout << "  " << reward.amount << "x " << reward.itemId
+                                  << std::endl;
+                    } else if (reward.type == "faction") {
+                        context->playerStats.changeFactionRep(reward.itemId, reward.amount);
+                        std::cout << "  " << reward.amount << " reputation with "
+                                  << reward.itemId << std::endl;
+                    } else if (reward.type == "skill") {
+                        context->playerStats.improveSkill(reward.itemId, reward.amount);
+                        std::cout << "  " << reward.amount << " points in " << reward.itemId
+                                  << " skill" << std::endl;
+                    }
+                }
+            }
+        } else if (questState == "Failed") {
+            if (context) {
+                context->questJournal[nodeName] = "Failed";
+            }
+            std::cout << "Quest failed: " << questTitle << std::endl;
+        }
+    }
+
+    // Get available actions specific to quests
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions = TANode::getAvailableActions();
+
+        // Add quest-specific actions
+        actions.push_back(
+            { "abandon_quest", "Abandon this quest", []() -> TAInput {
+                 return { "quest_action", { { "action", std::string("abandon") } } };
+             } });
+
+        return actions;
+    }
+};
+
+//----------------------------------------
+// DIALOGUE SYSTEM
+//----------------------------------------
+
+// Dialogue node for conversation trees
+class DialogueNode : public TANode {
+public:
+    // The text to display for this dialogue node
+    std::string speakerName;
+    std::string dialogueText;
+
+    // Response options
+    struct DialogueResponse {
+        std::string text;
+        std::function<bool(const GameContext&)> requirement;
+        TANode* targetNode;
+        std::function<void(GameContext*)> effect;
+
+        DialogueResponse(
+            const std::string& responseText, TANode* target,
+            std::function<bool(const GameContext&)> req =
+                [](const GameContext&) { return true; },
+            std::function<void(GameContext*)> eff = [](GameContext*) {})
+            : text(responseText)
+            , requirement(req)
+            , targetNode(target)
+            , effect(eff)
+        {
+        }
+    };
+    std::vector<DialogueResponse> responses;
+
+    // Optional effect to run when this dialogue is shown
+    std::function<void(GameContext*)> onShowEffect;
+
+    DialogueNode(const std::string& name, const std::string& speaker,
+        const std::string& text)
+        : TANode(name)
+        , speakerName(speaker)
+        , dialogueText(text)
+    {
+    }
+
+    void addResponse(
+        const std::string& text, TANode* target,
+        std::function<bool(const GameContext&)> requirement =
+            [](const GameContext&) { return true; },
+        std::function<void(GameContext*)> effect = [](GameContext*) {})
+    {
+        responses.push_back(DialogueResponse(text, target, requirement, effect));
+    }
+
+    void onEnter(GameContext* context) override
+    {
+        // Display the dialogue
+        std::cout << speakerName << ": " << dialogueText << std::endl;
+
+        // Run any effects
+        if (onShowEffect && context) {
+            onShowEffect(context);
+        }
+
+        // Store in dialogue history
+        if (context) {
+            context->dialogueHistory[nodeName] = dialogueText;
+        }
+    }
+
+    // Get available dialogue responses
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions;
+
+        for (size_t i = 0; i < responses.size(); i++) {
+            actions.push_back(
+                { "response_" + std::to_string(i), responses[i].text,
+                    [this, i]() -> TAInput {
+                        return { "dialogue_response", { { "index", static_cast<int>(i) } } };
+                    } });
+        }
+
+        return actions;
+    }
+
+    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
+    {
+        if (input.type == "dialogue_response") {
+            int index = std::get<int>(input.parameters.at("index"));
+            if (index >= 0 && index < static_cast<int>(responses.size())) {
+                outNextNode = responses[index].targetNode;
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// NPC class for dialogue interactions
+class NPC {
+public:
+    std::string name;
+    std::string description;
+    DialogueNode* rootDialogue;
+    DialogueNode* currentDialogue;
+    std::map<std::string, DialogueNode*> dialogueNodes;
+
+    // Relationship with player
+    int relationshipValue = 0;
+
+    NPC(const std::string& npcName, const std::string& desc)
+        : name(npcName)
+        , description(desc)
+        , rootDialogue(nullptr)
+        , currentDialogue(nullptr)
+    {
+    }
+
+    void startDialogue(GameContext* context)
+    {
+        if (rootDialogue) {
+            currentDialogue = rootDialogue;
+            currentDialogue->onEnter(context);
+        }
+    }
+
+    bool processResponse(int responseIndex, GameContext* context)
+    {
+        if (!currentDialogue)
+            return false;
+
+        if (responseIndex >= 0 && responseIndex < static_cast<int>(currentDialogue->responses.size())) {
+            auto& response = currentDialogue->responses[responseIndex];
+
+            // Check if requirement is met
+            if (!response.requirement(*context)) {
+                std::cout << "You cannot select that response." << std::endl;
+                return false;
+            }
+
+            // Execute effect
+            if (response.effect) {
+                response.effect(context);
+            }
+
+            // Move to next dialogue node
+            currentDialogue = dynamic_cast<DialogueNode*>(response.targetNode);
+            if (currentDialogue) {
+                currentDialogue->onEnter(context);
+                return true;
+            }
+        }
+
+        return false;
+    }
+};
+
+//----------------------------------------
+// CHARACTER PROGRESSION SYSTEM
+//----------------------------------------
+
+// Skill node for character progression
+class SkillNode : public TANode {
+public:
+    std::string skillName;
+    std::string description;
+    int level;
+    int maxLevel;
+
+    // Requirements to unlock this skill
+    struct SkillRequirement {
+        std::string type; // "skill", "item", "quest", etc.
+        std::string target; // skill name, item id, quest id, etc.
+        int level;
+
+        bool check(const GameContext& context) const
+        {
+            if (type == "skill") {
+                return context.playerStats.hasSkill(target, level);
+            } else if (type == "item") {
+                return context.playerInventory.hasItem(target, level);
+            } else if (type == "knowledge") {
+                return context.playerStats.hasKnowledge(target);
+            }
+            return false;
+        }
+    };
+    std::vector<SkillRequirement> requirements;
+
+    // Effects when this skill is learned or improved
+    struct SkillEffect {
+        std::string type;
+        std::string target;
+        int value;
+
+        void apply(GameContext* context) const
+        {
+            if (!context)
+                return;
+
+            if (type == "stat") {
+                if (target == "strength")
+                    context->playerStats.strength += value;
+                else if (target == "dexterity")
+                    context->playerStats.dexterity += value;
+                else if (target == "constitution")
+                    context->playerStats.constitution += value;
+                else if (target == "intelligence")
+                    context->playerStats.intelligence += value;
+                else if (target == "wisdom")
+                    context->playerStats.wisdom += value;
+                else if (target == "charisma")
+                    context->playerStats.charisma += value;
+            } else if (type == "skill") {
+                context->playerStats.improveSkill(target, value);
+            } else if (type == "ability") {
+                context->playerStats.unlockAbility(target);
+            }
+        }
+    };
+    std::vector<SkillEffect> effects;
+
+    // Cost to learn this skill
+    struct SkillCost {
+        std::string type; // "points", "gold", "item", etc.
+        std::string itemId; // if type is "item"
+        int amount;
+
+        bool canPay(const GameContext& context) const
+        {
+            if (type == "item") {
+                return context.playerInventory.hasItem(itemId, amount);
+            }
+            // Other types would be checked here
+            return true;
+        }
+
+        void pay(GameContext* context) const
+        {
+            if (!context)
+                return;
+
+            if (type == "item") {
+                context->playerInventory.removeItem(itemId, amount);
+            }
+            // Other payment types would be handled here
+        }
+    };
+    std::vector<SkillCost> costs;
+
+    SkillNode(const std::string& name, const std::string& skill,
+        int initialLevel = 0, int max = 5)
+        : TANode(name)
+        , skillName(skill)
+        , description("")
+        , level(initialLevel)
+        , maxLevel(max)
+    {
+    }
+
+    bool canLearn(const GameContext& context) const
+    {
+        // Check all requirements
+        for (const auto& req : requirements) {
+            if (!req.check(context)) {
+                return false;
+            }
+        }
+
+        // Check costs
+        for (const auto& cost : costs) {
+            if (!cost.canPay(context)) {
+                return false;
+            }
+        }
+
+        return level < maxLevel;
+    }
+
+    void learnSkill(GameContext* context)
+    {
+        if (!context || !canLearn(*context)) {
+            return;
+        }
+
+        // Pay costs
+        for (const auto& cost : costs) {
+            cost.pay(context);
+        }
+
+        // Apply effects
+        for (const auto& effect : effects) {
+            effect.apply(context);
+        }
+
+        // Increase level
+        level++;
+
+        // Update player stats
+        context->playerStats.improveSkill(skillName, 1);
+
+        // If reached max level, mark as accepting state
+        if (level >= maxLevel) {
+            isAcceptingState = true;
+        }
+
+        std::cout << "Learned " << skillName << " (Level " << level << "/"
+                  << maxLevel << ")" << std::endl;
+    }
+
+    void onEnter(GameContext* context) override
+    {
+        std::cout << "Viewing skill: " << skillName << " (Level " << level << "/"
+                  << maxLevel << ")" << std::endl;
+        std::cout << description << std::endl;
+
+        if (context && canLearn(*context)) {
+            std::cout << "This skill can be learned/improved." << std::endl;
+        }
+    }
+
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions = TANode::getAvailableActions();
+
+        // Add learn skill action if not at max level
+        if (level < maxLevel) {
+            actions.push_back(
+                { "learn_skill", "Learn/Improve " + skillName, [this]() -> TAInput {
+                     return { "skill_action",
+                         { { "action", std::string("learn") }, { "skill", skillName } } };
+                 } });
+        }
+
+        return actions;
+    }
+
+    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
+    {
+        if (input.type == "skill_action") {
+            std::string action = std::get<std::string>(input.parameters.at("action"));
+            if (action == "learn") {
+                // Stay in same node after learning
+                outNextNode = this;
+                return true;
+            }
+        }
+
+        return TANode::evaluateTransition(input, outNextNode);
+    }
+};
+
+// Class specialization node
+class ClassNode : public TANode {
+public:
+    std::string className;
+    std::string description;
+    std::map<std::string, int> statBonuses;
+    std::set<std::string> startingAbilities;
+    std::vector<SkillNode*> classSkills;
+
+    ClassNode(const std::string& name, const std::string& classType)
+        : TANode(name)
+        , className(classType)
+    {
+    }
+
+    void onEnter(GameContext* context) override
+    {
+        std::cout << "Selected class: " << className << std::endl;
+        std::cout << description << std::endl;
+
+        if (context) {
+            // Apply stat bonuses
+            for (const auto& [stat, bonus] : statBonuses) {
+                if (stat == "strength")
+                    context->playerStats.strength += bonus;
+                else if (stat == "dexterity")
+                    context->playerStats.dexterity += bonus;
+                else if (stat == "constitution")
+                    context->playerStats.constitution += bonus;
+                else if (stat == "intelligence")
+                    context->playerStats.intelligence += bonus;
+                else if (stat == "wisdom")
+                    context->playerStats.wisdom += bonus;
+                else if (stat == "charisma")
+                    context->playerStats.charisma += bonus;
+            }
+
+            // Grant starting abilities
+            for (const auto& ability : startingAbilities) {
+                context->playerStats.unlockAbility(ability);
+            }
+        }
+    }
+};
+
+//----------------------------------------
+// CRAFTING SYSTEM
+//----------------------------------------
+
+// Recipe for crafting items
+class Recipe {
+public:
+    std::string recipeId;
+    std::string name;
+    std::string description;
+    bool discovered;
+
+    // Ingredients needed
+    struct Ingredient {
+        std::string itemId;
+        int quantity;
+    };
+    std::vector<Ingredient> ingredients;
+
+    // Result of crafting
+    struct Result {
+        std::string itemId;
+        std::string name;
+        std::string type;
+        int quantity;
+        std::map<std::string, std::variant<int, float, std::string, bool>>
+            properties;
+    };
+    Result result;
+
+    // Skill requirements
+    std::map<std::string, int> skillRequirements;
+
+    Recipe(const std::string& id, const std::string& recipeName)
+        : recipeId(id)
+        , name(recipeName)
+        , discovered(false)
+    {
+    }
+
+    bool canCraft(const GameContext& context) const
+    {
+        // Check skill requirements
+        for (const auto& [skill, level] : skillRequirements) {
+            if (!context.playerStats.hasSkill(skill, level)) {
+                return false;
+            }
+        }
+
+        // Check ingredients
+        for (const auto& ingredient : ingredients) {
+            if (!context.playerInventory.hasItem(ingredient.itemId,
+                    ingredient.quantity)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool craft(GameContext* context)
+    {
+        if (!context || !canCraft(*context)) {
+            return false;
+        }
+
+        // Consume ingredients
+        for (const auto& ingredient : ingredients) {
+            context->playerInventory.removeItem(ingredient.itemId,
+                ingredient.quantity);
+        }
+
+        // Create result item
+        Item craftedItem(result.itemId, result.name, result.type, 1,
+            result.quantity);
+        craftedItem.properties = result.properties;
+
+        // Add to inventory
+        context->playerInventory.addItem(craftedItem);
+
+        // Mark as discovered
+        discovered = true;
+
+        std::cout << "Crafted " << result.quantity << "x " << result.name
+                  << std::endl;
+        return true;
+    }
+};
+
+// Crafting station node
+class CraftingNode : public TANode {
+public:
+    std::string stationType;
+    std::string description;
+    std::vector<Recipe> availableRecipes;
+
+    CraftingNode(const std::string& name, const std::string& type)
+        : TANode(name)
+        , stationType(type)
+    {
+    }
+
+    void onEnter(GameContext* context) override
+    {
+        std::cout << "At " << stationType << " station." << std::endl;
+        std::cout << description << std::endl;
+
+        // Show available recipes
+        std::cout << "Available recipes:" << std::endl;
+        for (size_t i = 0; i < availableRecipes.size(); i++) {
+            const auto& recipe = availableRecipes[i];
+            if (recipe.discovered) {
+                std::cout << i + 1 << ". " << recipe.name;
+                if (context && recipe.canCraft(*context)) {
+                    std::cout << " (Can craft)";
+                }
+                std::cout << std::endl;
+            } else {
+                std::cout << i + 1 << ". ???" << std::endl;
+            }
+        }
+    }
+
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions = TANode::getAvailableActions();
+
+        // Add crafting actions for discovered recipes
+        for (size_t i = 0; i < availableRecipes.size(); i++) {
+            if (availableRecipes[i].discovered) {
+                actions.push_back({ "craft_" + std::to_string(i),
+                    "Craft " + availableRecipes[i].name,
+                    [this, i]() -> TAInput {
+                        return { "crafting_action",
+                            { { "action", std::string("craft") },
+                                { "recipe_index", static_cast<int>(i) } } };
+                    } });
+            }
+        }
+
+        // Add exit action
+        actions.push_back(
+            { "exit_crafting", "Exit crafting station", [this]() -> TAInput {
+                 return { "crafting_action", { { "action", std::string("exit") } } };
+             } });
+
+        return actions;
+    }
+
+    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
+    {
+        if (input.type == "crafting_action") {
+            std::string action = std::get<std::string>(input.parameters.at("action"));
+
+            if (action == "craft") {
+                int recipeIndex = std::get<int>(input.parameters.at("recipe_index"));
+                if (recipeIndex >= 0 && recipeIndex < static_cast<int>(availableRecipes.size())) {
+                    // Stay in same node after crafting
+                    outNextNode = this;
+                    return true;
+                }
+            } else if (action == "exit") {
+                // Return to default node (would be set in game logic)
+                for (const auto& rule : transitionRules) {
+                    if (rule.description == "Exit") {
+                        outNextNode = rule.targetNode;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return TANode::evaluateTransition(input, outNextNode);
+    }
+
+    void addRecipe(const Recipe& recipe) { availableRecipes.push_back(recipe); }
+};
+
+//----------------------------------------
+// WORLD PROGRESSION SYSTEM
+//----------------------------------------
+
+// Location node for world state
+class LocationNode : public TANode {
+public:
+    std::string locationName;
+    std::string description;
+    std::string currentState;
+    std::map<std::string, std::string> stateDescriptions;
+
+    // NPCs at this location
+    std::vector<NPC*> npcs;
+
+    // Available activities at this location
+    std::vector<TANode*> activities;
+
+    // Conditions to access this location
+    struct AccessCondition {
+        std::string type;
+        std::string target;
+        int value;
+
+        bool check(const GameContext& context) const
+        {
+            if (type == "item") {
+                return context.playerInventory.hasItem(target, value);
+            } else if (type == "skill") {
+                return context.playerStats.hasSkill(target, value);
+            } else if (type == "faction") {
+                return context.playerStats.hasFactionReputation(target, value);
+            } else if (type == "worldflag") {
+                return context.worldState.hasFlag(target);
+            }
+            return false;
+        }
+    };
+    std::vector<AccessCondition> accessConditions;
+
+    LocationNode(const std::string& name, const std::string& location,
+        const std::string& initialState = "normal")
+        : TANode(name)
+        , locationName(location)
+        , currentState(initialState)
+    {
+    }
+
+    bool canAccess(const GameContext& context) const
+    {
+        for (const auto& condition : accessConditions) {
+            if (!condition.check(context)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void onEnter(GameContext* context) override
+    {
+        std::cout << "Arrived at " << locationName << std::endl;
+
+        // Show description based on current state
+        if (stateDescriptions.find(currentState) != stateDescriptions.end()) {
+            std::cout << stateDescriptions.at(currentState) << std::endl;
+        } else {
+            std::cout << description << std::endl;
+        }
+
+        // Update world state
+        if (context) {
+            context->worldState.setLocationState(locationName, currentState);
+        }
+
+        // List NPCs
+        if (!npcs.empty()) {
+            std::cout << "People here:" << std::endl;
+            for (const auto& npc : npcs) {
+                std::cout << "- " << npc->name << std::endl;
+            }
+        }
+
+        // List activities
+        if (!activities.empty()) {
+            std::cout << "Available activities:" << std::endl;
+            for (const auto& activity : activities) {
+                std::cout << "- " << activity->nodeName << std::endl;
+            }
+        }
+    }
+
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions = TANode::getAvailableActions();
+
+        // Add NPC interaction actions
+        for (size_t i = 0; i < npcs.size(); i++) {
+            actions.push_back({ "talk_to_npc_" + std::to_string(i),
+                "Talk to " + npcs[i]->name, [this, i]() -> TAInput {
+                    return { "location_action",
+                        { { "action", std::string("talk") },
+                            { "npc_index", static_cast<int>(i) } } };
+                } });
+        }
+
+        // Add activity actions
+        for (size_t i = 0; i < activities.size(); i++) {
+            actions.push_back({ "do_activity_" + std::to_string(i),
+                "Do " + activities[i]->nodeName,
+                [this, i]() -> TAInput {
+                    return { "location_action",
+                        { { "action", std::string("activity") },
+                            { "activity_index", static_cast<int>(i) } } };
+                } });
+        }
+
+        return actions;
+    }
+};
+
+// Region node for world map
+class RegionNode : public TANode {
+public:
+    std::string regionName;
+    std::string description;
+    std::string controllingFaction;
+
+    // Locations in this region
+    std::vector<LocationNode*> locations;
+
+    // Connected regions
+    std::vector<RegionNode*> connectedRegions;
+
+    // Events that can happen in this region
+    struct RegionEvent {
+        std::string name;
+        std::string description;
+        std::function<bool(const GameContext&)> condition;
+        std::function<void(GameContext*)> effect;
+        double probability;
+    };
+    std::vector<RegionEvent> possibleEvents;
+
+    RegionNode(const std::string& name, const std::string& region)
+        : TANode(name)
+        , regionName(region)
+    {
+    }
+
+    void onEnter(GameContext* context) override
+    {
+        std::cout << "Entered region: " << regionName << std::endl;
+        std::cout << description << std::endl;
+
+        if (!controllingFaction.empty()) {
+            std::cout << "Controlled by: " << controllingFaction << std::endl;
+        }
+
+        // List locations
+        if (!locations.empty()) {
+            std::cout << "Locations in this region:" << std::endl;
+            for (const auto& location : locations) {
+                std::cout << "- " << location->locationName;
+                if (context && !location->canAccess(*context)) {
+                    std::cout << " (Inaccessible)";
+                }
+                std::cout << std::endl;
+            }
+        }
+
+        // List connected regions
+        if (!connectedRegions.empty()) {
+            std::cout << "Connected regions:" << std::endl;
+            for (const auto& region : connectedRegions) {
+                std::cout << "- " << region->regionName << std::endl;
+            }
+        }
+
+        // Check for random events
+        if (context) {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<> dis(0.0, 1.0);
+
+            for (const auto& event : possibleEvents) {
+                if (event.condition(*context) && dis(gen) < event.probability) {
+                    std::cout << "\nEvent: " << event.name << std::endl;
+                    std::cout << event.description << std::endl;
+                    event.effect(context);
+                    break;
+                }
+            }
+        }
+    }
+
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions = TANode::getAvailableActions();
+
+        // Add location travel actions
+        for (size_t i = 0; i < locations.size(); i++) {
+            actions.push_back({ "travel_to_location_" + std::to_string(i),
+                "Travel to " + locations[i]->locationName,
+                [this, i]() -> TAInput {
+                    return { "region_action",
+                        { { "action", std::string("travel_location") },
+                            { "location_index", static_cast<int>(i) } } };
+                } });
+        }
+
+        // Add region travel actions
+        for (size_t i = 0; i < connectedRegions.size(); i++) {
+            actions.push_back({ "travel_to_region_" + std::to_string(i),
+                "Travel to " + connectedRegions[i]->regionName,
+                [this, i]() -> TAInput {
+                    return { "region_action",
+                        { { "action", std::string("travel_region") },
+                            { "region_index", static_cast<int>(i) } } };
+                } });
+        }
+
+        return actions;
+    }
+
+    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
+    {
+        if (input.type == "region_action") {
+            std::string action = std::get<std::string>(input.parameters.at("action"));
+
+            if (action == "travel_location") {
+                int locationIndex = std::get<int>(input.parameters.at("location_index"));
+                if (locationIndex >= 0 && locationIndex < static_cast<int>(locations.size())) {
+                    // Set the persistent ID for the location to include the region path
+                    locations[locationIndex]->nodeID.persistentID = "WorldSystem/" + locations[locationIndex]->nodeName;
+
+                    outNextNode = locations[locationIndex];
+                    return true;
+                }
+            } else if (action == "travel_region") {
+                int regionIndex = std::get<int>(input.parameters.at("region_index"));
+                if (regionIndex >= 0 && regionIndex < static_cast<int>(connectedRegions.size())) {
+                    outNextNode = connectedRegions[regionIndex];
+                    return true;
+                }
+            }
+        }
+
+        return TANode::evaluateTransition(input, outNextNode);
+    }
+};
+
+// Time/Season system
+class TimeNode : public TANode {
+public:
+    int day;
+    int hour;
+    std::string season;
+    std::string timeOfDay;
+
+    TimeNode(const std::string& name)
+        : TANode(name)
+        , day(1)
+        , hour(6)
+        , season("spring")
+        , timeOfDay("morning")
+    {
+    }
+
+    void advanceHour(GameContext* context)
+    {
+        hour++;
+
+        if (hour >= 24) {
+            hour = 0;
+            day++;
+
+            // Update season every 90 days
+            if (day % 90 == 0) {
+                if (season == "spring")
+                    season = "summer";
+                else if (season == "summer")
+                    season = "autumn";
+                else if (season == "autumn")
+                    season = "winter";
+                else if (season == "winter")
+                    season = "spring";
+            }
+
+            if (context) {
+                context->worldState.advanceDay();
+            }
+        }
+
+        // Update time of day
+        if (hour >= 5 && hour < 12)
+            timeOfDay = "morning";
+        else if (hour >= 12 && hour < 17)
+            timeOfDay = "afternoon";
+        else if (hour >= 17 && hour < 21)
+            timeOfDay = "evening";
+        else
+            timeOfDay = "night";
+
+        std::cout << "Time: Day " << day << ", " << hour << ":00, " << timeOfDay
+                  << " (" << season << ")" << std::endl;
+    }
+
+    std::vector<TAAction> getAvailableActions() override
+    {
+        std::vector<TAAction> actions = TANode::getAvailableActions();
+
+        actions.push_back({ "wait_1_hour", "Wait 1 hour", [this]() -> TAInput {
+                               return {
+                                   "time_action",
+                                   { { "action", std::string("wait") }, { "hours", 1 } }
+                               };
+                           } });
+
+        actions.push_back(
+            { "wait_until_morning", "Wait until morning", [this]() -> TAInput {
+                 return { "time_action",
+                     { { "action", std::string("wait_until") },
+                         { "time", std::string("morning") } } };
+             } });
+
+        return actions;
+    }
+
+    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
+    {
+        if (input.type == "time_action") {
+            std::string action = std::get<std::string>(input.parameters.at("action"));
+
+            if (action == "wait") {
+                int hours = std::get<int>(input.parameters.at("hours"));
+                // In a real game, this would trigger events, status changes, etc.
+                std::cout << "Waiting for " << hours << " hours..." << std::endl;
+
+                // Stay in same node after waiting
+                outNextNode = this;
+                return true;
+            } else if (action == "wait_until") {
+                std::string targetTime = std::get<std::string>(input.parameters.at("time"));
+                // Calculate hours to wait
+                int hoursToWait = 0;
+
+                if (targetTime == "morning" && timeOfDay != "morning") {
+                    if (hour < 5)
+                        hoursToWait = 5 - hour;
+                    else
+                        hoursToWait = 24 - (hour - 5);
+                }
+                // Add other time of day calculations
+
+                std::cout << "Waiting until " << targetTime << " (" << hoursToWait
+                          << " hours)..." << std::endl;
+
+                // Stay in same node after waiting
+                outNextNode = this;
+                return true;
+            }
+        }
+
+        return TANode::evaluateTransition(input, outNextNode);
+    }
+};
+
 // The main automaton controller
 class TAController {
 public:
@@ -617,11 +1729,32 @@ public:
             if (nextNode != currentNodes[systemName]) {
                 currentNodes[systemName]->onExit(&gameContext);
                 currentNodes[systemName] = nextNode;
+
+                // Update the persistent ID to reflect the actual path
+                // This is the key addition
+                updateCurrentNodePersistentID(systemName);
+
                 nextNode->onEnter(&gameContext);
                 return true;
             }
         }
         return false;
+    }
+
+    void updateCurrentNodePersistentID(const std::string& systemName)
+    {
+        if (currentNodes.find(systemName) == currentNodes.end() || systemRoots.find(systemName) == systemRoots.end()) {
+            return;
+        }
+
+        TANode* current = currentNodes[systemName];
+
+        // Set a persistent ID that includes the system name and node name
+        // This ensures it can be found even if the hierarchy isn't perfectly matched
+        current->nodeID.persistentID = systemName + "/" + current->nodeName;
+
+        std::cout << "Updated node ID for " << current->nodeName
+                  << " to: " << current->nodeID.persistentID << std::endl;
     }
 
     // Get available actions from current state
@@ -813,18 +1946,149 @@ public:
     {
         for (const auto& [systemName, rootNode] : systemRoots) {
             rootNode->generatePersistentID(systemName);
+
+            // Also initialize persistent IDs for currentNodes, especially if they're not
+            // directly in the hierarchy
+            if (currentNodes.find(systemName) != currentNodes.end() && currentNodes[systemName] != rootNode) {
+
+                // Find the path from root to this node
+                std::string path = findPathToNode(rootNode, currentNodes[systemName], systemName);
+                if (!path.empty()) {
+                    currentNodes[systemName]->nodeID.persistentID = path;
+                    std::cout << "Set current node ID for " << systemName << ": " << path << std::endl;
+                }
+            }
         }
+    }
+
+    std::string findPathToNode(TANode* root, TANode* target, const std::string& basePath)
+    {
+        if (root == target) {
+            return basePath;
+        }
+
+        for (TANode* child : root->childNodes) {
+            std::string childPath = basePath + "/" + child->nodeName;
+
+            if (child == target) {
+                return childPath;
+            }
+
+            std::string path = findPathToNode(child, target, childPath);
+            if (!path.empty()) {
+                return path;
+            }
+        }
+
+        return ""; // Not found in this branch
     }
 
     // Find a node by its persistent ID
     TANode* findNodeByPersistentID(const std::string& persistentID)
     {
+        // First try direct match with recursive search
         for (const auto& [systemName, rootNode] : systemRoots) {
             TANode* node = findNodeByPersistentIDRecursive(rootNode, persistentID);
             if (node)
                 return node;
         }
+
+        // If not found, try to extract just the node name
+        std::string nodeName = persistentID;
+        size_t lastSlash = persistentID.find_last_of('/');
+        if (lastSlash != std::string::npos) {
+            nodeName = persistentID.substr(lastSlash + 1);
+        }
+
+        // Try to find by name
+        TANode* foundNode = nullptr;
+        for (const auto& [systemName, rootNode] : systemRoots) {
+            foundNode = findNodeByNameRecursive(rootNode, nodeName);
+            if (foundNode) {
+                std::cout << "Found node '" << nodeName << "' by name instead of by full ID" << std::endl;
+
+                // Update its persistent ID to match what was expected
+                foundNode->nodeID.persistentID = persistentID;
+                return foundNode;
+            }
+        }
+
+        // Check if this is a location node (special case for WorldSystem)
+        if (persistentID.find("WorldSystem/") == 0) {
+            // Try to find locations in each region
+            TANode* worldRoot = systemRoots["WorldSystem"];
+            RegionNode* regionNode = dynamic_cast<RegionNode*>(worldRoot);
+
+            if (regionNode) {
+                // Check direct locations in this region
+                for (LocationNode* location : regionNode->locations) {
+                    if (location->nodeName == nodeName) {
+                        std::cout << "Found location '" << nodeName << "' in region "
+                                  << regionNode->regionName << std::endl;
+                        location->nodeID.persistentID = persistentID;
+                        return location;
+                    }
+                }
+            }
+
+            // Try sub-regions if main region didn't have it
+            for (TANode* child : worldRoot->childNodes) {
+                RegionNode* subRegion = dynamic_cast<RegionNode*>(child);
+                if (subRegion) {
+                    for (LocationNode* location : subRegion->locations) {
+                        if (location->nodeName == nodeName) {
+                            std::cout << "Found location '" << nodeName << "' in sub-region "
+                                      << subRegion->regionName << std::endl;
+                            location->nodeID.persistentID = persistentID;
+                            return location;
+                        }
+                    }
+                }
+            }
+        }
+
         return nullptr;
+    }
+
+    TANode* findNodeByNameRecursive(TANode* node, const std::string& nodeName)
+    {
+        if (node->nodeName == nodeName) {
+            return node;
+        }
+
+        for (TANode* child : node->childNodes) {
+            TANode* result = findNodeByNameRecursive(child, nodeName);
+            if (result)
+                return result;
+        }
+
+        return nullptr;
+    }
+
+    TANode* findNodeByNameInHierarchy(TANode* node, const std::string& nodeName)
+    {
+        if (node->nodeName == nodeName) {
+            return node;
+        }
+
+        for (TANode* child : node->childNodes) {
+            TANode* result = findNodeByNameInHierarchy(child, nodeName);
+            if (result)
+                return result;
+        }
+
+        return nullptr;
+    }
+
+    void printNodeIDsRecursive(TANode* node, int depth)
+    {
+        for (int i = 0; i < depth; i++)
+            std::cerr << "  ";
+        std::cerr << "- " << node->nodeName << ": '" << node->nodeID.persistentID << "'" << std::endl;
+
+        for (TANode* child : node->childNodes) {
+            printNodeIDsRecursive(child, depth + 1);
+        }
     }
 
     TANode* findNodeByPersistentIDRecursive(TANode* node,
@@ -1070,6 +2334,15 @@ public:
 
                 // Find the node with this ID
                 TANode* node = findNodeByPersistentID(persistentID);
+
+                if (!node) {
+                    std::cerr << "Looking for node with ID: " << persistentID << std::endl;
+                    std::cerr << "Available nodes and their IDs:" << std::endl;
+                    // Print all node IDs for debugging
+                    for (const auto& [systemName, rootNode] : systemRoots) {
+                        printNodeIDsRecursive(rootNode, 0);
+                    }
+                }
 
                 if (node) {
                     try {
@@ -2039,1096 +3312,6 @@ private:
     }
 };
 
-//----------------------------------------
-// QUEST SYSTEM
-//----------------------------------------
-
-// Quest-specific node implementation
-class QuestNode : public TANode {
-public:
-    // Quest state (Available, Active, Completed, Failed)
-    std::string questState;
-
-    // Quest details
-    std::string questTitle;
-    std::string questDescription;
-
-    // Rewards for completion
-    struct QuestReward {
-        std::string type;
-        int amount;
-        std::string itemId;
-    };
-    std::vector<QuestReward> rewards;
-
-    // Requirements to access this quest
-    struct QuestRequirement {
-        std::string type; // skill, item, faction, etc.
-        std::string target; // skill name, item id, faction name, etc.
-        int value; // required value
-
-        bool check(const GameContext& context) const
-        {
-            if (type == "skill") {
-                return context.playerStats.hasSkill(target, value);
-            } else if (type == "item") {
-                return context.playerInventory.hasItem(target, value);
-            } else if (type == "faction") {
-                return context.playerStats.hasFactionReputation(target, value);
-            } else if (type == "knowledge") {
-                return context.playerStats.hasKnowledge(target);
-            } else if (type == "worldflag") {
-                return context.worldState.hasFlag(target);
-            }
-            return false;
-        }
-    };
-    std::vector<QuestRequirement> requirements;
-
-    QuestNode(const std::string& name)
-        : TANode(name)
-        , questState("Available")
-    {
-    }
-
-    // Process player action and return next state
-    bool processAction(const std::string& playerAction, TANode*& outNextNode)
-    {
-        return evaluateTransition({ "action", { { "name", playerAction } } },
-            outNextNode);
-    }
-
-    // Check if player can access this quest
-    bool canAccess(const GameContext& context) const
-    {
-        for (const auto& req : requirements) {
-            if (!req.check(context)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Activate child quests when this node is entered
-    void onEnter(GameContext* context) override
-    {
-        // Mark quest as active
-        questState = "Active";
-
-        // Activate all child quests/objectives
-        for (TANode* childNode : childNodes) {
-            if (auto* questChild = dynamic_cast<QuestNode*>(childNode)) {
-                questChild->questState = "Available";
-            }
-        }
-
-        // Update quest journal
-        if (context) {
-            context->questJournal[nodeName] = "Active";
-        }
-
-        std::cout << "Quest activated: " << questTitle << std::endl;
-        std::cout << questDescription << std::endl;
-    }
-
-    // Award rewards when completing quest
-    void onExit(GameContext* context) override
-    {
-        // Only award rewards if moving to a completion state
-        if (isAcceptingState) {
-            questState = "Completed";
-
-            if (context) {
-                context->questJournal[nodeName] = "Completed";
-
-                // Award rewards to player
-                std::cout << "Quest completed: " << questTitle << std::endl;
-                std::cout << "Rewards:" << std::endl;
-
-                for (const auto& reward : rewards) {
-                    if (reward.type == "experience") {
-                        std::cout << "  " << reward.amount << " experience points"
-                                  << std::endl;
-                    } else if (reward.type == "gold") {
-                        std::cout << "  " << reward.amount << " gold coins" << std::endl;
-                    } else if (reward.type == "item") {
-                        context->playerInventory.addItem(Item(reward.itemId, reward.itemId,
-                            "quest_reward", 1,
-                            reward.amount));
-                        std::cout << "  " << reward.amount << "x " << reward.itemId
-                                  << std::endl;
-                    } else if (reward.type == "faction") {
-                        context->playerStats.changeFactionRep(reward.itemId, reward.amount);
-                        std::cout << "  " << reward.amount << " reputation with "
-                                  << reward.itemId << std::endl;
-                    } else if (reward.type == "skill") {
-                        context->playerStats.improveSkill(reward.itemId, reward.amount);
-                        std::cout << "  " << reward.amount << " points in " << reward.itemId
-                                  << " skill" << std::endl;
-                    }
-                }
-            }
-        } else if (questState == "Failed") {
-            if (context) {
-                context->questJournal[nodeName] = "Failed";
-            }
-            std::cout << "Quest failed: " << questTitle << std::endl;
-        }
-    }
-
-    // Get available actions specific to quests
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
-
-        // Add quest-specific actions
-        actions.push_back(
-            { "abandon_quest", "Abandon this quest", []() -> TAInput {
-                 return { "quest_action", { { "action", std::string("abandon") } } };
-             } });
-
-        return actions;
-    }
-};
-
-//----------------------------------------
-// DIALOGUE SYSTEM
-//----------------------------------------
-
-// Dialogue node for conversation trees
-class DialogueNode : public TANode {
-public:
-    // The text to display for this dialogue node
-    std::string speakerName;
-    std::string dialogueText;
-
-    // Response options
-    struct DialogueResponse {
-        std::string text;
-        std::function<bool(const GameContext&)> requirement;
-        TANode* targetNode;
-        std::function<void(GameContext*)> effect;
-
-        DialogueResponse(
-            const std::string& responseText, TANode* target,
-            std::function<bool(const GameContext&)> req =
-                [](const GameContext&) { return true; },
-            std::function<void(GameContext*)> eff = [](GameContext*) {})
-            : text(responseText)
-            , requirement(req)
-            , targetNode(target)
-            , effect(eff)
-        {
-        }
-    };
-    std::vector<DialogueResponse> responses;
-
-    // Optional effect to run when this dialogue is shown
-    std::function<void(GameContext*)> onShowEffect;
-
-    DialogueNode(const std::string& name, const std::string& speaker,
-        const std::string& text)
-        : TANode(name)
-        , speakerName(speaker)
-        , dialogueText(text)
-    {
-    }
-
-    void addResponse(
-        const std::string& text, TANode* target,
-        std::function<bool(const GameContext&)> requirement =
-            [](const GameContext&) { return true; },
-        std::function<void(GameContext*)> effect = [](GameContext*) {})
-    {
-        responses.push_back(DialogueResponse(text, target, requirement, effect));
-    }
-
-    void onEnter(GameContext* context) override
-    {
-        // Display the dialogue
-        std::cout << speakerName << ": " << dialogueText << std::endl;
-
-        // Run any effects
-        if (onShowEffect && context) {
-            onShowEffect(context);
-        }
-
-        // Store in dialogue history
-        if (context) {
-            context->dialogueHistory[nodeName] = dialogueText;
-        }
-    }
-
-    // Get available dialogue responses
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions;
-
-        for (size_t i = 0; i < responses.size(); i++) {
-            actions.push_back(
-                { "response_" + std::to_string(i), responses[i].text,
-                    [this, i]() -> TAInput {
-                        return { "dialogue_response", { { "index", static_cast<int>(i) } } };
-                    } });
-        }
-
-        return actions;
-    }
-
-    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
-    {
-        if (input.type == "dialogue_response") {
-            int index = std::get<int>(input.parameters.at("index"));
-            if (index >= 0 && index < static_cast<int>(responses.size())) {
-                outNextNode = responses[index].targetNode;
-                return true;
-            }
-        }
-        return false;
-    }
-};
-
-// NPC class for dialogue interactions
-class NPC {
-public:
-    std::string name;
-    std::string description;
-    DialogueNode* rootDialogue;
-    DialogueNode* currentDialogue;
-    std::map<std::string, DialogueNode*> dialogueNodes;
-
-    // Relationship with player
-    int relationshipValue = 0;
-
-    NPC(const std::string& npcName, const std::string& desc)
-        : name(npcName)
-        , description(desc)
-        , rootDialogue(nullptr)
-        , currentDialogue(nullptr)
-    {
-    }
-
-    void startDialogue(GameContext* context)
-    {
-        if (rootDialogue) {
-            currentDialogue = rootDialogue;
-            currentDialogue->onEnter(context);
-        }
-    }
-
-    bool processResponse(int responseIndex, GameContext* context)
-    {
-        if (!currentDialogue)
-            return false;
-
-        if (responseIndex >= 0 && responseIndex < static_cast<int>(currentDialogue->responses.size())) {
-            auto& response = currentDialogue->responses[responseIndex];
-
-            // Check if requirement is met
-            if (!response.requirement(*context)) {
-                std::cout << "You cannot select that response." << std::endl;
-                return false;
-            }
-
-            // Execute effect
-            if (response.effect) {
-                response.effect(context);
-            }
-
-            // Move to next dialogue node
-            currentDialogue = dynamic_cast<DialogueNode*>(response.targetNode);
-            if (currentDialogue) {
-                currentDialogue->onEnter(context);
-                return true;
-            }
-        }
-
-        return false;
-    }
-};
-
-//----------------------------------------
-// CHARACTER PROGRESSION SYSTEM
-//----------------------------------------
-
-// Skill node for character progression
-class SkillNode : public TANode {
-public:
-    std::string skillName;
-    std::string description;
-    int level;
-    int maxLevel;
-
-    // Requirements to unlock this skill
-    struct SkillRequirement {
-        std::string type; // "skill", "item", "quest", etc.
-        std::string target; // skill name, item id, quest id, etc.
-        int level;
-
-        bool check(const GameContext& context) const
-        {
-            if (type == "skill") {
-                return context.playerStats.hasSkill(target, level);
-            } else if (type == "item") {
-                return context.playerInventory.hasItem(target, level);
-            } else if (type == "knowledge") {
-                return context.playerStats.hasKnowledge(target);
-            }
-            return false;
-        }
-    };
-    std::vector<SkillRequirement> requirements;
-
-    // Effects when this skill is learned or improved
-    struct SkillEffect {
-        std::string type;
-        std::string target;
-        int value;
-
-        void apply(GameContext* context) const
-        {
-            if (!context)
-                return;
-
-            if (type == "stat") {
-                if (target == "strength")
-                    context->playerStats.strength += value;
-                else if (target == "dexterity")
-                    context->playerStats.dexterity += value;
-                else if (target == "constitution")
-                    context->playerStats.constitution += value;
-                else if (target == "intelligence")
-                    context->playerStats.intelligence += value;
-                else if (target == "wisdom")
-                    context->playerStats.wisdom += value;
-                else if (target == "charisma")
-                    context->playerStats.charisma += value;
-            } else if (type == "skill") {
-                context->playerStats.improveSkill(target, value);
-            } else if (type == "ability") {
-                context->playerStats.unlockAbility(target);
-            }
-        }
-    };
-    std::vector<SkillEffect> effects;
-
-    // Cost to learn this skill
-    struct SkillCost {
-        std::string type; // "points", "gold", "item", etc.
-        std::string itemId; // if type is "item"
-        int amount;
-
-        bool canPay(const GameContext& context) const
-        {
-            if (type == "item") {
-                return context.playerInventory.hasItem(itemId, amount);
-            }
-            // Other types would be checked here
-            return true;
-        }
-
-        void pay(GameContext* context) const
-        {
-            if (!context)
-                return;
-
-            if (type == "item") {
-                context->playerInventory.removeItem(itemId, amount);
-            }
-            // Other payment types would be handled here
-        }
-    };
-    std::vector<SkillCost> costs;
-
-    SkillNode(const std::string& name, const std::string& skill,
-        int initialLevel = 0, int max = 5)
-        : TANode(name)
-        , skillName(skill)
-        , description("")
-        , level(initialLevel)
-        , maxLevel(max)
-    {
-    }
-
-    bool canLearn(const GameContext& context) const
-    {
-        // Check all requirements
-        for (const auto& req : requirements) {
-            if (!req.check(context)) {
-                return false;
-            }
-        }
-
-        // Check costs
-        for (const auto& cost : costs) {
-            if (!cost.canPay(context)) {
-                return false;
-            }
-        }
-
-        return level < maxLevel;
-    }
-
-    void learnSkill(GameContext* context)
-    {
-        if (!context || !canLearn(*context)) {
-            return;
-        }
-
-        // Pay costs
-        for (const auto& cost : costs) {
-            cost.pay(context);
-        }
-
-        // Apply effects
-        for (const auto& effect : effects) {
-            effect.apply(context);
-        }
-
-        // Increase level
-        level++;
-
-        // Update player stats
-        context->playerStats.improveSkill(skillName, 1);
-
-        // If reached max level, mark as accepting state
-        if (level >= maxLevel) {
-            isAcceptingState = true;
-        }
-
-        std::cout << "Learned " << skillName << " (Level " << level << "/"
-                  << maxLevel << ")" << std::endl;
-    }
-
-    void onEnter(GameContext* context) override
-    {
-        std::cout << "Viewing skill: " << skillName << " (Level " << level << "/"
-                  << maxLevel << ")" << std::endl;
-        std::cout << description << std::endl;
-
-        if (context && canLearn(*context)) {
-            std::cout << "This skill can be learned/improved." << std::endl;
-        }
-    }
-
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
-
-        // Add learn skill action if not at max level
-        if (level < maxLevel) {
-            actions.push_back(
-                { "learn_skill", "Learn/Improve " + skillName, [this]() -> TAInput {
-                     return { "skill_action",
-                         { { "action", std::string("learn") }, { "skill", skillName } } };
-                 } });
-        }
-
-        return actions;
-    }
-
-    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
-    {
-        if (input.type == "skill_action") {
-            std::string action = std::get<std::string>(input.parameters.at("action"));
-            if (action == "learn") {
-                // Stay in same node after learning
-                outNextNode = this;
-                return true;
-            }
-        }
-
-        return TANode::evaluateTransition(input, outNextNode);
-    }
-};
-
-// Class specialization node
-class ClassNode : public TANode {
-public:
-    std::string className;
-    std::string description;
-    std::map<std::string, int> statBonuses;
-    std::set<std::string> startingAbilities;
-    std::vector<SkillNode*> classSkills;
-
-    ClassNode(const std::string& name, const std::string& classType)
-        : TANode(name)
-        , className(classType)
-    {
-    }
-
-    void onEnter(GameContext* context) override
-    {
-        std::cout << "Selected class: " << className << std::endl;
-        std::cout << description << std::endl;
-
-        if (context) {
-            // Apply stat bonuses
-            for (const auto& [stat, bonus] : statBonuses) {
-                if (stat == "strength")
-                    context->playerStats.strength += bonus;
-                else if (stat == "dexterity")
-                    context->playerStats.dexterity += bonus;
-                else if (stat == "constitution")
-                    context->playerStats.constitution += bonus;
-                else if (stat == "intelligence")
-                    context->playerStats.intelligence += bonus;
-                else if (stat == "wisdom")
-                    context->playerStats.wisdom += bonus;
-                else if (stat == "charisma")
-                    context->playerStats.charisma += bonus;
-            }
-
-            // Grant starting abilities
-            for (const auto& ability : startingAbilities) {
-                context->playerStats.unlockAbility(ability);
-            }
-        }
-    }
-};
-
-//----------------------------------------
-// CRAFTING SYSTEM
-//----------------------------------------
-
-// Recipe for crafting items
-class Recipe {
-public:
-    std::string recipeId;
-    std::string name;
-    std::string description;
-    bool discovered;
-
-    // Ingredients needed
-    struct Ingredient {
-        std::string itemId;
-        int quantity;
-    };
-    std::vector<Ingredient> ingredients;
-
-    // Result of crafting
-    struct Result {
-        std::string itemId;
-        std::string name;
-        std::string type;
-        int quantity;
-        std::map<std::string, std::variant<int, float, std::string, bool>>
-            properties;
-    };
-    Result result;
-
-    // Skill requirements
-    std::map<std::string, int> skillRequirements;
-
-    Recipe(const std::string& id, const std::string& recipeName)
-        : recipeId(id)
-        , name(recipeName)
-        , discovered(false)
-    {
-    }
-
-    bool canCraft(const GameContext& context) const
-    {
-        // Check skill requirements
-        for (const auto& [skill, level] : skillRequirements) {
-            if (!context.playerStats.hasSkill(skill, level)) {
-                return false;
-            }
-        }
-
-        // Check ingredients
-        for (const auto& ingredient : ingredients) {
-            if (!context.playerInventory.hasItem(ingredient.itemId,
-                    ingredient.quantity)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    bool craft(GameContext* context)
-    {
-        if (!context || !canCraft(*context)) {
-            return false;
-        }
-
-        // Consume ingredients
-        for (const auto& ingredient : ingredients) {
-            context->playerInventory.removeItem(ingredient.itemId,
-                ingredient.quantity);
-        }
-
-        // Create result item
-        Item craftedItem(result.itemId, result.name, result.type, 1,
-            result.quantity);
-        craftedItem.properties = result.properties;
-
-        // Add to inventory
-        context->playerInventory.addItem(craftedItem);
-
-        // Mark as discovered
-        discovered = true;
-
-        std::cout << "Crafted " << result.quantity << "x " << result.name
-                  << std::endl;
-        return true;
-    }
-};
-
-// Crafting station node
-class CraftingNode : public TANode {
-public:
-    std::string stationType;
-    std::string description;
-    std::vector<Recipe> availableRecipes;
-
-    CraftingNode(const std::string& name, const std::string& type)
-        : TANode(name)
-        , stationType(type)
-    {
-    }
-
-    void onEnter(GameContext* context) override
-    {
-        std::cout << "At " << stationType << " station." << std::endl;
-        std::cout << description << std::endl;
-
-        // Show available recipes
-        std::cout << "Available recipes:" << std::endl;
-        for (size_t i = 0; i < availableRecipes.size(); i++) {
-            const auto& recipe = availableRecipes[i];
-            if (recipe.discovered) {
-                std::cout << i + 1 << ". " << recipe.name;
-                if (context && recipe.canCraft(*context)) {
-                    std::cout << " (Can craft)";
-                }
-                std::cout << std::endl;
-            } else {
-                std::cout << i + 1 << ". ???" << std::endl;
-            }
-        }
-    }
-
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
-
-        // Add crafting actions for discovered recipes
-        for (size_t i = 0; i < availableRecipes.size(); i++) {
-            if (availableRecipes[i].discovered) {
-                actions.push_back({ "craft_" + std::to_string(i),
-                    "Craft " + availableRecipes[i].name,
-                    [this, i]() -> TAInput {
-                        return { "crafting_action",
-                            { { "action", std::string("craft") },
-                                { "recipe_index", static_cast<int>(i) } } };
-                    } });
-            }
-        }
-
-        // Add exit action
-        actions.push_back(
-            { "exit_crafting", "Exit crafting station", [this]() -> TAInput {
-                 return { "crafting_action", { { "action", std::string("exit") } } };
-             } });
-
-        return actions;
-    }
-
-    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
-    {
-        if (input.type == "crafting_action") {
-            std::string action = std::get<std::string>(input.parameters.at("action"));
-
-            if (action == "craft") {
-                int recipeIndex = std::get<int>(input.parameters.at("recipe_index"));
-                if (recipeIndex >= 0 && recipeIndex < static_cast<int>(availableRecipes.size())) {
-                    // Stay in same node after crafting
-                    outNextNode = this;
-                    return true;
-                }
-            } else if (action == "exit") {
-                // Return to default node (would be set in game logic)
-                for (const auto& rule : transitionRules) {
-                    if (rule.description == "Exit") {
-                        outNextNode = rule.targetNode;
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return TANode::evaluateTransition(input, outNextNode);
-    }
-
-    void addRecipe(const Recipe& recipe) { availableRecipes.push_back(recipe); }
-};
-
-//----------------------------------------
-// WORLD PROGRESSION SYSTEM
-//----------------------------------------
-
-// Location node for world state
-class LocationNode : public TANode {
-public:
-    std::string locationName;
-    std::string description;
-    std::string currentState;
-    std::map<std::string, std::string> stateDescriptions;
-
-    // NPCs at this location
-    std::vector<NPC*> npcs;
-
-    // Available activities at this location
-    std::vector<TANode*> activities;
-
-    // Conditions to access this location
-    struct AccessCondition {
-        std::string type;
-        std::string target;
-        int value;
-
-        bool check(const GameContext& context) const
-        {
-            if (type == "item") {
-                return context.playerInventory.hasItem(target, value);
-            } else if (type == "skill") {
-                return context.playerStats.hasSkill(target, value);
-            } else if (type == "faction") {
-                return context.playerStats.hasFactionReputation(target, value);
-            } else if (type == "worldflag") {
-                return context.worldState.hasFlag(target);
-            }
-            return false;
-        }
-    };
-    std::vector<AccessCondition> accessConditions;
-
-    LocationNode(const std::string& name, const std::string& location,
-        const std::string& initialState = "normal")
-        : TANode(name)
-        , locationName(location)
-        , currentState(initialState)
-    {
-    }
-
-    bool canAccess(const GameContext& context) const
-    {
-        for (const auto& condition : accessConditions) {
-            if (!condition.check(context)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    void onEnter(GameContext* context) override
-    {
-        std::cout << "Arrived at " << locationName << std::endl;
-
-        // Show description based on current state
-        if (stateDescriptions.find(currentState) != stateDescriptions.end()) {
-            std::cout << stateDescriptions.at(currentState) << std::endl;
-        } else {
-            std::cout << description << std::endl;
-        }
-
-        // Update world state
-        if (context) {
-            context->worldState.setLocationState(locationName, currentState);
-        }
-
-        // List NPCs
-        if (!npcs.empty()) {
-            std::cout << "People here:" << std::endl;
-            for (const auto& npc : npcs) {
-                std::cout << "- " << npc->name << std::endl;
-            }
-        }
-
-        // List activities
-        if (!activities.empty()) {
-            std::cout << "Available activities:" << std::endl;
-            for (const auto& activity : activities) {
-                std::cout << "- " << activity->nodeName << std::endl;
-            }
-        }
-    }
-
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
-
-        // Add NPC interaction actions
-        for (size_t i = 0; i < npcs.size(); i++) {
-            actions.push_back({ "talk_to_npc_" + std::to_string(i),
-                "Talk to " + npcs[i]->name, [this, i]() -> TAInput {
-                    return { "location_action",
-                        { { "action", std::string("talk") },
-                            { "npc_index", static_cast<int>(i) } } };
-                } });
-        }
-
-        // Add activity actions
-        for (size_t i = 0; i < activities.size(); i++) {
-            actions.push_back({ "do_activity_" + std::to_string(i),
-                "Do " + activities[i]->nodeName,
-                [this, i]() -> TAInput {
-                    return { "location_action",
-                        { { "action", std::string("activity") },
-                            { "activity_index", static_cast<int>(i) } } };
-                } });
-        }
-
-        return actions;
-    }
-};
-
-// Region node for world map
-class RegionNode : public TANode {
-public:
-    std::string regionName;
-    std::string description;
-    std::string controllingFaction;
-
-    // Locations in this region
-    std::vector<LocationNode*> locations;
-
-    // Connected regions
-    std::vector<RegionNode*> connectedRegions;
-
-    // Events that can happen in this region
-    struct RegionEvent {
-        std::string name;
-        std::string description;
-        std::function<bool(const GameContext&)> condition;
-        std::function<void(GameContext*)> effect;
-        double probability;
-    };
-    std::vector<RegionEvent> possibleEvents;
-
-    RegionNode(const std::string& name, const std::string& region)
-        : TANode(name)
-        , regionName(region)
-    {
-    }
-
-    void onEnter(GameContext* context) override
-    {
-        std::cout << "Entered region: " << regionName << std::endl;
-        std::cout << description << std::endl;
-
-        if (!controllingFaction.empty()) {
-            std::cout << "Controlled by: " << controllingFaction << std::endl;
-        }
-
-        // List locations
-        if (!locations.empty()) {
-            std::cout << "Locations in this region:" << std::endl;
-            for (const auto& location : locations) {
-                std::cout << "- " << location->locationName;
-                if (context && !location->canAccess(*context)) {
-                    std::cout << " (Inaccessible)";
-                }
-                std::cout << std::endl;
-            }
-        }
-
-        // List connected regions
-        if (!connectedRegions.empty()) {
-            std::cout << "Connected regions:" << std::endl;
-            for (const auto& region : connectedRegions) {
-                std::cout << "- " << region->regionName << std::endl;
-            }
-        }
-
-        // Check for random events
-        if (context) {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_real_distribution<> dis(0.0, 1.0);
-
-            for (const auto& event : possibleEvents) {
-                if (event.condition(*context) && dis(gen) < event.probability) {
-                    std::cout << "\nEvent: " << event.name << std::endl;
-                    std::cout << event.description << std::endl;
-                    event.effect(context);
-                    break;
-                }
-            }
-        }
-    }
-
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
-
-        // Add location travel actions
-        for (size_t i = 0; i < locations.size(); i++) {
-            actions.push_back({ "travel_to_location_" + std::to_string(i),
-                "Travel to " + locations[i]->locationName,
-                [this, i]() -> TAInput {
-                    return { "region_action",
-                        { { "action", std::string("travel_location") },
-                            { "location_index", static_cast<int>(i) } } };
-                } });
-        }
-
-        // Add region travel actions
-        for (size_t i = 0; i < connectedRegions.size(); i++) {
-            actions.push_back({ "travel_to_region_" + std::to_string(i),
-                "Travel to " + connectedRegions[i]->regionName,
-                [this, i]() -> TAInput {
-                    return { "region_action",
-                        { { "action", std::string("travel_region") },
-                            { "region_index", static_cast<int>(i) } } };
-                } });
-        }
-
-        return actions;
-    }
-
-    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
-    {
-        if (input.type == "region_action") {
-            std::string action = std::get<std::string>(input.parameters.at("action"));
-
-            if (action == "travel_location") {
-                int locationIndex = std::get<int>(input.parameters.at("location_index"));
-                if (locationIndex >= 0 && locationIndex < static_cast<int>(locations.size())) {
-                    outNextNode = locations[locationIndex];
-                    return true;
-                }
-            } else if (action == "travel_region") {
-                int regionIndex = std::get<int>(input.parameters.at("region_index"));
-                if (regionIndex >= 0 && regionIndex < static_cast<int>(connectedRegions.size())) {
-                    outNextNode = connectedRegions[regionIndex];
-                    return true;
-                }
-            }
-        }
-
-        return TANode::evaluateTransition(input, outNextNode);
-    }
-};
-
-// Time/Season system
-class TimeNode : public TANode {
-public:
-    int day;
-    int hour;
-    std::string season;
-    std::string timeOfDay;
-
-    TimeNode(const std::string& name)
-        : TANode(name)
-        , day(1)
-        , hour(6)
-        , season("spring")
-        , timeOfDay("morning")
-    {
-    }
-
-    void advanceHour(GameContext* context)
-    {
-        hour++;
-
-        if (hour >= 24) {
-            hour = 0;
-            day++;
-
-            // Update season every 90 days
-            if (day % 90 == 0) {
-                if (season == "spring")
-                    season = "summer";
-                else if (season == "summer")
-                    season = "autumn";
-                else if (season == "autumn")
-                    season = "winter";
-                else if (season == "winter")
-                    season = "spring";
-            }
-
-            if (context) {
-                context->worldState.advanceDay();
-            }
-        }
-
-        // Update time of day
-        if (hour >= 5 && hour < 12)
-            timeOfDay = "morning";
-        else if (hour >= 12 && hour < 17)
-            timeOfDay = "afternoon";
-        else if (hour >= 17 && hour < 21)
-            timeOfDay = "evening";
-        else
-            timeOfDay = "night";
-
-        std::cout << "Time: Day " << day << ", " << hour << ":00, " << timeOfDay
-                  << " (" << season << ")" << std::endl;
-    }
-
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
-
-        actions.push_back({ "wait_1_hour", "Wait 1 hour", [this]() -> TAInput {
-                               return {
-                                   "time_action",
-                                   { { "action", std::string("wait") }, { "hours", 1 } }
-                               };
-                           } });
-
-        actions.push_back(
-            { "wait_until_morning", "Wait until morning", [this]() -> TAInput {
-                 return { "time_action",
-                     { { "action", std::string("wait_until") },
-                         { "time", std::string("morning") } } };
-             } });
-
-        return actions;
-    }
-
-    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
-    {
-        if (input.type == "time_action") {
-            std::string action = std::get<std::string>(input.parameters.at("action"));
-
-            if (action == "wait") {
-                int hours = std::get<int>(input.parameters.at("hours"));
-                // In a real game, this would trigger events, status changes, etc.
-                std::cout << "Waiting for " << hours << " hours..." << std::endl;
-
-                // Stay in same node after waiting
-                outNextNode = this;
-                return true;
-            } else if (action == "wait_until") {
-                std::string targetTime = std::get<std::string>(input.parameters.at("time"));
-                // Calculate hours to wait
-                int hoursToWait = 0;
-
-                if (targetTime == "morning" && timeOfDay != "morning") {
-                    if (hour < 5)
-                        hoursToWait = 5 - hour;
-                    else
-                        hoursToWait = 24 - (hour - 5);
-                }
-                // Add other time of day calculations
-
-                std::cout << "Waiting until " << targetTime << " (" << hoursToWait
-                          << " hours)..." << std::endl;
-
-                // Stay in same node after waiting
-                outNextNode = this;
-                return true;
-            }
-        }
-
-        return TANode::evaluateTransition(input, outNextNode);
-    }
-};
-
 // Main function demonstrating all systems
 int main()
 {
@@ -3868,6 +4051,34 @@ int main()
 
     // Initialize persistent IDs before saving
     controller.initializePersistentIDs();
+
+    // Make sure the Village Center location has the current world state
+    if (controller.currentNodes["WorldSystem"] == villageCenterLocation) {
+        villageCenterLocation->generatePersistentID("WorldSystem");
+        // Also update connected location nodes
+        for (auto* location : villageRegion->locations) {
+            location->generatePersistentID("WorldSystem");
+        }
+    }
+
+    // After initializing persistent IDs but before saving:
+    // First, ensure the current node in the world system has the right persistent ID
+    // that matches how it's accessed in the system
+
+    // Fix specifically for the village center location
+    if (controller.currentNodes["WorldSystem"] == villageCenterLocation) {
+        // Set a direct ID that matches exactly how it's accessed
+        villageCenterLocation->nodeID.persistentID = "WorldSystem/VillageCenter";
+
+        // Make sure the node is properly registered with the controller
+        std::cout << "Current WorldSystem node: " << villageCenterLocation->nodeName
+                  << " with ID: " << villageCenterLocation->nodeID.persistentID << std::endl;
+    }
+
+    // Debug - print out all node IDs before saving
+    std::cout << "\nVerifying node IDs before saving:" << std::endl;
+    std::cout << "VillageRegion ID: " << villageRegion->nodeID.persistentID << std::endl;
+    std::cout << "VillageCenter ID: " << villageCenterLocation->nodeID.persistentID << std::endl;
 
     // Save the game state
     controller.saveState("game_save.dat");
