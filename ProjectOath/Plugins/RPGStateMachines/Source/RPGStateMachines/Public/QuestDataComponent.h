@@ -2,17 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "QuestTreeNode.h"
 #include "QuestDataComponent.generated.h"
-
-UENUM(BlueprintType)
-enum class EQuestStatus : uint8
-{
-    Locked,
-    Available,
-    InProgress,
-    Completed,
-    Failed
-};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RPGSTATEMACHINES_API UQuestDataComponent : public UActorComponent
