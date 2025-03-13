@@ -2,6 +2,7 @@
 #include <ctime>
 #include <fstream>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -472,38 +473,79 @@ public:
     {
         // Read state data
         size_t stateDataSize;
-        file.read(reinterpret_cast<char*>(&stateDataSize), sizeof(stateDataSize));
+        if (!file.read(reinterpret_cast<char*>(&stateDataSize), sizeof(stateDataSize))) {
+            return false;
+        }
+
+        // Sanity check
+        if (stateDataSize > 1000) {
+            std::cerr << "Invalid state data size: " << stateDataSize << std::endl;
+            return false;
+        }
 
         stateData.clear();
         for (size_t i = 0; i < stateDataSize; i++) {
             // Read key
             size_t keyLength;
-            file.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength));
+            if (!file.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength))) {
+                return false;
+            }
+
+            // Sanity check
+            if (keyLength > 1000) {
+                std::cerr << "Invalid key length: " << keyLength << std::endl;
+                return false;
+            }
+
             std::string key(keyLength, ' ');
-            file.read(&key[0], keyLength);
+            if (!file.read(&key[0], keyLength)) {
+                return false;
+            }
 
             // Read type and value
             char type;
-            file.read(&type, 1);
+            if (!file.read(&type, 1)) {
+                return false;
+            }
 
             if (type == 'i') {
                 int val;
-                file.read(reinterpret_cast<char*>(&val), sizeof(val));
+                if (!file.read(reinterpret_cast<char*>(&val), sizeof(val))) {
+                    return false;
+                }
                 stateData[key] = val;
             } else if (type == 'f') {
                 float val;
-                file.read(reinterpret_cast<char*>(&val), sizeof(val));
+                if (!file.read(reinterpret_cast<char*>(&val), sizeof(val))) {
+                    return false;
+                }
                 stateData[key] = val;
             } else if (type == 's') {
                 size_t valLength;
-                file.read(reinterpret_cast<char*>(&valLength), sizeof(valLength));
+                if (!file.read(reinterpret_cast<char*>(&valLength), sizeof(valLength))) {
+                    return false;
+                }
+
+                // Sanity check
+                if (valLength > 10000) {
+                    std::cerr << "Invalid string value length: " << valLength << std::endl;
+                    return false;
+                }
+
                 std::string val(valLength, ' ');
-                file.read(&val[0], valLength);
+                if (!file.read(&val[0], valLength)) {
+                    return false;
+                }
                 stateData[key] = val;
             } else if (type == 'b') {
                 bool val;
-                file.read(reinterpret_cast<char*>(&val), sizeof(val));
+                if (!file.read(reinterpret_cast<char*>(&val), sizeof(val))) {
+                    return false;
+                }
                 stateData[key] = val;
+            } else {
+                std::cerr << "Unknown variant type: " << type << std::endl;
+                return false;
             }
         }
 
@@ -830,23 +872,60 @@ public:
         // Save dialogue history
         saveDialogueHistory(file, gameContext.dialogueHistory);
 
+        // After saveState
+        std::ifstream checkSavedFile("game_save.dat", std::ios::binary);
+        if (checkSavedFile.is_open()) {
+            // Get the file size
+            checkSavedFile.seekg(0, std::ios::end);
+            std::streamsize fileSize = checkSavedFile.tellg();
+            checkSavedFile.seekg(0, std::ios::beg);
+
+            std::cout << "Save file size: " << fileSize << " bytes" << std::endl;
+
+            // Read and display the first few bytes as hex
+            if (fileSize > 0) {
+                // const int bytesToRead = std::min(static_cast<std::streamsize>(20), fileSize);
+                const size_t bytesToRead = std::min(static_cast<size_t>(20), static_cast<size_t>(fileSize));
+
+                std::vector<unsigned char> buffer(bytesToRead);
+                checkSavedFile.read(reinterpret_cast<char*>(buffer.data()), bytesToRead);
+
+                std::cout << "First " << bytesToRead << " bytes: ";
+                for (int i = 0; i < bytesToRead; i++) {
+                    std::cout << std::hex << std::setw(2) << std::setfill('0')
+                              << static_cast<int>(buffer[i]) << " ";
+                }
+                std::cout << std::dec << std::endl;
+            }
+
+            checkSavedFile.close();
+        } else {
+            std::cout << "Failed to open save file for verification" << std::endl;
+            return false;
+        }
+
+        std::cout << "Saved save file and verified it." << std::endl;
         return true;
     }
 
-    // Enhanced load state from file
     bool loadState(const std::string& filename)
     {
         std::ifstream file(filename, std::ios::binary);
         if (!file.is_open()) {
+            std::cerr << "Failed to open save file: " << filename << std::endl;
             return false;
         }
 
         // Ensure all nodes have persistent IDs for proper lookup
         initializePersistentIDs();
 
-        // Version check
+        // Add error handling for version check
         int saveVersion;
-        file.read(reinterpret_cast<char*>(&saveVersion), sizeof(saveVersion));
+        if (!file.read(reinterpret_cast<char*>(&saveVersion), sizeof(saveVersion))) {
+            std::cerr << "Failed to read save version" << std::endl;
+            return false;
+        }
+
         if (saveVersion != 2) {
             std::cerr << "Incompatible save version: " << saveVersion << std::endl;
             return false;
@@ -857,44 +936,91 @@ public:
 
         // Read number of systems
         size_t numSystems;
-        file.read(reinterpret_cast<char*>(&numSystems), sizeof(numSystems));
+        if (!file.read(reinterpret_cast<char*>(&numSystems), sizeof(numSystems))) {
+            std::cerr << "Failed to read number of systems" << std::endl;
+            return false;
+        }
+
+        // Sanity check for numSystems
+        if (numSystems > 100) { // Arbitrary reasonable limit
+            std::cerr << "Invalid number of systems: " << numSystems << std::endl;
+            return false;
+        }
 
         // Read each system
         for (size_t i = 0; i < numSystems; i++) {
             // Read system name
             size_t nameLength;
-            file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
+            if (!file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength))) {
+                std::cerr << "Failed to read name length for system " << i << std::endl;
+                return false;
+            }
+
+            // Sanity check for nameLength
+            if (nameLength > 1000) { // Arbitrary reasonable limit
+                std::cerr << "Invalid name length: " << nameLength << std::endl;
+                return false;
+            }
+
             std::string name(nameLength, ' ');
-            file.read(&name[0], nameLength);
+            if (!file.read(&name[0], nameLength)) {
+                std::cerr << "Failed to read name for system " << i << std::endl;
+                return false;
+            }
 
             // Check if this system exists
             if (systemRoots.find(name) == systemRoots.end()) {
                 std::cerr << "System not found during load: " << name << std::endl;
+                // Skip this system's data rather than failing completely
                 continue;
             }
 
             // Read if there's a current node
             bool hasCurrentNode;
-            file.read(reinterpret_cast<char*>(&hasCurrentNode),
-                sizeof(hasCurrentNode));
+            if (!file.read(reinterpret_cast<char*>(&hasCurrentNode), sizeof(hasCurrentNode))) {
+                std::cerr << "Failed to read hasCurrentNode flag for system " << name << std::endl;
+                return false;
+            }
 
             if (hasCurrentNode) {
                 // Read node persistent ID
                 size_t idLength;
-                file.read(reinterpret_cast<char*>(&idLength), sizeof(idLength));
+                if (!file.read(reinterpret_cast<char*>(&idLength), sizeof(idLength))) {
+                    std::cerr << "Failed to read ID length for system " << name << std::endl;
+                    return false;
+                }
+
+                // Sanity check for idLength
+                if (idLength > 1000) { // Arbitrary reasonable limit
+                    std::cerr << "Invalid ID length: " << idLength << std::endl;
+                    return false;
+                }
+
                 std::string persistentID(idLength, ' ');
-                file.read(&persistentID[0], idLength);
+                if (!file.read(&persistentID[0], idLength)) {
+                    std::cerr << "Failed to read persistent ID for system " << name << std::endl;
+                    return false;
+                }
 
                 // Find the node with this ID
                 TANode* node = findNodeByPersistentID(persistentID);
 
                 if (node) {
-                    // Deserialize node state
-                    node->deserialize(file);
+                    try {
+                        // Deserialize node state
+                        if (!node->deserialize(file)) {
+                            std::cerr << "Failed to deserialize node " << persistentID << std::endl;
+                            return false;
+                        }
 
-                    currentNodes[name] = node;
-                    std::cout << "Successfully restored node " << node->nodeName
-                              << " for system " << name << std::endl;
+                        currentNodes[name] = node;
+                        std::cout << "Successfully restored node " << node->nodeName
+                                  << " for system " << name << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cerr << "Exception while deserializing node " << persistentID
+                                  << ": " << e.what() << std::endl;
+                        return false;
+                    }
                 } else {
                     std::cerr << "Node not found during load: " << persistentID
                               << std::endl;
@@ -904,25 +1030,53 @@ public:
 
                     // Skip node state data
                     TANode dummyNode("dummy");
-                    dummyNode.deserialize(file);
+                    try {
+                        if (!dummyNode.deserialize(file)) {
+                            std::cerr << "Failed to skip node data for " << persistentID << std::endl;
+                            return false;
+                        }
+                    } catch (const std::exception& e) {
+                        std::cerr << "Exception while skipping node data: " << e.what() << std::endl;
+                        return false;
+                    }
                 }
             }
         }
 
-        // Load game context - CharacterStats
-        loadCharacterStats(file, gameContext.playerStats);
+        try {
+            // Load game context - CharacterStats
+            if (!loadCharacterStats(file, gameContext.playerStats)) {
+                std::cerr << "Failed to load character stats" << std::endl;
+                return false;
+            }
 
-        // Load game context - WorldState
-        loadWorldState(file, gameContext.worldState);
+            // Load game context - WorldState
+            if (!loadWorldState(file, gameContext.worldState)) {
+                std::cerr << "Failed to load world state" << std::endl;
+                return false;
+            }
 
-        // Load game context - Inventory
-        loadInventory(file, gameContext.playerInventory);
+            // Load game context - Inventory
+            if (!loadInventory(file, gameContext.playerInventory)) {
+                std::cerr << "Failed to load inventory" << std::endl;
+                return false;
+            }
 
-        // Load quest journal
-        loadQuestJournal(file, gameContext.questJournal);
+            // Load quest journal
+            if (!loadQuestJournal(file, gameContext.questJournal)) {
+                std::cerr << "Failed to load quest journal" << std::endl;
+                return false;
+            }
 
-        // Load dialogue history
-        loadDialogueHistory(file, gameContext.dialogueHistory);
+            // Load dialogue history
+            if (!loadDialogueHistory(file, gameContext.dialogueHistory)) {
+                std::cerr << "Failed to load dialogue history" << std::endl;
+                return false;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Exception during load: " << e.what() << std::endl;
+            return false;
+        }
 
         return true;
     }
@@ -987,71 +1141,165 @@ private:
         }
     }
 
-    void loadCharacterStats(std::ifstream& file, CharacterStats& stats)
+    bool loadCharacterStats(std::ifstream& file, CharacterStats& stats)
     {
         // Load basic stats
-        file.read(reinterpret_cast<char*>(&stats.strength), sizeof(int));
-        file.read(reinterpret_cast<char*>(&stats.dexterity), sizeof(int));
-        file.read(reinterpret_cast<char*>(&stats.constitution), sizeof(int));
-        file.read(reinterpret_cast<char*>(&stats.intelligence), sizeof(int));
-        file.read(reinterpret_cast<char*>(&stats.wisdom), sizeof(int));
-        file.read(reinterpret_cast<char*>(&stats.charisma), sizeof(int));
+        if (!file.read(reinterpret_cast<char*>(&stats.strength), sizeof(int)) || !file.read(reinterpret_cast<char*>(&stats.dexterity), sizeof(int)) || !file.read(reinterpret_cast<char*>(&stats.constitution), sizeof(int)) || !file.read(reinterpret_cast<char*>(&stats.intelligence), sizeof(int)) || !file.read(reinterpret_cast<char*>(&stats.wisdom), sizeof(int)) || !file.read(reinterpret_cast<char*>(&stats.charisma), sizeof(int))) {
+            std::cerr << "Failed to read basic character stats" << std::endl;
+            return false;
+        }
 
         // Load skills
         size_t skillCount;
-        file.read(reinterpret_cast<char*>(&skillCount), sizeof(skillCount));
+        if (!file.read(reinterpret_cast<char*>(&skillCount), sizeof(skillCount))) {
+            std::cerr << "Failed to read skill count" << std::endl;
+            return false;
+        }
+
+        // Sanity check
+        if (skillCount > 1000) {
+            std::cerr << "Invalid skill count: " << skillCount << std::endl;
+            return false;
+        }
+
         stats.skills.clear();
         for (size_t i = 0; i < skillCount; i++) {
             size_t skillLength;
-            file.read(reinterpret_cast<char*>(&skillLength), sizeof(skillLength));
+            if (!file.read(reinterpret_cast<char*>(&skillLength), sizeof(skillLength))) {
+                std::cerr << "Failed to read skill name length for skill " << i << std::endl;
+                return false;
+            }
+
+            // Sanity check
+            if (skillLength > 1000) {
+                std::cerr << "Invalid skill name length: " << skillLength << std::endl;
+                return false;
+            }
+
             std::string skill(skillLength, ' ');
-            file.read(&skill[0], skillLength);
+            if (!file.read(&skill[0], skillLength)) {
+                std::cerr << "Failed to read skill name for skill " << i << std::endl;
+                return false;
+            }
 
             int level;
-            file.read(reinterpret_cast<char*>(&level), sizeof(level));
+            if (!file.read(reinterpret_cast<char*>(&level), sizeof(level))) {
+                std::cerr << "Failed to read skill level for skill " << skill << std::endl;
+                return false;
+            }
+
             stats.skills[skill] = level;
         }
 
         // Load faction reputation
         size_t factionCount;
-        file.read(reinterpret_cast<char*>(&factionCount), sizeof(factionCount));
+        if (!file.read(reinterpret_cast<char*>(&factionCount), sizeof(factionCount))) {
+            std::cerr << "Failed to read faction count" << std::endl;
+            return false;
+        }
+
+        if (factionCount > 1000) {
+            std::cerr << "Invalid faction count: " << factionCount << std::endl;
+            return false;
+        }
+
         stats.factionReputation.clear();
         for (size_t i = 0; i < factionCount; i++) {
             size_t factionLength;
-            file.read(reinterpret_cast<char*>(&factionLength),
-                sizeof(factionLength));
+            if (!file.read(reinterpret_cast<char*>(&factionLength), sizeof(factionLength))) {
+                std::cerr << "Failed to read faction name length for faction " << i << std::endl;
+                return false;
+            }
+
+            if (factionLength > 1000) {
+                std::cerr << "Invalid faction name length: " << factionLength << std::endl;
+                return false;
+            }
+
             std::string faction(factionLength, ' ');
-            file.read(&faction[0], factionLength);
+            if (!file.read(&faction[0], factionLength)) {
+                std::cerr << "Failed to read faction name for faction " << i << std::endl;
+                return false;
+            }
 
             int rep;
-            file.read(reinterpret_cast<char*>(&rep), sizeof(rep));
+            if (!file.read(reinterpret_cast<char*>(&rep), sizeof(rep))) {
+                std::cerr << "Failed to read reputation value for faction " << faction << std::endl;
+                return false;
+            }
+
             stats.factionReputation[faction] = rep;
         }
 
         // Load known facts
         size_t factCount;
-        file.read(reinterpret_cast<char*>(&factCount), sizeof(factCount));
+        if (!file.read(reinterpret_cast<char*>(&factCount), sizeof(factCount))) {
+            std::cerr << "Failed to read known facts count" << std::endl;
+            return false;
+        }
+
+        if (factCount > 10000) {
+            std::cerr << "Invalid known facts count: " << factCount << std::endl;
+            return false;
+        }
+
         stats.knownFacts.clear();
         for (size_t i = 0; i < factCount; i++) {
             size_t factLength;
-            file.read(reinterpret_cast<char*>(&factLength), sizeof(factLength));
+            if (!file.read(reinterpret_cast<char*>(&factLength), sizeof(factLength))) {
+                std::cerr << "Failed to read fact length for fact " << i << std::endl;
+                return false;
+            }
+
+            if (factLength > 10000) {
+                std::cerr << "Invalid fact length: " << factLength << std::endl;
+                return false;
+            }
+
             std::string fact(factLength, ' ');
-            file.read(&fact[0], factLength);
+            if (!file.read(&fact[0], factLength)) {
+                std::cerr << "Failed to read fact content for fact " << i << std::endl;
+                return false;
+            }
+
             stats.knownFacts.insert(fact);
         }
 
         // Load unlocked abilities
         size_t abilityCount;
-        file.read(reinterpret_cast<char*>(&abilityCount), sizeof(abilityCount));
+        if (!file.read(reinterpret_cast<char*>(&abilityCount), sizeof(abilityCount))) {
+            std::cerr << "Failed to read ability count" << std::endl;
+            return false;
+        }
+
+        if (abilityCount > 1000) {
+            std::cerr << "Invalid ability count: " << abilityCount << std::endl;
+            return false;
+        }
+
         stats.unlockedAbilities.clear();
         for (size_t i = 0; i < abilityCount; i++) {
             size_t abilityLength;
-            file.read(reinterpret_cast<char*>(&abilityLength),
-                sizeof(abilityLength));
+            if (!file.read(reinterpret_cast<char*>(&abilityLength), sizeof(abilityLength))) {
+                std::cerr << "Failed to read ability length for ability " << i << std::endl;
+                return false;
+            }
+
+            if (abilityLength > 1000) {
+                std::cerr << "Invalid ability length: " << abilityLength << std::endl;
+                return false;
+            }
+
             std::string ability(abilityLength, ' ');
-            file.read(&ability[0], abilityLength);
+            if (!file.read(&ability[0], abilityLength)) {
+                std::cerr << "Failed to read ability name for ability " << i << std::endl;
+                return false;
+            }
+
             stats.unlockedAbilities.insert(ability);
         }
+
+        return true;
     }
 
     void saveWorldState(std::ofstream& file, const WorldState& state)
@@ -1108,68 +1356,174 @@ private:
         file.write(state.currentSeason.c_str(), seasonLength);
     }
 
-    void loadWorldState(std::ifstream& file, WorldState& state)
+    bool loadWorldState(std::ifstream& file, WorldState& state)
     {
         // Load location states
         size_t locationCount;
-        file.read(reinterpret_cast<char*>(&locationCount), sizeof(locationCount));
+        if (!file.read(reinterpret_cast<char*>(&locationCount), sizeof(locationCount))) {
+            std::cerr << "Failed to read location count" << std::endl;
+            return false;
+        }
+
+        if (locationCount > 1000) {
+            std::cerr << "Invalid location count: " << locationCount << std::endl;
+            return false;
+        }
+
         state.locationStates.clear();
         for (size_t i = 0; i < locationCount; i++) {
             size_t locLength;
-            file.read(reinterpret_cast<char*>(&locLength), sizeof(locLength));
+            if (!file.read(reinterpret_cast<char*>(&locLength), sizeof(locLength))) {
+                std::cerr << "Failed to read location name length for location " << i << std::endl;
+                return false;
+            }
+
+            if (locLength > 1000) {
+                std::cerr << "Invalid location name length: " << locLength << std::endl;
+                return false;
+            }
+
             std::string location(locLength, ' ');
-            file.read(&location[0], locLength);
+            if (!file.read(&location[0], locLength)) {
+                std::cerr << "Failed to read location name for location " << i << std::endl;
+                return false;
+            }
 
             size_t stateLength;
-            file.read(reinterpret_cast<char*>(&stateLength), sizeof(stateLength));
+            if (!file.read(reinterpret_cast<char*>(&stateLength), sizeof(stateLength))) {
+                std::cerr << "Failed to read location state length for location " << location << std::endl;
+                return false;
+            }
+
+            if (stateLength > 1000) {
+                std::cerr << "Invalid location state length: " << stateLength << std::endl;
+                return false;
+            }
+
             std::string locState(stateLength, ' ');
-            file.read(&locState[0], stateLength);
+            if (!file.read(&locState[0], stateLength)) {
+                std::cerr << "Failed to read location state for location " << location << std::endl;
+                return false;
+            }
 
             state.locationStates[location] = locState;
         }
 
         // Load faction states
         size_t factionCount;
-        file.read(reinterpret_cast<char*>(&factionCount), sizeof(factionCount));
+        if (!file.read(reinterpret_cast<char*>(&factionCount), sizeof(factionCount))) {
+            std::cerr << "Failed to read faction count" << std::endl;
+            return false;
+        }
+
+        if (factionCount > 1000) {
+            std::cerr << "Invalid faction count: " << factionCount << std::endl;
+            return false;
+        }
+
         state.factionStates.clear();
         for (size_t i = 0; i < factionCount; i++) {
             size_t facLength;
-            file.read(reinterpret_cast<char*>(&facLength), sizeof(facLength));
+            if (!file.read(reinterpret_cast<char*>(&facLength), sizeof(facLength))) {
+                std::cerr << "Failed to read faction name length for faction " << i << std::endl;
+                return false;
+            }
+
+            if (facLength > 1000) {
+                std::cerr << "Invalid faction name length: " << facLength << std::endl;
+                return false;
+            }
+
             std::string faction(facLength, ' ');
-            file.read(&faction[0], facLength);
+            if (!file.read(&faction[0], facLength)) {
+                std::cerr << "Failed to read faction name for faction " << i << std::endl;
+                return false;
+            }
 
             size_t stateLength;
-            file.read(reinterpret_cast<char*>(&stateLength), sizeof(stateLength));
+            if (!file.read(reinterpret_cast<char*>(&stateLength), sizeof(stateLength))) {
+                std::cerr << "Failed to read faction state length for faction " << faction << std::endl;
+                return false;
+            }
+
+            if (stateLength > 1000) {
+                std::cerr << "Invalid faction state length: " << stateLength << std::endl;
+                return false;
+            }
+
             std::string facState(stateLength, ' ');
-            file.read(&facState[0], stateLength);
+            if (!file.read(&facState[0], stateLength)) {
+                std::cerr << "Failed to read faction state for faction " << faction << std::endl;
+                return false;
+            }
 
             state.factionStates[faction] = facState;
         }
 
         // Load world flags
         size_t flagCount;
-        file.read(reinterpret_cast<char*>(&flagCount), sizeof(flagCount));
+        if (!file.read(reinterpret_cast<char*>(&flagCount), sizeof(flagCount))) {
+            std::cerr << "Failed to read world flag count" << std::endl;
+            return false;
+        }
+
+        if (flagCount > 1000) {
+            std::cerr << "Invalid world flag count: " << flagCount << std::endl;
+            return false;
+        }
+
         state.worldFlags.clear();
         for (size_t i = 0; i < flagCount; i++) {
             size_t flagLength;
-            file.read(reinterpret_cast<char*>(&flagLength), sizeof(flagLength));
+            if (!file.read(reinterpret_cast<char*>(&flagLength), sizeof(flagLength))) {
+                std::cerr << "Failed to read flag name length for flag " << i << std::endl;
+                return false;
+            }
+
+            if (flagLength > 1000) {
+                std::cerr << "Invalid flag name length: " << flagLength << std::endl;
+                return false;
+            }
+
             std::string flag(flagLength, ' ');
-            file.read(&flag[0], flagLength);
+            if (!file.read(&flag[0], flagLength)) {
+                std::cerr << "Failed to read flag name for flag " << i << std::endl;
+                return false;
+            }
 
             bool value;
-            file.read(reinterpret_cast<char*>(&value), sizeof(value));
+            if (!file.read(reinterpret_cast<char*>(&value), sizeof(value))) {
+                std::cerr << "Failed to read flag value for flag " << flag << std::endl;
+                return false;
+            }
 
             state.worldFlags[flag] = value;
         }
 
         // Load days and season
-        file.read(reinterpret_cast<char*>(&state.daysPassed),
-            sizeof(state.daysPassed));
+        if (!file.read(reinterpret_cast<char*>(&state.daysPassed), sizeof(state.daysPassed))) {
+            std::cerr << "Failed to read days passed" << std::endl;
+            return false;
+        }
 
         size_t seasonLength;
-        file.read(reinterpret_cast<char*>(&seasonLength), sizeof(seasonLength));
+        if (!file.read(reinterpret_cast<char*>(&seasonLength), sizeof(seasonLength))) {
+            std::cerr << "Failed to read season length" << std::endl;
+            return false;
+        }
+
+        if (seasonLength > 100) {
+            std::cerr << "Invalid season length: " << seasonLength << std::endl;
+            return false;
+        }
+
         state.currentSeason.resize(seasonLength);
-        file.read(&state.currentSeason[0], seasonLength);
+        if (!file.read(&state.currentSeason[0], seasonLength)) {
+            std::cerr << "Failed to read current season" << std::endl;
+            return false;
+        }
+
+        return true;
     }
 
     void saveInventory(std::ofstream& file, const Inventory& inventory)
@@ -1242,79 +1596,174 @@ private:
         }
     }
 
-    void loadInventory(std::ifstream& file, Inventory& inventory)
+    bool loadInventory(std::ifstream& file, Inventory& inventory)
     {
         // Load items
         size_t itemCount;
-        file.read(reinterpret_cast<char*>(&itemCount), sizeof(itemCount));
+        if (!file.read(reinterpret_cast<char*>(&itemCount), sizeof(itemCount))) {
+            std::cerr << "Failed to read item count" << std::endl;
+            return false;
+        }
+
+        if (itemCount > 1000) {
+            std::cerr << "Invalid item count: " << itemCount << std::endl;
+            return false;
+        }
 
         inventory.items.clear();
         for (size_t i = 0; i < itemCount; i++) {
             // Load item ID
             size_t idLength;
-            file.read(reinterpret_cast<char*>(&idLength), sizeof(idLength));
+            if (!file.read(reinterpret_cast<char*>(&idLength), sizeof(idLength))) {
+                std::cerr << "Failed to read item ID length for item " << i << std::endl;
+                return false;
+            }
+
+            if (idLength > 1000) {
+                std::cerr << "Invalid item ID length: " << idLength << std::endl;
+                return false;
+            }
+
             std::string id(idLength, ' ');
-            file.read(&id[0], idLength);
+            if (!file.read(&id[0], idLength)) {
+                std::cerr << "Failed to read item ID for item " << i << std::endl;
+                return false;
+            }
 
             // Load item name
             size_t nameLength;
-            file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
+            if (!file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength))) {
+                std::cerr << "Failed to read item name length for item " << id << std::endl;
+                return false;
+            }
+
+            if (nameLength > 1000) {
+                std::cerr << "Invalid item name length: " << nameLength << std::endl;
+                return false;
+            }
+
             std::string name(nameLength, ' ');
-            file.read(&name[0], nameLength);
+            if (!file.read(&name[0], nameLength)) {
+                std::cerr << "Failed to read item name for item " << id << std::endl;
+                return false;
+            }
 
             // Load item type
             size_t typeLength;
-            file.read(reinterpret_cast<char*>(&typeLength), sizeof(typeLength));
+            if (!file.read(reinterpret_cast<char*>(&typeLength), sizeof(typeLength))) {
+                std::cerr << "Failed to read item type length for item " << id << std::endl;
+                return false;
+            }
+
+            if (typeLength > 1000) {
+                std::cerr << "Invalid item type length: " << typeLength << std::endl;
+                return false;
+            }
+
             std::string type(typeLength, ' ');
-            file.read(&type[0], typeLength);
+            if (!file.read(&type[0], typeLength)) {
+                std::cerr << "Failed to read item type for item " << id << std::endl;
+                return false;
+            }
 
             // Load value and quantity
             int value;
             int quantity;
-            file.read(reinterpret_cast<char*>(&value), sizeof(value));
-            file.read(reinterpret_cast<char*>(&quantity), sizeof(quantity));
+            if (!file.read(reinterpret_cast<char*>(&value), sizeof(value)) || !file.read(reinterpret_cast<char*>(&quantity), sizeof(quantity))) {
+                std::cerr << "Failed to read item value/quantity for item " << id << std::endl;
+                return false;
+            }
 
             // Create item
             Item item(id, name, type, value, quantity);
 
             // Load properties
             size_t propCount;
-            file.read(reinterpret_cast<char*>(&propCount), sizeof(propCount));
+            if (!file.read(reinterpret_cast<char*>(&propCount), sizeof(propCount))) {
+                std::cerr << "Failed to read property count for item " << id << std::endl;
+                return false;
+            }
+
+            if (propCount > 1000) {
+                std::cerr << "Invalid property count: " << propCount << std::endl;
+                return false;
+            }
 
             for (size_t j = 0; j < propCount; j++) {
                 // Read key
                 size_t keyLength;
-                file.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength));
+                if (!file.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength))) {
+                    std::cerr << "Failed to read property key length for property " << j << " of item " << id << std::endl;
+                    return false;
+                }
+
+                if (keyLength > 1000) {
+                    std::cerr << "Invalid property key length: " << keyLength << std::endl;
+                    return false;
+                }
+
                 std::string key(keyLength, ' ');
-                file.read(&key[0], keyLength);
+                if (!file.read(&key[0], keyLength)) {
+                    std::cerr << "Failed to read property key for property " << j << " of item " << id << std::endl;
+                    return false;
+                }
 
                 // Read type and value
                 char type;
-                file.read(&type, 1);
+                if (!file.read(&type, 1)) {
+                    std::cerr << "Failed to read property type for property " << key << " of item " << id << std::endl;
+                    return false;
+                }
 
                 if (type == 'i') {
                     int val;
-                    file.read(reinterpret_cast<char*>(&val), sizeof(val));
+                    if (!file.read(reinterpret_cast<char*>(&val), sizeof(val))) {
+                        std::cerr << "Failed to read int property value for property " << key << " of item " << id << std::endl;
+                        return false;
+                    }
                     item.properties[key] = val;
                 } else if (type == 'f') {
                     float val;
-                    file.read(reinterpret_cast<char*>(&val), sizeof(val));
+                    if (!file.read(reinterpret_cast<char*>(&val), sizeof(val))) {
+                        std::cerr << "Failed to read float property value for property " << key << " of item " << id << std::endl;
+                        return false;
+                    }
                     item.properties[key] = val;
                 } else if (type == 's') {
                     size_t valLength;
-                    file.read(reinterpret_cast<char*>(&valLength), sizeof(valLength));
+                    if (!file.read(reinterpret_cast<char*>(&valLength), sizeof(valLength))) {
+                        std::cerr << "Failed to read string property length for property " << key << " of item " << id << std::endl;
+                        return false;
+                    }
+
+                    if (valLength > 10000) {
+                        std::cerr << "Invalid string property length: " << valLength << std::endl;
+                        return false;
+                    }
+
                     std::string val(valLength, ' ');
-                    file.read(&val[0], valLength);
+                    if (!file.read(&val[0], valLength)) {
+                        std::cerr << "Failed to read string property value for property " << key << " of item " << id << std::endl;
+                        return false;
+                    }
                     item.properties[key] = val;
                 } else if (type == 'b') {
                     bool val;
-                    file.read(reinterpret_cast<char*>(&val), sizeof(val));
+                    if (!file.read(reinterpret_cast<char*>(&val), sizeof(val))) {
+                        std::cerr << "Failed to read bool property value for property " << key << " of item " << id << std::endl;
+                        return false;
+                    }
                     item.properties[key] = val;
+                } else {
+                    std::cerr << "Unknown property type '" << type << "' for property " << key << " of item " << id << std::endl;
+                    return false;
                 }
             }
 
             inventory.items.push_back(item);
         }
+
+        return true;
     }
 
     void saveQuestJournal(std::ofstream& file,
@@ -1338,28 +1787,61 @@ private:
         }
     }
 
-    void loadQuestJournal(std::ifstream& file,
-        std::map<std::string, std::string>& journal)
+    bool loadQuestJournal(std::ifstream& file, std::map<std::string, std::string>& journal)
     {
         size_t entryCount;
-        file.read(reinterpret_cast<char*>(&entryCount), sizeof(entryCount));
+        if (!file.read(reinterpret_cast<char*>(&entryCount), sizeof(entryCount))) {
+            std::cerr << "Failed to read quest journal entry count" << std::endl;
+            return false;
+        }
+
+        if (entryCount > 1000) {
+            std::cerr << "Invalid quest journal entry count: " << entryCount << std::endl;
+            return false;
+        }
 
         journal.clear();
         for (size_t i = 0; i < entryCount; i++) {
             // Load quest name
             size_t questLength;
-            file.read(reinterpret_cast<char*>(&questLength), sizeof(questLength));
+            if (!file.read(reinterpret_cast<char*>(&questLength), sizeof(questLength))) {
+                std::cerr << "Failed to read quest name length for quest " << i << std::endl;
+                return false;
+            }
+
+            if (questLength > 1000) {
+                std::cerr << "Invalid quest name length: " << questLength << std::endl;
+                return false;
+            }
+
             std::string quest(questLength, ' ');
-            file.read(&quest[0], questLength);
+            if (!file.read(&quest[0], questLength)) {
+                std::cerr << "Failed to read quest name for quest " << i << std::endl;
+                return false;
+            }
 
             // Load quest status
             size_t statusLength;
-            file.read(reinterpret_cast<char*>(&statusLength), sizeof(statusLength));
+            if (!file.read(reinterpret_cast<char*>(&statusLength), sizeof(statusLength))) {
+                std::cerr << "Failed to read quest status length for quest " << quest << std::endl;
+                return false;
+            }
+
+            if (statusLength > 1000) {
+                std::cerr << "Invalid quest status length: " << statusLength << std::endl;
+                return false;
+            }
+
             std::string status(statusLength, ' ');
-            file.read(&status[0], statusLength);
+            if (!file.read(&status[0], statusLength)) {
+                std::cerr << "Failed to read quest status for quest " << quest << std::endl;
+                return false;
+            }
 
             journal[quest] = status;
         }
+
+        return true;
     }
 
     void saveDialogueHistory(std::ofstream& file,
@@ -1383,29 +1865,61 @@ private:
         }
     }
 
-    void loadDialogueHistory(std::ifstream& file,
-        std::map<std::string, std::string>& history)
+    bool loadDialogueHistory(std::ifstream& file, std::map<std::string, std::string>& history)
     {
         size_t entryCount;
-        file.read(reinterpret_cast<char*>(&entryCount), sizeof(entryCount));
+        if (!file.read(reinterpret_cast<char*>(&entryCount), sizeof(entryCount))) {
+            std::cerr << "Failed to read dialogue history entry count" << std::endl;
+            return false;
+        }
+
+        if (entryCount > 10000) {
+            std::cerr << "Invalid dialogue history entry count: " << entryCount << std::endl;
+            return false;
+        }
 
         history.clear();
         for (size_t i = 0; i < entryCount; i++) {
             // Load dialogue ID
             size_t dialogueLength;
-            file.read(reinterpret_cast<char*>(&dialogueLength),
-                sizeof(dialogueLength));
+            if (!file.read(reinterpret_cast<char*>(&dialogueLength), sizeof(dialogueLength))) {
+                std::cerr << "Failed to read dialogue ID length for dialogue " << i << std::endl;
+                return false;
+            }
+
+            if (dialogueLength > 1000) {
+                std::cerr << "Invalid dialogue ID length: " << dialogueLength << std::endl;
+                return false;
+            }
+
             std::string dialogue(dialogueLength, ' ');
-            file.read(&dialogue[0], dialogueLength);
+            if (!file.read(&dialogue[0], dialogueLength)) {
+                std::cerr << "Failed to read dialogue ID for dialogue " << i << std::endl;
+                return false;
+            }
 
             // Load dialogue text
             size_t textLength;
-            file.read(reinterpret_cast<char*>(&textLength), sizeof(textLength));
+            if (!file.read(reinterpret_cast<char*>(&textLength), sizeof(textLength))) {
+                std::cerr << "Failed to read dialogue text length for dialogue " << dialogue << std::endl;
+                return false;
+            }
+
+            if (textLength > 10000) {
+                std::cerr << "Invalid dialogue text length: " << textLength << std::endl;
+                return false;
+            }
+
             std::string text(textLength, ' ');
-            file.read(&text[0], textLength);
+            if (!file.read(&text[0], textLength)) {
+                std::cerr << "Failed to read dialogue text for dialogue " << dialogue << std::endl;
+                return false;
+            }
 
             history[dialogue] = text;
         }
+
+        return true;
     }
 
     // Helper function to find a node by ID
@@ -3304,69 +3818,84 @@ int main()
     // Load the state from the saved file
     std::cout << "\n=== LOADING SAVED GAME ===\n"
               << std::endl;
-    if (controller.loadState("game_save.dat")) {
-        std::cout << "Game state loaded successfully!" << std::endl;
 
-        // Display the loaded state information
-        std::cout << "\nLoaded game information:" << std::endl;
+    // Check if file exists first
+    std::ifstream checkFile("game_save.dat");
+    if (!checkFile.good()) {
+        std::cout << "Save file doesn't exist or can't be opened." << std::endl;
+        return 0;
+    }
+    checkFile.close();
+    try {
+        bool load_result = controller.loadState("game_save.dat");
+        if (load_result) {
+            std::cout << "Game state loaded successfully!" << std::endl;
 
-        // Display current time
-        TimeNode* loadedTime = dynamic_cast<TimeNode*>(controller.currentNodes["TimeSystem"]);
-        if (loadedTime) {
-            std::cout << "Time: Day " << loadedTime->day << ", " << loadedTime->hour
-                      << ":00, " << loadedTime->timeOfDay << " ("
-                      << loadedTime->season << ")" << std::endl;
-        }
+            // Display the loaded state information
+            std::cout << "\nLoaded game information:" << std::endl;
 
-        // Display world state
-        std::cout << "\nWorld state:" << std::endl;
-        std::cout << "Days passed: " << controller.gameContext.worldState.daysPassed
-                  << std::endl;
-        std::cout << "Current season: "
-                  << controller.gameContext.worldState.currentSeason << std::endl;
+            // Display current time
+            TimeNode* loadedTime = dynamic_cast<TimeNode*>(controller.currentNodes["TimeSystem"]);
+            if (loadedTime) {
+                std::cout << "Time: Day " << loadedTime->day << ", " << loadedTime->hour
+                          << ":00, " << loadedTime->timeOfDay << " ("
+                          << loadedTime->season << ")" << std::endl;
+            }
 
-        // Display quest journal
-        std::cout << "\nQuest journal:" << std::endl;
-        for (const auto& [quest, status] : controller.gameContext.questJournal) {
-            std::cout << "- " << quest << ": " << status << std::endl;
-        }
-
-        // Display player stats
-        std::cout << "\nPlayer stats:" << std::endl;
-        std::cout << "Strength: " << controller.gameContext.playerStats.strength
-                  << std::endl;
-        std::cout << "Dexterity: " << controller.gameContext.playerStats.dexterity
-                  << std::endl;
-        std::cout << "Constitution: "
-                  << controller.gameContext.playerStats.constitution << std::endl;
-        std::cout << "Intelligence: "
-                  << controller.gameContext.playerStats.intelligence << std::endl;
-        std::cout << "Wisdom: " << controller.gameContext.playerStats.wisdom
-                  << std::endl;
-        std::cout << "Charisma: " << controller.gameContext.playerStats.charisma
-                  << std::endl;
-
-        // Display skills
-        std::cout << "\nSkills:" << std::endl;
-        for (const auto& [skill, level] :
-            controller.gameContext.playerStats.skills) {
-            std::cout << "- " << skill << ": " << level << std::endl;
-        }
-
-        // Display known facts
-        std::cout << "\nKnown facts:" << std::endl;
-        for (const auto& fact : controller.gameContext.playerStats.knownFacts) {
-            std::cout << "- " << fact << std::endl;
-        }
-
-        // Display inventory
-        std::cout << "\nInventory:" << std::endl;
-        for (const auto& item : controller.gameContext.playerInventory.items) {
-            std::cout << "- " << item.name << " (" << item.quantity << ")"
+            // Display world state
+            std::cout << "\nWorld state:" << std::endl;
+            std::cout << "Days passed: " << controller.gameContext.worldState.daysPassed
                       << std::endl;
+            std::cout << "Current season: "
+                      << controller.gameContext.worldState.currentSeason << std::endl;
+
+            // Display quest journal
+            std::cout << "\nQuest journal:" << std::endl;
+            for (const auto& [quest, status] : controller.gameContext.questJournal) {
+                std::cout << "- " << quest << ": " << status << std::endl;
+            }
+
+            // Display player stats
+            std::cout << "\nPlayer stats:" << std::endl;
+            std::cout << "Strength: " << controller.gameContext.playerStats.strength
+                      << std::endl;
+            std::cout << "Dexterity: " << controller.gameContext.playerStats.dexterity
+                      << std::endl;
+            std::cout << "Constitution: "
+                      << controller.gameContext.playerStats.constitution << std::endl;
+            std::cout << "Intelligence: "
+                      << controller.gameContext.playerStats.intelligence << std::endl;
+            std::cout << "Wisdom: " << controller.gameContext.playerStats.wisdom
+                      << std::endl;
+            std::cout << "Charisma: " << controller.gameContext.playerStats.charisma
+                      << std::endl;
+
+            // Display skills
+            std::cout << "\nSkills:" << std::endl;
+            for (const auto& [skill, level] :
+                controller.gameContext.playerStats.skills) {
+                std::cout << "- " << skill << ": " << level << std::endl;
+            }
+
+            // Display known facts
+            std::cout << "\nKnown facts:" << std::endl;
+            for (const auto& fact : controller.gameContext.playerStats.knownFacts) {
+                std::cout << "- " << fact << std::endl;
+            }
+
+            // Display inventory
+            std::cout << "\nInventory:" << std::endl;
+            for (const auto& item : controller.gameContext.playerInventory.items) {
+                std::cout << "- " << item.name << " (" << item.quantity << ")"
+                          << std::endl;
+            }
+        } else {
+            std::cout << "Failed to load game state." << std::endl;
         }
-    } else {
-        std::cout << "Failed to load game state." << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Exception during load: " << e.what() << std::endl;
+    } catch (...) {
+        std::cout << "Unknown error during loading process." << std::endl;
     }
 
     // Add this pause before exiting
