@@ -1,12 +1,14 @@
-#pragma once
+// Generator_NPC.hpp
+#ifndef GENERATOR_NPC_HPP
+#define GENERATOR_NPC_HPP
 
-#include <../../Include/nlohmann/json.hpp>
 #include <map>
 #include <optional>
 #include <random>
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 class Generator_NPC {
@@ -104,3 +106,5 @@ private:
     // Skill Definitions
     static const std::map<std::string, std::pair<int, int>> SkillRanges;
 };
+
+#endif // GENERATOR_NPC_HPP

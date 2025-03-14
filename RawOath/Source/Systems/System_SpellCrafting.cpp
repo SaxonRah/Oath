@@ -1,4 +1,7 @@
 // System_SpellCrafting.cpp
+
+#include "System_SpellCrafting.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>

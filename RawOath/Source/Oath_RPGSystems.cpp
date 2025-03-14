@@ -1,4 +1,7 @@
 // Oath_RPGSystems.cpp
+
+#include "Oath_RPGSystems.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <fstream>

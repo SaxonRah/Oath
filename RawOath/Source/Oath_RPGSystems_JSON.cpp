@@ -1,4 +1,7 @@
-// Oath_RPGSystems.cpp
+// Oath_RPGSystems_JSON.cpp
+
+#include "Oath_RPGSystems_JSON.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <fstream>

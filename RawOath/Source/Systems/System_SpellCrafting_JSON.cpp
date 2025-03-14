@@ -1,4 +1,7 @@
-// System_SpellCrafting.cpp
+// System_SpellCrafting_JSON.cpp
+
+#include "System_SpellCrafting_JSON.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -6,14 +9,13 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <random>
 #include <set>
 #include <sstream>
 #include <string>
 #include <vector>
 
-// Use the nlohmann json library with a shorter alias
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 // Forward declarations for RawOathFull.cpp components
