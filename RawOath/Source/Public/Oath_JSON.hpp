@@ -1,6 +1,6 @@
-// Oath_RPGSystems_JSON.hpp
-#ifndef OATH_RPG_SYSTEMS_JSON_HPP
-#define OATH_RPG_SYSTEMS_JSON_HPP
+// Oath_JSON.hpp
+#ifndef OATH_JSON_HPP
+#define OATH_JSON_HPP
 
 #include <algorithm>
 #include <ctime>
@@ -590,4 +590,4 @@ void loadWorldFromJSON(TAController& controller, const json& worldData);
 // Function to create default JSON files
 void createDefaultJSONFiles();
 
-#endif // OATH_RPG_SYSTEMS_JSON_HPP
+#endif // OATH_JSON_HPP
