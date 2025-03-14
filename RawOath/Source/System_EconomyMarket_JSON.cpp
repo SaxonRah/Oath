@@ -71,34 +71,36 @@ MarketType stringToMarketType(const std::string& typeStr)
         return MarketType::FOOD;
     if (typeStr == "TAVERN")
         return MarketType::TAVERN;
-    return MarketType::GENERAL; // Default
+
+    // Default to General Market
+    return MarketType::GENERAL;
 }
 
 // String conversion for MarketType
 const std::string marketTypeToString(MarketType type)
 {
-    switch (type) {
-    case MarketType::GENERAL:
+    if (type == MarketType::GENERAL)
         return "General Store";
-    case MarketType::BLACKSMITH:
+    if (type == MarketType::BLACKSMITH:
         return "Blacksmith";
-    case MarketType::ALCHEMIST:
+    if (type == MarketType::ALCHEMIST:
         return "Alchemist";
-    case MarketType::CLOTHIER:
+    if (type == MarketType::CLOTHIER:
         return "Clothier";
-    case MarketType::JEWELER:
+    if (type == MarketType::JEWELER:
         return "Jeweler";
-    case MarketType::BOOKSTORE:
+    if (type == MarketType::BOOKSTORE:
         return "Bookstore";
-    case MarketType::MAGIC_SUPPLIES:
+    if (type == MarketType::MAGIC_SUPPLIES:
         return "Magic Supplies";
-    case MarketType::FOOD:
+    if (type == MarketType::FOOD:
         return "Food Vendor";
-    case MarketType::TAVERN:
+    if (type == MarketType::TAVERN:
         return "Tavern";
-    default:
-        return "Unknown";
-    }
+
+    // Default to Unknown
+    return "Unknown";
+}
 }
 
 // Trade good commodity that can be tracked for economic simulation
@@ -543,28 +545,27 @@ private:
     // Helper to check if an item is specialized for this market type
     bool isItemSpecializedForMarket(const Item& item) const
     {
-        switch (type) {
-        case MarketType::BLACKSMITH:
+        if (type == MarketType::BLACKSMITH)
             return item.type == "weapon" || item.type == "armor" || item.type == "metal";
-        case MarketType::ALCHEMIST:
+        if (type == MarketType::ALCHEMIST)
             return item.type == "potion" || item.type == "herb" || item.type == "ingredient";
-        case MarketType::CLOTHIER:
+        if (type == MarketType::CLOTHIER)
             return item.type == "clothing" || item.type == "fabric";
-        case MarketType::JEWELER:
+        if (type == MarketType::JEWELER)
             return item.type == "jewelry" || item.type == "gem";
-        case MarketType::BOOKSTORE:
+        if (type == MarketType::BOOKSTORE)
             return item.type == "book" || item.type == "scroll";
-        case MarketType::MAGIC_SUPPLIES:
+        if (type == MarketType::MAGIC_SUPPLIES)
             return item.type == "magic" || item.type == "soul_gem" || item.type == "staff";
-        case MarketType::FOOD:
+        if (type == MarketType::FOOD)
             return item.type == "food" || item.type == "ingredient";
-        case MarketType::TAVERN:
+        if (type == MarketType::TAVERN)
             return item.type == "food" || item.type == "drink";
-        case MarketType::GENERAL:
+        if (type == MarketType::GENERAL)
             return true; // General stores buy/sell everything but at standard rates
-        default:
-            return false;
-        }
+
+        // Default to false
+        return false;
     }
 
     // Get quantity of an item already in inventory
@@ -598,36 +599,25 @@ private:
     {
         // Get market type string for JSON access
         std::string marketTypeStr;
-        switch (type) {
-        case MarketType::BLACKSMITH:
+
+        if (type == MarketType::BLACKSMITH)
             marketTypeStr = "blacksmith";
-            break;
-        case MarketType::ALCHEMIST:
+        if (type == MarketType::ALCHEMIST)
             marketTypeStr = "alchemist";
-            break;
-        case MarketType::CLOTHIER:
+        if (type == MarketType::CLOTHIER)
             marketTypeStr = "clothier";
-            break;
-        case MarketType::JEWELER:
+        if (type == MarketType::JEWELER)
             marketTypeStr = "jeweler";
-            break;
-        case MarketType::BOOKSTORE:
+        if (type == MarketType::BOOKSTORE)
             marketTypeStr = "bookstore";
-            break;
-        case MarketType::MAGIC_SUPPLIES:
+        if (type == MarketType::MAGIC_SUPPLIES)
             marketTypeStr = "magic_supplies";
-            break;
-        case MarketType::FOOD:
+        if (type == MarketType::FOOD)
             marketTypeStr = "food";
-            break;
-        case MarketType::TAVERN:
+        if (type == MarketType::TAVERN)
             marketTypeStr = "tavern";
-            break;
-        case MarketType::GENERAL:
-        default:
+        if (type == MarketType::GENERAL)
             marketTypeStr = "general";
-            break;
-        }
 
         // Load the item data from JSON
         std::ifstream file("EconomyMarket.JSON");

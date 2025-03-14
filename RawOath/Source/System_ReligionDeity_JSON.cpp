@@ -2189,9 +2189,6 @@ int main()
         }
     }
 
-    // Clean up
-    delete context;
-
     // Add this pause before exiting
     std::cout << "\nPress Enter to exit...";
     std::cin.get();

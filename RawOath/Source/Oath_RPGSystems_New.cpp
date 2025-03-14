@@ -1,4 +1,7 @@
-// Oath_RPGSystems.cpp
+// Oath_RPGSystems_New.cpp
+
+#include "Oath_RPGSystems_New.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <filesystem>
@@ -15,7 +18,6 @@
 #include <string>
 #include <variant>
 #include <vector>
-
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;

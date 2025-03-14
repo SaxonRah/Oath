@@ -7,31 +7,32 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/Source/Include)
+include_directories(${CMAKE_SOURCE_DIR}/Source/Public)
 
 # Define source files with main() functions that will each become executables
 set(MAIN_SOURCES
     Source/Oath_RPGSystems_New.cpp
     Source/Oath_RPGSystems_JSON.cpp
-    Source/Systems/System_AdvancedWeather_JSON.cpp
-    Source/Systems/System_CrimeLaw_JSON.cpp
-    Source/Systems/System_DiseaseHealth_JSON.cpp
-    Source/Systems/System_EconomyMarket_JSON.cpp
-    Source/Systems/System_FactionReputation_JSON.cpp
-    Source/Systems/System_Mount_JSON.cpp
-    Source/Systems/System_NPCRelationships_JSON.cpp
-    Source/Systems/System_ReligionDeity_JSON.cpp
-    Source/Systems/System_SpellCrafting_JSON.cpp
-    # Source/Oath_RPGSystems.cpp
-    # Source/Systems/System_AdvancedWeather.cpp
-    # Source/Systems/System_CrimeLaw.cpp
-    # Source/Systems/System_DiseaseHealth.cpp
-    # Source/Systems/System_EconomyMarket.cpp
-    # Source/Systems/System_FactionReputation.cpp
-    # Source/Systems/System_Mount.cpp
-    # Source/Systems/System_NPCRelationships.cpp
-    # Source/Systems/System_ReligionDeity.cpp
-    # Source/Systems/System_SpellCrafting.cpp
-    # Source/Generators/World/Generator_World.cpp
+    Source/System_AdvancedWeather_JSON.cpp
+    Source/System_CrimeLaw_JSON.cpp
+    Source/System_DiseaseHealth_JSON.cpp
+    Source/System_EconomyMarket_JSON.cpp
+    Source/System_FactionReputation_JSON.cpp
+    Source/System_Mount_JSON.cpp
+    Source/System_NPCRelationships_JSON.cpp
+    Source/System_ReligionDeity_JSON.cpp
+    Source/System_SpellCrafting_JSON.cpp
+    # Old/Oath_RPGSystems.cpp
+    # Old/System_AdvancedWeather.cpp
+    # Old/System_CrimeLaw.cpp
+    # Old/System_DiseaseHealth.cpp
+    # Old/System_EconomyMarket.cpp
+    # Old/System_FactionReputation.cpp
+    # Old/System_Mount.cpp
+    # Old/System_NPCRelationships.cpp
+    # Old/System_ReligionDeity.cpp
+    # Old/System_SpellCrafting.cpp
+    # Old/Generators/World/Generator_World.cpp
 )
 
 # Define the primary executable from the main RPG systems file

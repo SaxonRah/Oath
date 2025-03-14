@@ -122,66 +122,63 @@ SpellTargetType stringToTargetType(const std::string& targetStr)
 
 std::string effectTypeToString(SpellEffectType type)
 {
-    switch (type) {
-    case SpellEffectType::Damage:
+    if (type == SpellEffectType::Damage)
         return "damage";
-    case SpellEffectType::Healing:
+    if (type == SpellEffectType::Healing)
         return "healing";
-    case SpellEffectType::Protection:
+    if (type == SpellEffectType::Protection)
         return "protection";
-    case SpellEffectType::Control:
+    if (type == SpellEffectType::Control)
         return "control";
-    case SpellEffectType::Alteration:
+    if (type == SpellEffectType::Alteration)
         return "alteration";
-    case SpellEffectType::Conjuration:
+    if (type == SpellEffectType::Conjuration)
         return "conjuration";
-    case SpellEffectType::Illusion:
+    if (type == SpellEffectType::Illusion)
         return "illusion";
-    case SpellEffectType::Divination:
+    if (type == SpellEffectType::Divination)
         return "divination";
-    default:
-        return "unknown";
-    }
+
+    // Default to Unknown
+    return "unknown";
 }
 
 std::string deliveryMethodToString(SpellDeliveryMethod method)
 {
-    switch (method) {
-    case SpellDeliveryMethod::Touch:
+    if (method == SpellDeliveryMethod::Touch)
         return "touch";
-    case SpellDeliveryMethod::Projectile:
+    if (method == SpellDeliveryMethod::Projectile)
         return "projectile";
-    case SpellDeliveryMethod::AreaOfEffect:
+    if (method == SpellDeliveryMethod::AreaOfEffect)
         return "area_of_effect";
-    case SpellDeliveryMethod::Self:
+    if (method == SpellDeliveryMethod::Self)
         return "self";
-    case SpellDeliveryMethod::Ray:
+    if (method == SpellDeliveryMethod::Ray)
         return "ray";
-    case SpellDeliveryMethod::Rune:
+    if (method == SpellDeliveryMethod::Rune)
         return "rune";
-    default:
-        return "unknown";
-    }
+
+    // Default to Unknown
+    return "unknown";
 }
 
 std::string targetTypeToString(SpellTargetType type)
 {
-    switch (type) {
-    case SpellTargetType::SingleTarget:
+    if (type == SpellTargetType::SingleTarget)
         return "single_target";
-    case SpellTargetType::MultiTarget:
+    if (type == SpellTargetType::MultiTarget)
         return "multi_target";
-    case SpellTargetType::Self:
+    if (type == SpellTargetType::Self)
         return "self";
-    case SpellTargetType::AlliesOnly:
+    if (type == SpellTargetType::AlliesOnly)
         return "allies_only";
-    case SpellTargetType::EnemiesOnly:
+    if (type == SpellTargetType::EnemiesOnly)
         return "enemies_only";
-    case SpellTargetType::AreaEffect:
+    if (type == SpellTargetType::AreaEffect)
         return "area_effect";
-    default:
-        return "unknown";
-    }
+
+    // Default to Unknown
+    return "unknown";
 }
 
 // Spell component representing a fundamental magical effect
@@ -1413,443 +1410,443 @@ public:
 
     std::string getEffectTypeName(SpellEffectType type)
     {
-        switch (type) {
-        case SpellEffectType::Damage:
+        if (type == SpellEffectType::Damage)
             return "Damage";
-        case SpellEffectType::Healing:
+        if (type == SpellEffectType::Healing)
             return "Healing";
-        case SpellEffectType::Protection:
+        if (type == SpellEffectType::Protection)
             return "Protection";
-        case SpellEffectType::Control:
+        if (type == SpellEffectType::Control)
             return "Control";
-        case SpellEffectType::Alteration:
+        if (type == SpellEffectType::Alteration)
             return "Alteration";
-        case SpellEffectType::Conjuration:
+        if (type == SpellEffectType::Conjuration)
             return "Conjuration";
-        case SpellEffectType::Illusion:
+        if (type == SpellEffectType::Illusion)
             return "Illusion";
-        case SpellEffectType::Divination:
+        if (type == SpellEffectType::Divination)
             return "Divination";
-        default:
-            return "Unknown";
-        }
+
+        // Default to Unknown
+        return "Unknown";
     }
 
     std::string getDeliveryMethodName(SpellDeliveryMethod method)
     {
-        switch (method) {
-        case SpellDeliveryMethod::Touch:
+        if (method == SpellDeliveryMethod::Touch)
             return "Touch";
-        case SpellDeliveryMethod::Projectile:
+        if (method == SpellDeliveryMethod::Projectile:
             return "Projectile";
-        case SpellDeliveryMethod::AreaOfEffect:
+        if (method == SpellDeliveryMethod::AreaOfEffect:
             return "Area of Effect";
-        case SpellDeliveryMethod::Self:
+        if (method == SpellDeliveryMethod::Self:
             return "Self";
-        case SpellDeliveryMethod::Ray:
+        if (method == SpellDeliveryMethod::Ray:
             return "Ray";
-        case SpellDeliveryMethod::Rune:
+        if (method == SpellDeliveryMethod::Rune:
             return "Rune";
         default:
             return "Unknown";
-        }
+    }
+}
+
+std::string
+getTargetTypeName(SpellTargetType type)
+{
+    switch (type) {
+    if (type == SpellTargetType::SingleTarget:
+        return "Single Target";
+    if (type == SpellTargetType::MultiTarget:
+        return "Multi Target";
+    if (type == SpellTargetType::Self:
+        return "Self";
+    if (type == SpellTargetType::AlliesOnly:
+        return "Allies Only";
+    if (type == SpellTargetType::EnemiesOnly:
+        return "Enemies Only";
+    if (type == SpellTargetType::AreaEffect:
+        return "Area Effect";
+    default:
+        return "Unknown";
+    }
+}
+
+// Start creating a new spell
+void startNewSpell(const std::string& name, GameContext* context)
+{
+    if (currentDesign) {
+        std::cout << "You're already working on a spell. Finish or abandon it first." << std::endl;
+        return;
     }
 
-    std::string getTargetTypeName(SpellTargetType type)
-    {
-        switch (type) {
-        case SpellTargetType::SingleTarget:
-            return "Single Target";
-        case SpellTargetType::MultiTarget:
-            return "Multi Target";
-        case SpellTargetType::Self:
-            return "Self";
-        case SpellTargetType::AlliesOnly:
-            return "Allies Only";
-        case SpellTargetType::EnemiesOnly:
-            return "Enemies Only";
-        case SpellTargetType::AreaEffect:
-            return "Area Effect";
-        default:
-            return "Unknown";
-        }
+    currentDesign = new SpellDesign(spellSystem->generateUniqueID(), name);
+    std::cout << "Starting design of new spell: " << name << std::endl;
+}
+
+// Add a component to the current spell
+void addComponent(int componentIndex, GameContext* context)
+{
+    if (!currentDesign) {
+        std::cout << "You need to start a new spell design first." << std::endl;
+        return;
     }
 
-    // Start creating a new spell
-    void startNewSpell(const std::string& name, GameContext* context)
-    {
-        if (currentDesign) {
-            std::cout << "You're already working on a spell. Finish or abandon it first." << std::endl;
-            return;
-        }
-
-        currentDesign = new SpellDesign(spellSystem->generateUniqueID(), name);
-        std::cout << "Starting design of new spell: " << name << std::endl;
+    if (componentIndex < 0 || componentIndex >= static_cast<int>(availableComponents.size())) {
+        std::cout << "Invalid component selection." << std::endl;
+        return;
     }
 
-    // Add a component to the current spell
-    void addComponent(int componentIndex, GameContext* context)
-    {
-        if (!currentDesign) {
-            std::cout << "You need to start a new spell design first." << std::endl;
-            return;
-        }
+    SpellComponent* component = availableComponents[componentIndex];
+    currentDesign->components.push_back(component);
+    std::cout << "Added " << component->name << " to spell design." << std::endl;
 
-        if (componentIndex < 0 || componentIndex >= static_cast<int>(availableComponents.size())) {
-            std::cout << "Invalid component selection." << std::endl;
-            return;
-        }
+    // Recalculate spell attributes
+    currentDesign->calculateAttributes(*context);
 
-        SpellComponent* component = availableComponents[componentIndex];
-        currentDesign->components.push_back(component);
-        std::cout << "Added " << component->name << " to spell design." << std::endl;
+    // Show updated spell info
+    std::cout << currentDesign->getDescription() << std::endl;
+}
 
-        // Recalculate spell attributes
-        currentDesign->calculateAttributes(*context);
-
-        // Show updated spell info
-        std::cout << currentDesign->getDescription() << std::endl;
+// Add a modifier to the current spell
+void addModifier(int modifierIndex, GameContext* context)
+{
+    if (!currentDesign) {
+        std::cout << "You need to start a new spell design first." << std::endl;
+        return;
     }
 
-    // Add a modifier to the current spell
-    void addModifier(int modifierIndex, GameContext* context)
-    {
-        if (!currentDesign) {
-            std::cout << "You need to start a new spell design first." << std::endl;
-            return;
-        }
-
-        if (modifierIndex < 0 || modifierIndex >= static_cast<int>(availableModifiers.size())) {
-            std::cout << "Invalid modifier selection." << std::endl;
-            return;
-        }
-
-        SpellModifier* modifier = availableModifiers[modifierIndex];
-
-        // Check if player can use this modifier
-        if (!modifier->canApply(*context)) {
-            std::cout << "You lack the required skill to add this modifier." << std::endl;
-            return;
-        }
-
-        currentDesign->modifiers.push_back(modifier);
-        std::cout << "Added " << modifier->name << " to spell design." << std::endl;
-
-        // Recalculate spell attributes
-        currentDesign->calculateAttributes(*context);
-
-        // Show updated spell info
-        std::cout << currentDesign->getDescription() << std::endl;
+    if (modifierIndex < 0 || modifierIndex >= static_cast<int>(availableModifiers.size())) {
+        std::cout << "Invalid modifier selection." << std::endl;
+        return;
     }
 
-    // Set delivery method for the current spell
-    void setDeliveryMethod(int deliveryIndex, GameContext* context)
-    {
-        if (!currentDesign) {
-            std::cout << "You need to start a new spell design first." << std::endl;
-            return;
-        }
+    SpellModifier* modifier = availableModifiers[modifierIndex];
 
-        if (deliveryIndex < 0 || deliveryIndex >= static_cast<int>(availableDeliveryMethods.size())) {
-            std::cout << "Invalid delivery method selection." << std::endl;
-            return;
-        }
-
-        SpellDelivery* delivery = availableDeliveryMethods[deliveryIndex];
-
-        // Check if player can use this delivery method
-        if (!delivery->canUse(*context)) {
-            std::cout << "You lack the required skill to use this delivery method." << std::endl;
-            return;
-        }
-
-        currentDesign->delivery = delivery;
-        std::cout << "Set delivery method to " << delivery->name << "." << std::endl;
-
-        // Recalculate spell attributes
-        currentDesign->calculateAttributes(*context);
-
-        // Show updated spell info
-        std::cout << currentDesign->getDescription() << std::endl;
+    // Check if player can use this modifier
+    if (!modifier->canApply(*context)) {
+        std::cout << "You lack the required skill to add this modifier." << std::endl;
+        return;
     }
 
-    // Set target type for the current spell
-    void setTargetType(SpellTargetType targetType, GameContext* context)
-    {
-        if (!currentDesign) {
-            std::cout << "You need to start a new spell design first." << std::endl;
-            return;
-        }
+    currentDesign->modifiers.push_back(modifier);
+    std::cout << "Added " << modifier->name << " to spell design." << std::endl;
 
-        currentDesign->targetType = targetType;
-        std::cout << "Set target type to " << getTargetTypeName(targetType) << "." << std::endl;
+    // Recalculate spell attributes
+    currentDesign->calculateAttributes(*context);
 
-        // Recalculate spell attributes
-        currentDesign->calculateAttributes(*context);
+    // Show updated spell info
+    std::cout << currentDesign->getDescription() << std::endl;
+}
 
-        // Show updated spell info
-        std::cout << currentDesign->getDescription() << std::endl;
+// Set delivery method for the current spell
+void setDeliveryMethod(int deliveryIndex, GameContext* context)
+{
+    if (!currentDesign) {
+        std::cout << "You need to start a new spell design first." << std::endl;
+        return;
     }
 
-    // Finalize and learn the current spell design
-    bool finalizeSpell(GameContext* context)
-    {
-        if (!currentDesign) {
-            std::cout << "You need to start a new spell design first." << std::endl;
-            return false;
-        }
-
-        // Check if design is valid
-        if (currentDesign->components.empty()) {
-            std::cout << "The spell needs at least one component." << std::endl;
-            return false;
-        }
-
-        if (!currentDesign->delivery) {
-            std::cout << "The spell needs a delivery method." << std::endl;
-            return false;
-        }
-
-        // Calculate final attributes
-        currentDesign->calculateAttributes(*context);
-
-        // Check if player can learn this spell
-        if (!currentDesign->canLearn(*context)) {
-            std::cout << "This spell is too complex for you to learn with your current skills." << std::endl;
-            std::cout << "Required Intelligence: " << (8 + (currentDesign->complexityRating / 5)) << std::endl;
-            return false;
-        }
-
-        // Mark as learned and add to spellbook
-        currentDesign->isLearned = true;
-        knownSpells.push_back(currentDesign);
-
-        std::cout << "Successfully finalized and learned " << currentDesign->name << "!" << std::endl;
-        std::cout << currentDesign->getDescription() << std::endl;
-
-        // Reset current design
-        currentDesign = nullptr;
-
-        return true;
+    if (deliveryIndex < 0 || deliveryIndex >= static_cast<int>(availableDeliveryMethods.size())) {
+        std::cout << "Invalid delivery method selection." << std::endl;
+        return;
     }
 
-    // Abandon the current spell design
-    void abandonSpell()
-    {
-        if (!currentDesign) {
-            std::cout << "You're not working on any spell design." << std::endl;
-            return;
-        }
+    SpellDelivery* delivery = availableDeliveryMethods[deliveryIndex];
 
-        std::cout << "Abandoned spell design: " << currentDesign->name << std::endl;
-        delete currentDesign;
-        currentDesign = nullptr;
+    // Check if player can use this delivery method
+    if (!delivery->canUse(*context)) {
+        std::cout << "You lack the required skill to use this delivery method." << std::endl;
+        return;
     }
 
-    // Cast a known spell from your spellbook
-    bool castSpell(int spellIndex, GameContext* context)
-    {
-        if (spellIndex < 0 || spellIndex >= static_cast<int>(knownSpells.size())) {
-            std::cout << "Invalid spell selection." << std::endl;
-            return false;
-        }
+    currentDesign->delivery = delivery;
+    std::cout << "Set delivery method to " << delivery->name << "." << std::endl;
 
-        SpellDesign* spell = knownSpells[spellIndex];
-        return spell->cast(context);
+    // Recalculate spell attributes
+    currentDesign->calculateAttributes(*context);
+
+    // Show updated spell info
+    std::cout << currentDesign->getDescription() << std::endl;
+}
+
+// Set target type for the current spell
+void setTargetType(SpellTargetType targetType, GameContext* context)
+{
+    if (!currentDesign) {
+        std::cout << "You need to start a new spell design first." << std::endl;
+        return;
     }
 
-    // Research to discover new components or improve existing ones
-    SpellResearchResult conductResearch(const std::string& researchArea, int hoursSpent, GameContext* context)
-    {
-        SpellResearchResult result;
-        result.discoveredComponent = nullptr;
-        result.discoveredModifier = nullptr;
+    currentDesign->targetType = targetType;
+    std::cout << "Set target type to " << getTargetTypeName(targetType) << "." << std::endl;
 
-        // Check if the research area is a valid magical skill
-        if (!spellSystem->isMagicalSkill(researchArea)) {
-            std::cout << "Invalid research area. Please choose a valid magical school." << std::endl;
-            result.type = SpellResearchResult::Failure;
-            result.message = "Invalid research area: " + researchArea;
-            result.skillProgress = 0;
-            return result;
-        }
+    // Recalculate spell attributes
+    currentDesign->calculateAttributes(*context);
 
-        // Base success chance based on intelligence and relevant skill
-        int intelligence = context->playerStats.intelligence;
-        int relevantSkill = 0;
+    // Show updated spell info
+    std::cout << currentDesign->getDescription() << std::endl;
+}
 
-        if (context->playerStats.skills.count(researchArea)) {
-            relevantSkill = context->playerStats.skills.at(researchArea);
-        }
+// Finalize and learn the current spell design
+bool finalizeSpell(GameContext* context)
+{
+    if (!currentDesign) {
+        std::cout << "You need to start a new spell design first." << std::endl;
+        return false;
+    }
 
-        int baseSuccessChance = 10 + (intelligence - 10) * 2 + relevantSkill * 3;
+    // Check if design is valid
+    if (currentDesign->components.empty()) {
+        std::cout << "The spell needs at least one component." << std::endl;
+        return false;
+    }
 
-        // Adjust for time spent
-        float timeMultiplier = std::min(3.0f, hoursSpent / 2.0f);
-        int successChance = static_cast<int>(baseSuccessChance * timeMultiplier);
+    if (!currentDesign->delivery) {
+        std::cout << "The spell needs a delivery method." << std::endl;
+        return false;
+    }
 
-        // Cap at reasonable values
-        successChance = std::min(95, std::max(5, successChance));
+    // Calculate final attributes
+    currentDesign->calculateAttributes(*context);
 
-        // Roll for success
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(1, 100);
-        int roll = dis(gen);
+    // Check if player can learn this spell
+    if (!currentDesign->canLearn(*context)) {
+        std::cout << "This spell is too complex for you to learn with your current skills." << std::endl;
+        std::cout << "Required Intelligence: " << (8 + (currentDesign->complexityRating / 5)) << std::endl;
+        return false;
+    }
 
-        // Determine research progress
-        float progressGained = (hoursSpent * 0.5f) * (1.0f + (relevantSkill * 0.1f));
+    // Mark as learned and add to spellbook
+    currentDesign->isLearned = true;
+    knownSpells.push_back(currentDesign);
 
-        // Add to research progress
-        if (!researchProgress.count(researchArea)) {
-            researchProgress[researchArea] = 0.0f;
-        }
-        researchProgress[researchArea] += progressGained;
+    std::cout << "Successfully finalized and learned " << currentDesign->name << "!" << std::endl;
+    std::cout << currentDesign->getDescription() << std::endl;
 
-        // Set result based on roll
-        if (roll <= successChance / 3) {
-            // Great success
-            result.type = SpellResearchResult::Success;
-            result.message = "Your research yields exceptional results!";
-            result.skillProgress = progressGained * 1.5f;
-        } else if (roll <= successChance) {
-            // Normal success
-            result.type = SpellResearchResult::PartialSuccess;
-            result.message = "Your research progresses well.";
-            result.skillProgress = progressGained;
-        } else if (roll <= 90) {
-            // Failure
-            result.type = SpellResearchResult::Failure;
-            result.message = "Your research yields no significant results.";
-            result.skillProgress = progressGained * 0.5f;
-        } else {
-            // Disaster
-            result.type = SpellResearchResult::Disaster;
-            result.message = "Your experiment backfires spectacularly!";
-            result.skillProgress = progressGained * 0.25f;
+    // Reset current design
+    currentDesign = nullptr;
 
-            // Apply some negative effect
-            // Damage or temporary skill reduction
-        }
+    return true;
+}
 
-        // Discover a new component or modifier if we've reached enough research points
-        if (researchProgress[researchArea] >= 100.0f) {
-            researchProgress[researchArea] -= 100.0f;
+// Abandon the current spell design
+void abandonSpell()
+{
+    if (!currentDesign) {
+        std::cout << "You're not working on any spell design." << std::endl;
+        return;
+    }
 
-            // Determine what we discovered
-            if (researchArea == "destruction" || researchArea == "restoration" || researchArea == "alteration" || researchArea == "conjuration") {
-                // Create a new component
-                SpellComponent* newComponent = spellSystem->createResearchComponent(researchArea, relevantSkill);
+    std::cout << "Abandoned spell design: " << currentDesign->name << std::endl;
+    delete currentDesign;
+    currentDesign = nullptr;
+}
 
-                // Add to available components
-                availableComponents.push_back(newComponent);
-                result.discoveredComponent = newComponent;
+// Cast a known spell from your spellbook
+bool castSpell(int spellIndex, GameContext* context)
+{
+    if (spellIndex < 0 || spellIndex >= static_cast<int>(knownSpells.size())) {
+        std::cout << "Invalid spell selection." << std::endl;
+        return false;
+    }
 
-                result.message += " You've discovered a new spell component: " + newComponent->name + "!";
-            } else {
-                // Create a new modifier
-                SpellModifier* newModifier = spellSystem->createResearchModifier(researchArea, relevantSkill);
+    SpellDesign* spell = knownSpells[spellIndex];
+    return spell->cast(context);
+}
 
-                // Add to available modifiers
-                availableModifiers.push_back(newModifier);
-                result.discoveredModifier = newModifier;
+// Research to discover new components or improve existing ones
+SpellResearchResult conductResearch(const std::string& researchArea, int hoursSpent, GameContext* context)
+{
+    SpellResearchResult result;
+    result.discoveredComponent = nullptr;
+    result.discoveredModifier = nullptr;
 
-                result.message += " You've discovered a new spell modifier: " + newModifier->name + "!";
-            }
-        } else {
-            // Display progress
-            result.message += " Research progress: " + std::to_string(static_cast<int>(researchProgress[researchArea])) + "/100";
-        }
-
-        // Improve skill from research
-        context->playerStats.improveSkill(researchArea, static_cast<int>(result.skillProgress / 10.0f));
-
+    // Check if the research area is a valid magical skill
+    if (!spellSystem->isMagicalSkill(researchArea)) {
+        std::cout << "Invalid research area. Please choose a valid magical school." << std::endl;
+        result.type = SpellResearchResult::Failure;
+        result.message = "Invalid research area: " + researchArea;
+        result.skillProgress = 0;
         return result;
     }
 
-    // Get available actions specific to spell crafting
-    std::vector<TAAction> getAvailableActions() override
-    {
-        std::vector<TAAction> actions = TANode::getAvailableActions();
+    // Base success chance based on intelligence and relevant skill
+    int intelligence = context->playerStats.intelligence;
+    int relevantSkill = 0;
 
-        // Add spell crafting specific actions
-        if (!currentDesign) {
-            actions.push_back(
-                { "start_new_spell", "Start a new spell design", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("start_new") } } };
-                 } });
-        } else {
-            actions.push_back(
-                { "add_component", "Add component", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("add_component") } } };
-                 } });
-
-            actions.push_back(
-                { "add_modifier", "Add modifier", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("add_modifier") } } };
-                 } });
-
-            actions.push_back(
-                { "set_delivery", "Set delivery method", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("set_delivery") } } };
-                 } });
-
-            actions.push_back(
-                { "set_target", "Set target type", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("set_target") } } };
-                 } });
-
-            actions.push_back(
-                { "finalize_spell", "Finalize spell", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("finalize") } } };
-                 } });
-
-            actions.push_back(
-                { "abandon_spell", "Abandon spell design", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("abandon") } } };
-                 } });
-        }
-
-        // Always available actions
-        if (!knownSpells.empty()) {
-            actions.push_back(
-                { "cast_spell", "Cast a spell", []() -> TAInput {
-                     return { "spellcraft_action", { { "action", std::string("cast_spell") } } };
-                 } });
-        }
-
-        actions.push_back(
-            { "conduct_research", "Conduct magical research", []() -> TAInput {
-                 return { "spellcraft_action", { { "action", std::string("research") } } };
-             } });
-
-        actions.push_back(
-            { "exit_spellcrafting", "Exit spell crafting", []() -> TAInput {
-                 return { "spellcraft_action", { { "action", std::string("exit") } } };
-             } });
-
-        return actions;
+    if (context->playerStats.skills.count(researchArea)) {
+        relevantSkill = context->playerStats.skills.at(researchArea);
     }
 
-    bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
-    {
-        if (input.type == "spellcraft_action") {
-            std::string action = std::get<std::string>(input.parameters.at("action"));
+    int baseSuccessChance = 10 + (intelligence - 10) * 2 + relevantSkill * 3;
 
-            if (action == "exit") {
-                // Return to default node (would be set in game logic)
-                for (const auto& rule : transitionRules) {
-                    if (rule.description == "Exit") {
-                        outNextNode = rule.targetNode;
-                        return true;
-                    }
+    // Adjust for time spent
+    float timeMultiplier = std::min(3.0f, hoursSpent / 2.0f);
+    int successChance = static_cast<int>(baseSuccessChance * timeMultiplier);
+
+    // Cap at reasonable values
+    successChance = std::min(95, std::max(5, successChance));
+
+    // Roll for success
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1, 100);
+    int roll = dis(gen);
+
+    // Determine research progress
+    float progressGained = (hoursSpent * 0.5f) * (1.0f + (relevantSkill * 0.1f));
+
+    // Add to research progress
+    if (!researchProgress.count(researchArea)) {
+        researchProgress[researchArea] = 0.0f;
+    }
+    researchProgress[researchArea] += progressGained;
+
+    // Set result based on roll
+    if (roll <= successChance / 3) {
+        // Great success
+        result.type = SpellResearchResult::Success;
+        result.message = "Your research yields exceptional results!";
+        result.skillProgress = progressGained * 1.5f;
+    } else if (roll <= successChance) {
+        // Normal success
+        result.type = SpellResearchResult::PartialSuccess;
+        result.message = "Your research progresses well.";
+        result.skillProgress = progressGained;
+    } else if (roll <= 90) {
+        // Failure
+        result.type = SpellResearchResult::Failure;
+        result.message = "Your research yields no significant results.";
+        result.skillProgress = progressGained * 0.5f;
+    } else {
+        // Disaster
+        result.type = SpellResearchResult::Disaster;
+        result.message = "Your experiment backfires spectacularly!";
+        result.skillProgress = progressGained * 0.25f;
+
+        // Apply some negative effect
+        // Damage or temporary skill reduction
+    }
+
+    // Discover a new component or modifier if we've reached enough research points
+    if (researchProgress[researchArea] >= 100.0f) {
+        researchProgress[researchArea] -= 100.0f;
+
+        // Determine what we discovered
+        if (researchArea == "destruction" || researchArea == "restoration" || researchArea == "alteration" || researchArea == "conjuration") {
+            // Create a new component
+            SpellComponent* newComponent = spellSystem->createResearchComponent(researchArea, relevantSkill);
+
+            // Add to available components
+            availableComponents.push_back(newComponent);
+            result.discoveredComponent = newComponent;
+
+            result.message += " You've discovered a new spell component: " + newComponent->name + "!";
+        } else {
+            // Create a new modifier
+            SpellModifier* newModifier = spellSystem->createResearchModifier(researchArea, relevantSkill);
+
+            // Add to available modifiers
+            availableModifiers.push_back(newModifier);
+            result.discoveredModifier = newModifier;
+
+            result.message += " You've discovered a new spell modifier: " + newModifier->name + "!";
+        }
+    } else {
+        // Display progress
+        result.message += " Research progress: " + std::to_string(static_cast<int>(researchProgress[researchArea])) + "/100";
+    }
+
+    // Improve skill from research
+    context->playerStats.improveSkill(researchArea, static_cast<int>(result.skillProgress / 10.0f));
+
+    return result;
+}
+
+// Get available actions specific to spell crafting
+std::vector<TAAction> getAvailableActions() override
+{
+    std::vector<TAAction> actions = TANode::getAvailableActions();
+
+    // Add spell crafting specific actions
+    if (!currentDesign) {
+        actions.push_back(
+            { "start_new_spell", "Start a new spell design", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("start_new") } } };
+             } });
+    } else {
+        actions.push_back(
+            { "add_component", "Add component", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("add_component") } } };
+             } });
+
+        actions.push_back(
+            { "add_modifier", "Add modifier", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("add_modifier") } } };
+             } });
+
+        actions.push_back(
+            { "set_delivery", "Set delivery method", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("set_delivery") } } };
+             } });
+
+        actions.push_back(
+            { "set_target", "Set target type", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("set_target") } } };
+             } });
+
+        actions.push_back(
+            { "finalize_spell", "Finalize spell", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("finalize") } } };
+             } });
+
+        actions.push_back(
+            { "abandon_spell", "Abandon spell design", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("abandon") } } };
+             } });
+    }
+
+    // Always available actions
+    if (!knownSpells.empty()) {
+        actions.push_back(
+            { "cast_spell", "Cast a spell", []() -> TAInput {
+                 return { "spellcraft_action", { { "action", std::string("cast_spell") } } };
+             } });
+    }
+
+    actions.push_back(
+        { "conduct_research", "Conduct magical research", []() -> TAInput {
+             return { "spellcraft_action", { { "action", std::string("research") } } };
+         } });
+
+    actions.push_back(
+        { "exit_spellcrafting", "Exit spell crafting", []() -> TAInput {
+             return { "spellcraft_action", { { "action", std::string("exit") } } };
+         } });
+
+    return actions;
+}
+
+bool evaluateTransition(const TAInput& input, TANode*& outNextNode) override
+{
+    if (input.type == "spellcraft_action") {
+        std::string action = std::get<std::string>(input.parameters.at("action"));
+
+        if (action == "exit") {
+            // Return to default node (would be set in game logic)
+            for (const auto& rule : transitionRules) {
+                if (rule.description == "Exit") {
+                    outNextNode = rule.targetNode;
+                    return true;
                 }
             }
         }
-
-        return TANode::evaluateTransition(input, outNextNode);
     }
-};
+
+    return TANode::evaluateTransition(input, outNextNode);
+}
+}
+;
 
 // Integration function to set up the full spell crafting system in a game
 void setupSpellCraftingSystem(TAController& controller, TANode* worldRoot)
