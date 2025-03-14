@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iomanip>
@@ -141,6 +142,8 @@ struct GameContext {
     CharacterStats playerStats;
     WorldState worldState;
     Inventory playerInventory;
+
+    // Add any additional game-specific context here
     std::map<std::string, std::string> questJournal;
     std::map<std::string, std::string> dialogueHistory;
 };
@@ -196,6 +199,10 @@ public:
     virtual bool deserialize(std::ifstream& file);
 };
 
+//----------------------------------------
+// QUEST SYSTEM
+//----------------------------------------
+
 // Quest-specific node implementation
 class QuestNode : public TANode {
 public:
@@ -242,6 +249,10 @@ public:
     std::vector<TAAction> getAvailableActions() override;
 };
 
+//----------------------------------------
+// DIALOGUE SYSTEM
+//----------------------------------------
+
 // Dialogue node for conversation trees
 class DialogueNode : public TANode {
 public:
@@ -258,7 +269,8 @@ public:
 
         DialogueResponse(
             const std::string& responseText, TANode* target,
-            std::function<bool(const GameContext&)> req = [](const GameContext&) { return true; },
+            std::function<bool(const GameContext&)> req =
+                [](const GameContext&) { return true; },
             std::function<void(GameContext*)> eff = [](GameContext*) {});
     };
     std::vector<DialogueResponse> responses;
@@ -266,11 +278,13 @@ public:
     // Optional effect to run when this dialogue is shown
     std::function<void(GameContext*)> onShowEffect;
 
-    DialogueNode(const std::string& name, const std::string& speaker, const std::string& text);
+    DialogueNode(const std::string& name, const std::string& speaker,
+        const std::string& text);
 
     void addResponse(
         const std::string& text, TANode* target,
-        std::function<bool(const GameContext&)> requirement = [](const GameContext&) { return true; },
+        std::function<bool(const GameContext&)> requirement =
+            [](const GameContext&) { return true; },
         std::function<void(GameContext*)> effect = [](GameContext*) {});
 
     void onEnter(GameContext* context) override;
@@ -298,6 +312,10 @@ public:
     void startDialogue(GameContext* context);
     bool processResponse(int responseIndex, GameContext* context);
 };
+
+//----------------------------------------
+// CHARACTER PROGRESSION SYSTEM
+//----------------------------------------
 
 // Skill node for character progression
 class SkillNode : public TANode {
@@ -338,7 +356,8 @@ public:
     };
     std::vector<SkillCost> costs;
 
-    SkillNode(const std::string& name, const std::string& skill, int initialLevel = 0, int max = 5);
+    SkillNode(const std::string& name, const std::string& skill,
+        int initialLevel = 0, int max = 5);
 
     bool canLearn(const GameContext& context) const;
     void learnSkill(GameContext* context);
@@ -359,6 +378,10 @@ public:
     ClassNode(const std::string& name, const std::string& classType);
     void onEnter(GameContext* context) override;
 };
+
+//----------------------------------------
+// CRAFTING SYSTEM
+//----------------------------------------
 
 // Recipe for crafting items
 class Recipe {
@@ -407,6 +430,10 @@ public:
     void addRecipe(const Recipe& recipe);
 };
 
+//----------------------------------------
+// WORLD PROGRESSION SYSTEM
+//----------------------------------------
+
 // Location node for world state
 class LocationNode : public TANode {
 public:
@@ -431,7 +458,9 @@ public:
     };
     std::vector<AccessCondition> accessConditions;
 
-    LocationNode(const std::string& name, const std::string& location, const std::string& initialState = "normal");
+    LocationNode(const std::string& name, const std::string& location,
+        const std::string& initialState = "normal");
+
     bool canAccess(const GameContext& context) const;
     void onEnter(GameContext* context) override;
     std::vector<TAAction> getAvailableActions() override;
@@ -495,7 +524,7 @@ public:
     // Game context
     GameContext gameContext;
 
-    // Additional data for systems
+    // Game data storage for references
     std::map<std::string, std::map<std::string, NPC*>> gameData;
 
     // Process an input and potentially transition to a new state
@@ -516,23 +545,25 @@ public:
     // Set a system root
     void setSystemRoot(const std::string& systemName, TANode* rootNode);
 
-    // Save/load state
-    bool saveState_old(const std::string& filename);
-    bool loadState_old(const std::string& filename);
-    bool saveState(const std::string& filename);
-    bool loadState(const std::string& filename);
-
     // Initialize persistent IDs for all nodes
     void initializePersistentIDs();
     std::string findPathToNode(TANode* root, TANode* target, const std::string& basePath);
+
+    // Find a node by its persistent ID
     TANode* findNodeByPersistentID(const std::string& persistentID);
     TANode* findNodeByNameRecursive(TANode* node, const std::string& nodeName);
     TANode* findNodeByNameInHierarchy(TANode* node, const std::string& nodeName);
     void printNodeIDsRecursive(TANode* node, int depth);
     TANode* findNodeByPersistentIDRecursive(TANode* node, const std::string& persistentID);
 
+    // Save/load state
+    bool saveState_old(const std::string& filename);
+    bool loadState_old(const std::string& filename);
+    bool saveState(const std::string& filename);
+    bool loadState(const std::string& filename);
+
 private:
-    // Helper functions for node finding
+    // Helper functions for serializing game context components
     TANode* findNodeById(TANode* startNode, const NodeID& id);
     TANode* findNodeByName(TANode* startNode, const std::string& name);
     bool isNodeReachableFromNode(TANode* startNode, const NodeID& targetId);
@@ -555,5 +586,8 @@ void loadNPCsFromJSON(TAController& controller, const json& npcData);
 void loadSkillsFromJSON(TAController& controller, const json& skillsData);
 void loadCraftingFromJSON(TAController& controller, const json& craftingData);
 void loadWorldFromJSON(TAController& controller, const json& worldData);
+
+// Function to create default JSON files
+void createDefaultJSONFiles();
 
 #endif // OATH_RPG_SYSTEMS_JSON_HPP

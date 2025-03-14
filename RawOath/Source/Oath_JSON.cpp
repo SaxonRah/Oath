@@ -1,6 +1,6 @@
-// Oath_RPGSystems_JSON.cpp
+// Oath_JSON.cpp
 
-#include "Oath_RPGSystems_JSON.hpp"
+#include "Oath_JSON.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -37,15 +37,25 @@ class CraftingNode;
 class LocationNode;
 class TimeNode;
 
-// New function to load game data
+// Function to load game data from JSON files
 bool loadGameData(TAController& controller)
 {
     try {
+        // Make sure the data directory exists
+        if (!std::filesystem::exists("data")) {
+            std::filesystem::create_directory("data");
+            std::cout << "Created data directory" << std::endl;
+            createDefaultJSONFiles();
+        }
+
         // Load quests
         std::ifstream questFile("data/quests.json");
         if (questFile.is_open()) {
             json questData = json::parse(questFile);
             loadQuestsFromJSON(controller, questData);
+            std::cout << "Loaded quest data" << std::endl;
+        } else {
+            std::cerr << "Failed to open data/quests.json" << std::endl;
         }
 
         // Load NPCs and dialogue
@@ -53,6 +63,9 @@ bool loadGameData(TAController& controller)
         if (npcFile.is_open()) {
             json npcData = json::parse(npcFile);
             loadNPCsFromJSON(controller, npcData);
+            std::cout << "Loaded NPC data" << std::endl;
+        } else {
+            std::cerr << "Failed to open data/npcs.json" << std::endl;
         }
 
         // Load skills and progression
@@ -60,6 +73,9 @@ bool loadGameData(TAController& controller)
         if (skillsFile.is_open()) {
             json skillsData = json::parse(skillsFile);
             loadSkillsFromJSON(controller, skillsData);
+            std::cout << "Loaded skills data" << std::endl;
+        } else {
+            std::cerr << "Failed to open data/skills.json" << std::endl;
         }
 
         // Load crafting recipes
@@ -67,6 +83,9 @@ bool loadGameData(TAController& controller)
         if (craftingFile.is_open()) {
             json craftingData = json::parse(craftingFile);
             loadCraftingFromJSON(controller, craftingData);
+            std::cout << "Loaded crafting data" << std::endl;
+        } else {
+            std::cerr << "Failed to open data/crafting.json" << std::endl;
         }
 
         // Load world data
@@ -74,12 +93,163 @@ bool loadGameData(TAController& controller)
         if (worldFile.is_open()) {
             json worldData = json::parse(worldFile);
             loadWorldFromJSON(controller, worldData);
+            std::cout << "Loaded world data" << std::endl;
+        } else {
+            std::cerr << "Failed to open data/world.json" << std::endl;
         }
 
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error loading game data: " << e.what() << std::endl;
         return false;
+    }
+}
+
+// Function to create default JSON files if they don't exist
+void createDefaultJSONFiles()
+{
+    // Create quests.json
+    std::ofstream questFile("data/quests.json");
+    if (questFile.is_open()) {
+        json questData;
+        questData["quests"] = json::array({ { { "id", "MainQuest" },
+            { "title", "Defend the Village" },
+            { "description", "The village is under threat. Prepare its defenses!" },
+            { "state", "Available" },
+            { "isAcceptingState", false },
+            { "rewards", json::array({ { { "type", "experience" }, { "amount", 500 }, { "itemId", "" } }, { { "type", "gold" }, { "amount", 200 }, { "itemId", "" } }, { { "type", "faction" }, { "amount", 25 }, { "itemId", "villagers" } }, { { "type", "item" }, { "amount", 1 }, { "itemId", "defenders_shield" } } }) },
+            { "requirements", json::array() },
+            { "subquests", json::array({ { { "id", "RepairWalls" }, { "title", "Repair the Walls" }, { "description", "The village walls are in disrepair. Fix them!" }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", json::array({ { { "type", "experience" }, { "amount", 100 }, { "itemId", "" } }, { { "type", "gold" }, { "amount", 50 }, { "itemId", "" } }, { { "type", "faction" }, { "amount", 10 }, { "itemId", "villagers" } } }) }, { "requirements", json::array({ { { "type", "skill" }, { "target", "crafting" }, { "value", 1 } } }) }, { "transitions", json::array({ { { "action", "repair_complete" }, { "target", "MainQuest" }, { "description", "Complete wall repairs" } } }) } }, { { "id", "TrainMilitia" }, { "title", "Train the Militia" }, { "description", "The villagers need combat training." }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", json::array({ { { "type", "experience" }, { "amount", 150 }, { "itemId", "" } }, { { "type", "skill" }, { "amount", 1 }, { "itemId", "combat" } } }) }, { "requirements", json::array({ { { "type", "skill" }, { "target", "combat" }, { "value", 2 } } }) }, { "transitions", json::array({ { { "action", "training_complete" }, { "target", "MainQuest" }, { "description", "Complete militia training" } } }) } }, { { "id", "GatherSupplies" }, { "title", "Gather Supplies" }, { "description", "The village needs food and resources." }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", json::array({ { { "type", "experience" }, { "amount", 100 }, { "itemId", "" } }, { { "type", "item" }, { "amount", 1 }, { "itemId", "rare_herb" } } }) }, { "requirements", json::array({ { { "type", "skill" }, { "target", "survival" }, { "value", 1 } } }) }, { "transitions", json::array({ { { "action", "supplies_gathered" }, { "target", "MainQuest" }, { "description", "Finish gathering supplies" } } }) } } }) } } });
+        questFile << std::setw(4) << questData << std::endl;
+        questFile.close();
+    }
+
+    // Create npcs.json
+    std::ofstream npcFile("data/npcs.json");
+    if (npcFile.is_open()) {
+        json npcData;
+        npcData["npcs"] = json::array({ { { "id", "elder_marius" },
+            { "name", "Elder Marius" },
+            { "description", "The wise leader of the village" },
+            { "relationshipValue", 0 },
+            { "rootDialogue", "ElderGreeting" },
+            { "dialogueNodes", json::array({ { { "id", "ElderGreeting" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Greetings, traveler. Our village faces difficult times." }, { "responses", json::array({ { { "text", "What threat does the village face?" }, { "targetNode", "AskThreat" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "Is there something I can help with?" }, { "targetNode", "AskHelp" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "I need to go. Farewell." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "AskThreat" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Bandits have been raiding nearby settlements. I fear we're next." }, { "responses", json::array({ { { "text", "How can I help against these bandits?" }, { "targetNode", "AskHelp" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "I'll be on my way." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "AskHelp" }, { "speakerName", "Elder Marius" }, { "dialogueText", "We need someone skilled to help prepare our defenses." }, { "responses", json::array({ { { "text", "I'll help defend the village." }, { "targetNode", "AcceptQuest" }, { "requirements", json::array() }, { "effects", json::array({ { { "type", "quest" }, { "action", "activate" }, { "target", "MainQuest" } }, { { "type", "knowledge" }, { "action", "add" }, { "target", "village_under_threat" } }, { { "type", "faction" }, { "action", "change" }, { "target", "villagers" }, { "amount", 5 } } }) } }, { { "text", "I'm not interested in helping." }, { "targetNode", "RejectQuest" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "I need to think about it." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "AcceptQuest" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Thank you! This means a lot to our community. We need the walls repaired, the militia trained, and supplies gathered." }, { "responses", json::array({ { { "text", "I'll get started right away." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "RejectQuest" }, { "speakerName", "Elder Marius" }, { "dialogueText", "I understand. Perhaps you'll reconsider when you have time." }, { "responses", json::array({ { { "text", "Goodbye." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "Farewell" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Safe travels, friend. Return if you need anything." }, { "responses", json::array() } } }) } } });
+        npcFile << std::setw(4) << npcData << std::endl;
+        npcFile.close();
+    }
+
+    // Create skills.json
+    std::ofstream skillsFile("data/skills.json");
+    if (skillsFile.is_open()) {
+        json skillsData;
+        // Add skills data
+        skillsData["skills"] = json::array({ { { "id", "CombatBasics" },
+                                                 { "skillName", "combat" },
+                                                 { "description", "Basic combat techniques and weapon handling." },
+                                                 { "level", 0 },
+                                                 { "maxLevel", 5 },
+                                                 { "requirements", json::array() },
+                                                 { "effects", json::array({ { { "type", "stat" }, { "target", "strength" }, { "value", 1 } } }) },
+                                                 { "costs", json::array() },
+                                                 { "childSkills", json::array({ { { "id", "Swordsmanship" }, { "skillName", "swordsmanship" }, { "description", "Advanced sword techniques for greater damage and defense." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "combat" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "power_attack" }, { "value", 0 } } }) } }, { { "id", "Archery" }, { "skillName", "archery" }, { "description", "Precision with bows and other ranged weapons." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "combat" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "precise_shot" }, { "value", 0 } } }) } } }) } },
+            { { "id", "SurvivalBasics" },
+                { "skillName", "survival" },
+                { "description", "Basic survival skills for harsh environments." },
+                { "level", 0 },
+                { "maxLevel", 5 },
+                { "requirements", json::array() },
+                { "effects", json::array({ { { "type", "stat" }, { "target", "constitution" }, { "value", 1 } } }) },
+                { "costs", json::array() },
+                { "childSkills", json::array({ { { "id", "Herbalism" }, { "skillName", "herbalism" }, { "description", "Knowledge of medicinal and poisonous plants." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "survival" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "herbal_remedy" }, { "value", 0 } } }) } }, { { "id", "Tracking" }, { "skillName", "tracking" }, { "description", "Follow trails and find creatures in the wilderness." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "survival" }, { "level", 1 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "track_prey" }, { "value", 0 } } }) } } }) } },
+            { { "id", "CraftingBasics" },
+                { "skillName", "crafting" },
+                { "description", "Basic crafting and repair techniques." },
+                { "level", 0 },
+                { "maxLevel", 5 },
+                { "requirements", json::array() },
+                { "effects", json::array({ { { "type", "stat" }, { "target", "dexterity" }, { "value", 1 } } }) },
+                { "costs", json::array() },
+                { "childSkills", json::array({ { { "id", "Blacksmithing" }, { "skillName", "blacksmithing" }, { "description", "Forge and improve metal weapons and armor." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "crafting" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "forge_weapon" }, { "value", 0 } } }) } }, { { "id", "Alchemy" }, { "skillName", "alchemy" }, { "description", "Create potions and elixirs with magical effects." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "crafting" }, { "level", 1 } }, { { "type", "skill" }, { "target", "herbalism" }, { "level", 1 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "brew_potion" }, { "value", 0 } } }) } } }) } } });
+
+        // Add classes data
+        skillsData["classes"] = json::array({ { { "id", "Warrior" },
+                                                  { "className", "Warrior" },
+                                                  { "description", "Masters of combat, strong and resilient." },
+                                                  { "statBonuses", { { "strength", 3 }, { "constitution", 2 } } },
+                                                  { "startingAbilities", { "weapon_specialization" } },
+                                                  { "classSkills", { "CombatBasics", "Swordsmanship" } } },
+            { { "id", "Ranger" },
+                { "className", "Ranger" },
+                { "description", "Wilderness experts, skilled with bow and blade." },
+                { "statBonuses", { { "dexterity", 2 }, { "wisdom", 2 } } },
+                { "startingAbilities", { "animal_companion" } },
+                { "classSkills", { "Archery", "Tracking" } } },
+            { { "id", "Alchemist" },
+                { "className", "Alchemist" },
+                { "description", "Masters of potions and elixirs." },
+                { "statBonuses", { { "intelligence", 3 }, { "dexterity", 1 } } },
+                { "startingAbilities", { "potion_mastery" } },
+                { "classSkills", { "Herbalism", "Alchemy" } } } });
+
+        skillsFile << std::setw(4) << skillsData << std::endl;
+        skillsFile.close();
+    }
+
+    // Create crafting.json
+    std::ofstream craftingFile("data/crafting.json");
+    if (craftingFile.is_open()) {
+        json craftingData;
+        craftingData["craftingStations"] = json::array({ { { "id", "BlacksmithStation" },
+                                                             { "stationType", "Blacksmith" },
+                                                             { "description", "A forge with anvil, hammers, and other metalworking tools." },
+                                                             { "recipes", json::array({ { { "recipeId", "sword_recipe" }, { "name", "Iron Sword" }, { "description", "A standard iron sword, good for combat." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "iron_ingot" }, { "quantity", 2 } }, { { "itemId", "leather_strips" }, { "quantity", 1 } } }) }, { "skillRequirements", { { "blacksmithing", 1 } } }, { "result", { { "itemId", "iron_sword" }, { "name", "Iron Sword" }, { "type", "weapon" }, { "quantity", 1 }, { "properties", { { "damage", 10 } } } } } }, { { "recipeId", "armor_recipe" }, { "name", "Leather Armor" }, { "description", "Basic protective gear made from leather." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "leather" }, { "quantity", 5 } }, { { "itemId", "metal_studs" }, { "quantity", 10 } } }) }, { "skillRequirements", { { "crafting", 2 } } }, { "result", { { "itemId", "leather_armor" }, { "name", "Leather Armor" }, { "type", "armor" }, { "quantity", 1 }, { "properties", { { "defense", 5 } } } } } } }) } },
+            { { "id", "AlchemyStation" },
+                { "stationType", "Alchemy" },
+                { "description", "A workbench with alembics, mortars, and various containers for brewing." },
+                { "recipes", json::array({ { { "recipeId", "health_potion_recipe" }, { "name", "Minor Healing Potion" }, { "description", "A potion that restores a small amount of health." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "red_herb" }, { "quantity", 2 } }, { { "itemId", "water_flask" }, { "quantity", 1 } } }) }, { "skillRequirements", { { "alchemy", 1 } } }, { "result", { { "itemId", "minor_healing_potion" }, { "name", "Minor Healing Potion" }, { "type", "potion" }, { "quantity", 1 }, { "properties", { { "heal_amount", 25 } } } } } } }) } },
+            { { "id", "CookingStation" },
+                { "stationType", "Cooking" },
+                { "description", "A firepit with cooking pots and utensils." },
+                { "recipes", json::array({ { { "recipeId", "stew_recipe" }, { "name", "Hearty Stew" }, { "description", "A filling meal that provides temporary stat bonuses." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "meat" }, { "quantity", 2 } }, { { "itemId", "vegetables" }, { "quantity", 3 } } }) }, { "skillRequirements", { { "cooking", 1 } } }, { "result", { { "itemId", "hearty_stew" }, { "name", "Hearty Stew" }, { "type", "food" }, { "quantity", 2 }, { "properties", { { "effect_duration", 300 } } } } } } }) } } });
+        craftingFile << std::setw(4) << craftingData << std::endl;
+        craftingFile.close();
+    }
+
+    // Create world.json
+    std::ofstream worldFile("data/world.json");
+    if (worldFile.is_open()) {
+        json worldData;
+        worldData["regions"] = json::array({ { { "id", "VillageRegion" },
+                                                 { "regionName", "Oakvale Village" },
+                                                 { "description", "A peaceful farming village surrounded by wooden palisades." },
+                                                 { "controllingFaction", "villagers" },
+                                                 { "connectedRegions", { "ForestRegion", "MountainRegion" } },
+                                                 { "locations", json::array({ { { "id", "VillageCenter" }, { "locationName", "Village Center" }, { "description", "The bustling center of the village with a market and well." }, { "currentState", "normal" }, { "stateDescriptions", { { "damaged", "The village center shows signs of damage from bandit raids." }, { "rebuilt", "The village center has been rebuilt stronger than before." } } }, { "accessConditions", json::array() }, { "npcs", { "elder_marius" } }, { "activities", { "MainQuest" } } }, { { "id", "VillageInn" }, { "locationName", "The Sleeping Dragon Inn" }, { "description", "A cozy inn where travelers find rest and information." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", json::array() } }, { { "id", "VillageForge" }, { "locationName", "Blacksmith's Forge" }, { "description", "The local blacksmith's workshop with a roaring forge." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", { "BlacksmithStation" } } } }) },
+                                                 { "possibleEvents", json::array({ { { "name", "Bandit Raid" }, { "description", "A small group of bandits is attacking the village outskirts!" }, { "condition", { { "type", "worldflag" }, { "flag", "village_defended" }, { "value", false } } }, { "effect", { { "type", "location" }, { "target", "village" }, { "state", "under_attack" } } }, { "probability", 0.2 } } }) } },
+            { { "id", "ForestRegion" },
+                { "regionName", "Green Haven Forest" },
+                { "description", "A dense forest with ancient trees and hidden paths." },
+                { "controllingFaction", "forest guardians" },
+                { "connectedRegions", { "VillageRegion", "MountainRegion" } },
+                { "locations", json::array({ { { "id", "ForestClearing" }, { "locationName", "Forest Clearing" }, { "description", "A peaceful clearing in the heart of the forest." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", json::array() } }, { { "id", "AncientGroves" }, { "locationName", "Ancient Groves" }, { "description", "An area with trees older than any human memory." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array({ { { "type", "skill" }, { "target", "survival" }, { "value", 2 } } }) }, { "npcs", json::array() }, { "activities", json::array() } } }) },
+                { "possibleEvents", json::array({ { { "name", "Rare Herb Sighting" }, { "description", "You spot a patch of rare medicinal herbs growing nearby." }, { "condition", { { "type", "skill" }, { "skill", "herbalism" }, { "value", 1 } } }, { "effect", { { "type", "item" }, { "item", "rare_herb" }, { "quantity", 1 } } }, { "probability", 0.3 } } }) } },
+            { { "id", "MountainRegion" },
+                { "regionName", "Stone Peak Mountains" },
+                { "description", "Rugged mountains with treacherous paths and hidden caves." },
+                { "controllingFaction", "mountainfolk" },
+                { "connectedRegions", { "VillageRegion", "ForestRegion" } },
+                { "locations", json::array({ { { "id", "MountainPass" }, { "locationName", "Mountain Pass" }, { "description", "A winding path through the mountains." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", json::array() } }, { { "id", "AbandonedMine" }, { "locationName", "Abandoned Mine" }, { "description", "An old mine, no longer in use. Rumors say something lurks within." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array({ { { "type", "item" }, { "target", "torch" }, { "value", 1 } } }) }, { "npcs", json::array() }, { "activities", json::array() } } }) },
+                { "possibleEvents", json::array() } } });
+
+        worldData["timeSystem"] = {
+            { "day", 1 },
+            { "hour", 6 },
+            { "season", "spring" },
+            { "timeOfDay", "morning" }
+        };
+
+        worldFile << std::setw(4) << worldData << std::endl;
+        worldFile.close();
     }
 }
 
@@ -264,8 +434,8 @@ void loadNPCsFromJSON(TAController& controller, const json& npcData)
     TANode* dialogueControllerNode = controller.createNode("DialogueController");
     controller.setSystemRoot("DialogueSystem", dialogueControllerNode);
 
-    // Store NPCs for later reference (e.g., to be placed in locations)
-    controller.gameData["npcs"] = npcs;
+    // Store NPCs for later reference
+    controller.gameData["npcs"] = reinterpret_cast<std::map<std::string, void*>&>(npcs);
 }
 
 // Load skills and progression from JSON
@@ -556,37 +726,43 @@ void loadWorldFromJSON(TAController& controller, const json& worldData)
         }
     }
 
-    // Set up NPCs in locations
+    // Set up NPCs in locations and activities
+    auto& npcMap = *reinterpret_cast<std::map<std::string, NPC*>*>(&controller.gameData["npcs"]);
+
     for (const auto& regionData : worldData["regions"]) {
         for (const auto& locationData : regionData["locations"]) {
             LocationNode* location = locations[locationData["id"]];
 
             // Add NPCs
-            for (const auto& npcId : locationData["npcs"]) {
-                if (controller.gameData.count("npcs") && controller.gameData["npcs"].count(npcId)) {
-                    location->npcs.push_back(controller.gameData["npcs"][npcId]);
+            if (locationData.contains("npcs")) {
+                for (const auto& npcId : locationData["npcs"]) {
+                    if (npcMap.count(npcId)) {
+                        location->npcs.push_back(npcMap[npcId]);
+                    }
                 }
             }
 
             // Add activities (quests, crafting, etc.)
-            for (const auto& activityId : locationData["activities"]) {
-                // Try to find the activity in various systems
-                TANode* activity = nullptr;
+            if (locationData.contains("activities")) {
+                for (const auto& activityId : locationData["activities"]) {
+                    // Try to find the activity in various systems
+                    TANode* activity = nullptr;
 
-                if (controller.currentNodes.count("QuestSystem") && controller.currentNodes["QuestSystem"]->nodeName == activityId) {
-                    activity = controller.currentNodes["QuestSystem"];
-                } else if (controller.currentNodes.count("CraftingSystem")) {
-                    // Search in crafting children
-                    for (TANode* child : controller.currentNodes["CraftingSystem"]->childNodes) {
-                        if (child->nodeName == activityId) {
-                            activity = child;
-                            break;
+                    if (controller.systemRoots.count("QuestSystem") && controller.systemRoots["QuestSystem"]->nodeName == activityId) {
+                        activity = controller.systemRoots["QuestSystem"];
+                    } else if (controller.systemRoots.count("CraftingSystem")) {
+                        // Search in crafting children
+                        for (TANode* child : controller.systemRoots["CraftingSystem"]->childNodes) {
+                            if (child->nodeName == activityId) {
+                                activity = child;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (activity) {
-                    location->activities.push_back(activity);
+                    if (activity) {
+                        location->activities.push_back(activity);
+                    }
                 }
             }
         }
@@ -2433,6 +2609,9 @@ public:
     // Game context
     GameContext gameContext;
 
+    // Game data storage for references
+    std::map<std::string, std::map<std::string, void*>> gameData;
+
     // Process an input and potentially transition to a new state
     bool processInput(const std::string& systemName, const TAInput& input)
     {
@@ -2454,7 +2633,6 @@ public:
                 currentNodes[systemName] = nextNode;
 
                 // Update the persistent ID to reflect the actual path
-                // This is the key addition
                 updateCurrentNodePersistentID(systemName);
 
                 nextNode->onEnter(&gameContext);
@@ -2739,31 +2917,33 @@ public:
         // Check if this is a location node (special case for WorldSystem)
         if (persistentID.find("WorldSystem/") == 0) {
             // Try to find locations in each region
-            TANode* worldRoot = systemRoots["WorldSystem"];
-            RegionNode* regionNode = dynamic_cast<RegionNode*>(worldRoot);
+            if (systemRoots.find("WorldSystem") != systemRoots.end()) {
+                TANode* worldRoot = systemRoots["WorldSystem"];
+                RegionNode* regionNode = dynamic_cast<RegionNode*>(worldRoot);
 
-            if (regionNode) {
-                // Check direct locations in this region
-                for (LocationNode* location : regionNode->locations) {
-                    if (location->nodeName == nodeName) {
-                        std::cout << "Found location '" << nodeName << "' in region "
-                                  << regionNode->regionName << std::endl;
-                        location->nodeID.persistentID = persistentID;
-                        return location;
-                    }
-                }
-            }
-
-            // Try sub-regions if main region didn't have it
-            for (TANode* child : worldRoot->childNodes) {
-                RegionNode* subRegion = dynamic_cast<RegionNode*>(child);
-                if (subRegion) {
-                    for (LocationNode* location : subRegion->locations) {
+                if (regionNode) {
+                    // Check direct locations in this region
+                    for (LocationNode* location : regionNode->locations) {
                         if (location->nodeName == nodeName) {
-                            std::cout << "Found location '" << nodeName << "' in sub-region "
-                                      << subRegion->regionName << std::endl;
+                            std::cout << "Found location '" << nodeName << "' in region "
+                                      << regionNode->regionName << std::endl;
                             location->nodeID.persistentID = persistentID;
                             return location;
+                        }
+                    }
+                }
+
+                // Try sub-regions if main region didn't have it
+                for (TANode* child : worldRoot->childNodes) {
+                    RegionNode* subRegion = dynamic_cast<RegionNode*>(child);
+                    if (subRegion) {
+                        for (LocationNode* location : subRegion->locations) {
+                            if (location->nodeName == nodeName) {
+                                std::cout << "Found location '" << nodeName << "' in sub-region "
+                                          << subRegion->regionName << std::endl;
+                                location->nodeID.persistentID = persistentID;
+                                return location;
+                            }
                         }
                     }
                 }
@@ -3875,6 +4055,15 @@ int main()
     // Create the automaton controller
     TAController controller;
 
+    // Load all game data from JSON files
+    std::cout << "___ LOADING GAME DATA FROM JSON FILES ___" << std::endl;
+    if (!loadGameData(controller)) {
+        std::cerr << "Failed to load game data. Exiting." << std::endl;
+        return 1;
+    }
+
+    std::cout << "\n___ GAME DATA LOADED SUCCESSFULLY ___\n"
+              << std::endl;
     //----------------------------------------
     // QUEST SYSTEM SETUP
     //----------------------------------------
@@ -4505,31 +4694,37 @@ int main()
     };
     controller.processInput("WorldSystem", travelInput);
 
-    // Talk to the village elder (NPC index 0)
-    std::cout << "\nTalking to Elder Marius...\n"
-              << std::endl;
-    elderNPC.startDialogue(&controller.gameContext);
+    // Get the Elder Marius NPC from the game data
+    std::map<std::string, NPC*>& npcMap = *reinterpret_cast<std::map<std::string, NPC*>*>(&controller.gameData["npcs"]);
+    NPC* elderMarius = npcMap["elder_marius"];
 
-    // Example: Choose dialogue option 0 (Ask about threat)
-    elderNPC.processResponse(0, &controller.gameContext);
+    // Talk to the village elder
+    if (elderMarius) {
+        std::cout << "\nTalking to Elder Marius...\n"
+                  << std::endl;
+        elderMarius->startDialogue(&controller.gameContext);
 
-    // Example: Choose dialogue option 0 (Ask how to help)
-    elderNPC.processResponse(0, &controller.gameContext);
+        // Example: Choose dialogue option 0 (Ask about threat)
+        elderMarius->processResponse(0, &controller.gameContext);
 
-    // Example: Choose dialogue option 0 (Accept quest)
-    elderNPC.processResponse(0, &controller.gameContext);
+        // Example: Choose dialogue option 0 (Ask how to help)
+        elderMarius->processResponse(0, &controller.gameContext);
 
-    // Example: Choose dialogue option 0 (I'll get started)
-    elderNPC.processResponse(0, &controller.gameContext);
+        // Example: Choose dialogue option 0 (Accept quest)
+        elderMarius->processResponse(0, &controller.gameContext);
+
+        // Example: Choose dialogue option 0 (I'll get started)
+        elderMarius->processResponse(0, &controller.gameContext);
+    }
 
     // Example: Try crafting
     std::cout << "\n=== CRAFTING EXAMPLE ===\n"
               << std::endl;
 
-    // Access the blacksmith station
+    // Access the crafting system
     controller.processInput("CraftingSystem", {});
 
-    // Select blacksmith station (child index 0)
+    // Navigate to blacksmith station (first child)
     TAInput craftingInput = {
         "crafting_action",
         { { "action", std::string("select_station") }, { "index", 0 } }
@@ -4573,18 +4768,28 @@ int main()
     // Initialize quest system with main quest
     controller.processInput("QuestSystem", {});
 
-    // Access the repair walls subquest
-    TANode* nextNode = nullptr;
-    if (dynamic_cast<QuestNode*>(controller.currentNodes["QuestSystem"])
-            ->processAction("access_subquest", nextNode)) {
-        controller.currentNodes["QuestSystem"] = repairWalls;
-        repairWalls->onEnter(&controller.gameContext);
+    // Find the repair walls subquest
+    QuestNode* mainQuest = dynamic_cast<QuestNode*>(controller.systemRoots["QuestSystem"]);
+    QuestNode* repairWalls = nullptr;
+
+    for (TANode* child : mainQuest->childNodes) {
+        if (child->nodeName == "RepairWalls") {
+            repairWalls = dynamic_cast<QuestNode*>(child);
+            break;
+        }
     }
 
-    // Complete the repair walls quest
-    TAInput completeQuestInput = { "action",
-        { { "name", std::string("repair_complete") } } };
-    controller.processInput("QuestSystem", completeQuestInput);
+    // Access and complete the repair walls subquest
+    if (repairWalls) {
+        // Make this the current quest node
+        controller.currentNodes["QuestSystem"] = repairWalls;
+        repairWalls->onEnter(&controller.gameContext);
+
+        // Complete the repair walls quest
+        TAInput completeQuestInput = { "action",
+            { { "name", std::string("repair_complete") } } };
+        controller.processInput("QuestSystem", completeQuestInput);
+    }
 
     // Track quest progress
     std::cout << "\nQuest journal:" << std::endl;
@@ -4600,8 +4805,11 @@ int main()
     controller.processInput("TimeSystem", {});
 
     // Wait 5 hours
-    for (int i = 0; i < 5; i++) {
-        timeSystem->advanceHour(&controller.gameContext);
+    TimeNode* timeSystem = dynamic_cast<TimeNode*>(controller.currentNodes["TimeSystem"]);
+    if (timeSystem) {
+        for (int i = 0; i < 5; i++) {
+            timeSystem->advanceHour(&controller.gameContext);
+        }
     }
 
     // Initialize persistent IDs before saving
@@ -4636,30 +4844,23 @@ int main()
     std::cout << "VillageCenter ID: " << villageCenterLocation->nodeID.persistentID << std::endl;
 
     // Save the game state
-    controller.saveState("game_save.dat");
-    std::cout << "\nGame state saved to game_save.dat" << std::endl;
-
-    // Display the contents of game_save
-    std::ifstream savedFile("game_save.dat", std::ios::binary);
-    if (savedFile.is_open()) {
-        std::cout << "File created with size: " << savedFile.tellg() << " bytes"
-                  << std::endl;
-        savedFile.close();
-    }
+    controller.saveState("game_save.json");
+    std::cout << "\nGame state saved to game_save.json" << std::endl;
 
     // Load the state from the saved file
     std::cout << "\n=== LOADING SAVED GAME ===\n"
               << std::endl;
 
     // Check if file exists first
-    std::ifstream checkFile("game_save.dat");
+    std::ifstream checkFile("game_save.json");
     if (!checkFile.good()) {
         std::cout << "Save file doesn't exist or can't be opened." << std::endl;
         return 0;
     }
     checkFile.close();
+
     try {
-        bool load_result = controller.loadState("game_save.dat");
+        bool load_result = controller.loadState("game_save.json");
         if (load_result) {
             std::cout << "Game state loaded successfully!" << std::endl;
 

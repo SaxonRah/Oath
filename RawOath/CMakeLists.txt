@@ -11,8 +11,7 @@ include_directories(${CMAKE_SOURCE_DIR}/Source/Public)
 
 # Define source files with main() functions that will each become executables
 set(MAIN_SOURCES
-    Source/Oath_RPGSystems_New.cpp
-    Source/Oath_RPGSystems_JSON.cpp
+    Source/Oath_JSON.cpp
     Source/System_AdvancedWeather_JSON.cpp
     Source/System_CrimeLaw_JSON.cpp
     Source/System_DiseaseHealth_JSON.cpp
@@ -36,8 +35,7 @@ set(MAIN_SOURCES
 )
 
 # Define the primary executable from the main RPG systems file
-add_executable(${PROJECT_NAME} Source/Oath_RPGSystems_New.cpp)
-# add_executable(${PROJECT_NAME} Source/Oath_RPGSystems_JSON.cpp)
+add_executable(${PROJECT_NAME} Source/Oath_JSON.cpp)
 
 # Create individual executables for each file with main()
 foreach(SOURCE_FILE ${MAIN_SOURCES})
