@@ -1,4 +1,4 @@
-#include "Generator/Generator_NPC.h"
+#include "Generator_NPC.h"
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
