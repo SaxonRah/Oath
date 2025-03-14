@@ -1,0 +1,245 @@
+{
+    "skills": [
+        {
+            "id": "CombatBasics",
+            "skillName": "combat",
+            "description": "Basic combat techniques and weapon handling.",
+            "level": 0,
+            "maxLevel": 5,
+            "requirements": [],
+            "effects": [
+                {
+                    "type": "stat",
+                    "target": "strength",
+                    "value": 1
+                }
+            ],
+            "costs": [],
+            "childSkills": [
+                {
+                    "id": "Swordsmanship",
+                    "skillName": "swordsmanship",
+                    "description": "Advanced sword techniques for greater damage and defense.",
+                    "level": 0,
+                    "maxLevel": 5,
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "combat",
+                            "level": 2
+                        }
+                    ],
+                    "effects": [
+                        {
+                            "type": "ability",
+                            "target": "power_attack",
+                            "value": 0
+                        }
+                    ],
+                    "costs": []
+                },
+                {
+                    "id": "Archery",
+                    "skillName": "archery",
+                    "description": "Precision with bows and other ranged weapons.",
+                    "level": 0,
+                    "maxLevel": 5,
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "combat",
+                            "level": 2
+                        }
+                    ],
+                    "effects": [
+                        {
+                            "type": "ability",
+                            "target": "precise_shot",
+                            "value": 0
+                        }
+                    ],
+                    "costs": []
+                }
+            ]
+        },
+        {
+            "id": "SurvivalBasics",
+            "skillName": "survival",
+            "description": "Basic survival skills for harsh environments.",
+            "level": 0,
+            "maxLevel": 5,
+            "requirements": [],
+            "effects": [
+                {
+                    "type": "stat",
+                    "target": "constitution",
+                    "value": 1
+                }
+            ],
+            "costs": [],
+            "childSkills": [
+                {
+                    "id": "Herbalism",
+                    "skillName": "herbalism",
+                    "description": "Knowledge of medicinal and poisonous plants.",
+                    "level": 0,
+                    "maxLevel": 5,
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "survival",
+                            "level": 2
+                        }
+                    ],
+                    "effects": [
+                        {
+                            "type": "ability",
+                            "target": "herbal_remedy",
+                            "value": 0
+                        }
+                    ],
+                    "costs": []
+                },
+                {
+                    "id": "Tracking",
+                    "skillName": "tracking",
+                    "description": "Follow trails and find creatures in the wilderness.",
+                    "level": 0,
+                    "maxLevel": 5,
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "survival",
+                            "level": 1
+                        }
+                    ],
+                    "effects": [
+                        {
+                            "type": "ability",
+                            "target": "track_prey",
+                            "value": 0
+                        }
+                    ],
+                    "costs": []
+                }
+            ]
+        },
+        {
+            "id": "CraftingBasics",
+            "skillName": "crafting",
+            "description": "Basic crafting and repair techniques.",
+            "level": 0,
+            "maxLevel": 5,
+            "requirements": [],
+            "effects": [
+                {
+                    "type": "stat",
+                    "target": "dexterity",
+                    "value": 1
+                }
+            ],
+            "costs": [],
+            "childSkills": [
+                {
+                    "id": "Blacksmithing",
+                    "skillName": "blacksmithing",
+                    "description": "Forge and improve metal weapons and armor.",
+                    "level": 0,
+                    "maxLevel": 5,
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "crafting",
+                            "level": 2
+                        }
+                    ],
+                    "effects": [
+                        {
+                            "type": "ability",
+                            "target": "forge_weapon",
+                            "value": 0
+                        }
+                    ],
+                    "costs": []
+                },
+                {
+                    "id": "Alchemy",
+                    "skillName": "alchemy",
+                    "description": "Create potions and elixirs with magical effects.",
+                    "level": 0,
+                    "maxLevel": 5,
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "crafting",
+                            "level": 1
+                        },
+                        {
+                            "type": "skill",
+                            "target": "herbalism",
+                            "level": 1
+                        }
+                    ],
+                    "effects": [
+                        {
+                            "type": "ability",
+                            "target": "brew_potion",
+                            "value": 0
+                        }
+                    ],
+                    "costs": []
+                }
+            ]
+        }
+    ],
+    "classes": [
+        {
+            "id": "Warrior",
+            "className": "Warrior",
+            "description": "Masters of combat, strong and resilient.",
+            "statBonuses": {
+                "strength": 3,
+                "constitution": 2
+            },
+            "startingAbilities": [
+                "weapon_specialization"
+            ],
+            "classSkills": [
+                "CombatBasics",
+                "Swordsmanship"
+            ]
+        },
+        {
+            "id": "Ranger",
+            "className": "Ranger",
+            "description": "Wilderness experts, skilled with bow and blade.",
+            "statBonuses": {
+                "dexterity": 2,
+                "wisdom": 2
+            },
+            "startingAbilities": [
+                "animal_companion"
+            ],
+            "classSkills": [
+                "Archery",
+                "Tracking"
+            ]
+        },
+        {
+            "id": "Alchemist",
+            "className": "Alchemist",
+            "description": "Masters of potions and elixirs.",
+            "statBonuses": {
+                "intelligence": 3,
+                "dexterity": 1
+            },
+            "startingAbilities": [
+                "potion_mastery"
+            ],
+            "classSkills": [
+                "Herbalism",
+                "Alchemy"
+            ]
+        }
+    ]
+}

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <queue>
 #include <random>
 #include <set>
@@ -33,6 +34,9 @@ class Item;
 // DISEASE AND HEALTH SYSTEM
 //----------------------------------------
 
+// Using json library
+using json = nlohmann::json;
+
 // Forward declarations for health system
 class Disease;
 class DiseaseManager;
@@ -51,6 +55,41 @@ enum class SymptomSeverity {
     CRITICAL
 };
 
+// Helper function to convert string to SymptomSeverity
+SymptomSeverity stringToSeverity(const std::string& severityStr)
+{
+    if (severityStr == "NONE")
+        return SymptomSeverity::NONE;
+    if (severityStr == "MILD")
+        return SymptomSeverity::MILD;
+    if (severityStr == "MODERATE")
+        return SymptomSeverity::MODERATE;
+    if (severityStr == "SEVERE")
+        return SymptomSeverity::SEVERE;
+    if (severityStr == "CRITICAL")
+        return SymptomSeverity::CRITICAL;
+    return SymptomSeverity::MILD; // Default
+}
+
+// Helper function to convert SymptomSeverity to string
+std::string severityToString(SymptomSeverity severity)
+{
+    switch (severity) {
+    case SymptomSeverity::NONE:
+        return "NONE";
+    case SymptomSeverity::MILD:
+        return "MILD";
+    case SymptomSeverity::MODERATE:
+        return "MODERATE";
+    case SymptomSeverity::SEVERE:
+        return "SEVERE";
+    case SymptomSeverity::CRITICAL:
+        return "CRITICAL";
+    default:
+        return "UNKNOWN";
+    }
+}
+
 // Class to represent a symptom of a disease
 class Symptom {
 public:
@@ -59,13 +98,45 @@ public:
     SymptomSeverity severity;
     std::map<std::string, float> statEffects; // Affects player stats (strength, speed, etc.)
     std::function<void(GameContext*)> onUpdateEffect; // Effect applied during symptoms update
+    bool hasDamageOverTime;
+    float damagePerUpdate;
 
     Symptom(const std::string& symptomName, const std::string& desc,
         SymptomSeverity initialSeverity = SymptomSeverity::MILD)
         : name(symptomName)
         , description(desc)
         , severity(initialSeverity)
+        , hasDamageOverTime(false)
+        , damagePerUpdate(0.0f)
     {
+    }
+
+    // Constructor from JSON
+    Symptom(const json& symptomJson)
+        : name(symptomJson["name"])
+        , description(symptomJson["description"])
+        , severity(stringToSeverity(symptomJson["initialSeverity"]))
+        , hasDamageOverTime(symptomJson.value("hasDamageOverTime", false))
+        , damagePerUpdate(symptomJson.value("damagePerUpdate", 0.0f))
+    {
+        // Load stat effects
+        if (symptomJson.contains("statEffects")) {
+            for (auto& [stat, effect] : symptomJson["statEffects"].items()) {
+                statEffects[stat] = effect;
+            }
+        }
+
+        // Set up damage over time effect if needed
+        if (hasDamageOverTime) {
+            onUpdateEffect = [this](GameContext* context) {
+                if (context) {
+                    HealthState* health = &context->healthContext.playerHealth;
+                    if (health) {
+                        health->takeDamage(damagePerUpdate);
+                    }
+                }
+            };
+        }
     }
 
     void increaseSeverity()
@@ -176,6 +247,33 @@ public:
     {
     }
 
+    // Constructor from JSON
+    Disease(const json& diseaseJson)
+        : id(diseaseJson["id"])
+        , name(diseaseJson["name"])
+        , description(diseaseJson["description"])
+        , incubationPeriod(diseaseJson["incubationPeriod"])
+        , naturalDuration(diseaseJson["naturalDuration"])
+        , contagiousness(diseaseJson["contagiousness"])
+        , resistanceThreshold(diseaseJson["resistanceThreshold"])
+        , isChronic(diseaseJson["isChronic"])
+    {
+        // Load regions
+        for (const auto& region : diseaseJson["regions"]) {
+            regions.insert(region);
+        }
+
+        // Load vectors
+        for (const auto& vector : diseaseJson["vectors"]) {
+            vectors.insert(vector);
+        }
+
+        // Load symptoms
+        for (const auto& symptomJson : diseaseJson["symptoms"]) {
+            symptoms.push_back(Symptom(symptomJson));
+        }
+    }
+
     void addSymptom(const Symptom& symptom)
     {
         symptoms.push_back(symptom);
@@ -213,11 +311,127 @@ public:
     std::map<std::string, float> effectivenessAgainstDisease; // Disease ID to effectiveness (0.0-1.0)
     std::function<bool(GameContext*)> requirementCheck; // Check if the method can be used
     std::function<void(GameContext*, const std::string&)> applyEffect; // Apply healing effects
+    float healAmount;
+    bool requiresItem;
+    std::string requiredItem;
+    int requiredAmount;
+    bool requiresLocation;
+    std::string requiredLocationType;
+    std::map<std::string, int> costs; // Disease ID to cost
 
     HealingMethod(const std::string& methodId, const std::string& methodName)
         : id(methodId)
         , name(methodName)
+        , healAmount(0.0f)
+        , requiresItem(false)
+        , requiredAmount(0)
+        , requiresLocation(false)
     {
+    }
+
+    // Constructor from JSON
+    HealingMethod(const json& methodJson)
+        : id(methodJson["id"])
+        , name(methodJson["name"])
+        , description(methodJson["description"])
+        , healAmount(methodJson["healAmount"])
+        , requiresItem(methodJson["requiresItem"])
+        , requiredAmount(0)
+        , requiresLocation(methodJson.value("requiresLocation", false))
+    {
+        // Load effectiveness
+        for (auto& [disease, effect] : methodJson["effectiveness"].items()) {
+            effectivenessAgainstDisease[disease] = effect;
+        }
+
+        // Load item requirements if needed
+        if (requiresItem) {
+            requiredItem = methodJson["requiredItem"];
+            requiredAmount = methodJson["requiredAmount"];
+        }
+
+        // Load location requirements if needed
+        if (requiresLocation) {
+            requiredLocationType = methodJson["requiredLocationType"];
+        }
+
+        // Load costs if present
+        if (methodJson.contains("costs")) {
+            for (auto& [disease, cost] : methodJson["costs"].items()) {
+                costs[disease] = cost;
+            }
+        }
+
+        // Set up requirement check based on JSON
+        setupRequirementCheck();
+
+        // Set up apply effect based on JSON
+        setupApplyEffect();
+    }
+
+    void setupRequirementCheck()
+    {
+        requirementCheck = [this](GameContext* context) {
+            if (!context)
+                return false;
+
+            // Check item requirements
+            if (requiresItem) {
+                if (!context->playerInventory.hasItem(requiredItem, requiredAmount)) {
+                    std::cout << "You need " << requiredAmount << " " << requiredItem << " to use this treatment." << std::endl;
+                    return false;
+                }
+            }
+
+            // Check location requirements
+            if (requiresLocation) {
+                // This would check if player is in the right location type
+                // For demo purposes, always return true
+                return true;
+            }
+
+            return true;
+        };
+    }
+
+    void setupApplyEffect()
+    {
+        applyEffect = [this](GameContext* context, const std::string& diseaseId) {
+            if (!context)
+                return;
+
+            HealthState* health = &context->healthContext.playerHealth;
+            if (!health)
+                return;
+
+            // Consume required items
+            if (requiresItem) {
+                context->playerInventory.removeItem(requiredItem, requiredAmount);
+                std::cout << "Used " << requiredAmount << " " << requiredItem << " for treatment." << std::endl;
+            }
+
+            // Handle cost if applicable
+            if (costs.find(diseaseId) != costs.end()) {
+                int cost = costs[diseaseId];
+                // Would deduct gold here
+                std::cout << "Paid " << cost << " gold for treatment." << std::endl;
+            }
+
+            // Apply healing
+            health->heal(healAmount);
+            std::cout << "Recovered " << healAmount << " health points." << std::endl;
+
+            // Chance to recover based on effectiveness
+            float recoveryChance = getEffectivenessAgainst(diseaseId);
+            float roll = static_cast<float>(rand()) / RAND_MAX;
+
+            if (roll < recoveryChance) {
+                health->recoverFromDisease(diseaseId, context->worldState.daysPassed, true);
+                std::cout << "The treatment was successful! You have recovered from " << diseaseId << "." << std::endl;
+            } else {
+                std::cout << "The treatment provided some relief, but hasn't cured you completely." << std::endl;
+            }
+        };
     }
 
     void setEffectiveness(const std::string& diseaseId, float effectiveness)
@@ -265,6 +479,17 @@ public:
         , naturalHealRate(1.0f)
         , diseaseResistance(0.0f)
     {
+    }
+
+    // Initialize from JSON
+    void initFromJson(const json& healthJson)
+    {
+        maxHealth = healthJson["maxHealth"];
+        currentHealth = maxHealth;
+        maxStamina = healthJson["maxStamina"];
+        stamina = maxStamina;
+        naturalHealRate = healthJson["naturalHealRate"];
+        diseaseResistance = healthJson["diseaseResistance"];
     }
 
     void takeDamage(float amount)
@@ -354,6 +579,49 @@ public:
     std::map<std::string, Disease> diseases;
     std::map<std::string, HealingMethod> healingMethods;
     std::map<std::string, float> regionDiseaseRisk; // Risk multiplier for each region
+
+    // Load all data from JSON file
+    bool loadFromJson(const std::string& filename)
+    {
+        try {
+            // Read JSON file
+            std::ifstream file(filename);
+            if (!file.is_open()) {
+                std::cerr << "Failed to open file: " << filename << std::endl;
+                return false;
+            }
+
+            json j;
+            file >> j;
+            file.close();
+
+            // Load diseases
+            for (const auto& diseaseJson : j["diseases"]) {
+                Disease disease(diseaseJson);
+                diseases[disease.id] = disease;
+            }
+
+            // Load healing methods
+            for (const auto& methodJson : j["healingMethods"]) {
+                HealingMethod method(methodJson);
+                healingMethods[method.id] = method;
+            }
+
+            // Load region risks
+            for (auto& [region, risk] : j["regionDiseaseRisks"].items()) {
+                regionDiseaseRisk[region] = risk;
+            }
+
+            std::cout << "Successfully loaded " << diseases.size() << " diseases, "
+                      << healingMethods.size() << " healing methods, and "
+                      << regionDiseaseRisk.size() << " region risk factors from " << filename << std::endl;
+
+            return true;
+        } catch (const std::exception& e) {
+            std::cerr << "Error loading disease system from JSON: " << e.what() << std::endl;
+            return false;
+        }
+    }
 
     void registerDisease(const Disease& disease)
     {
@@ -526,18 +794,16 @@ public:
 private:
     HealthState* getHealthState(GameContext* context)
     {
-        // This would access the health state from your extended GameContext
-        // You'll need to adapt this based on how you integrate this system
-        // For example, if you add a HealthContext to GameContext:
-        // return &context->healthContext.playerHealth;
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->healthContext.playerHealth;
     }
 
     DiseaseManager* getDiseaseManager(GameContext* context)
     {
-        // Similarly, this would access your disease manager
-        // return &context->healthContext.diseaseManager;
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->diseaseManager;
     }
 };
 
@@ -655,14 +921,16 @@ public:
 private:
     HealthState* getHealthState(GameContext* context)
     {
-        // As before, implementation depends on how you integrate this
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->healthContext.playerHealth;
     }
 
     DiseaseManager* getDiseaseManager(GameContext* context)
     {
-        // As before
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->diseaseManager;
     }
 };
 
@@ -782,7 +1050,16 @@ public:
                 std::string methodId = std::get<std::string>(input.parameters.at("method_id"));
 
                 // Apply the treatment and show results
-                // Implementation depends on your disease manager
+                GameContext* context = getGameContext();
+                if (context) {
+                    DiseaseManager* manager = getDiseaseManager(context);
+                    if (manager) {
+                        const HealingMethod* method = manager->getHealingMethodById(methodId);
+                        if (method) {
+                            method->apply(context, diseaseId);
+                        }
+                    }
+                }
             } else if (action == "back") {
                 for (const auto& rule : transitionRules) {
                     if (rule.description == "Back to Health") {
@@ -797,14 +1074,24 @@ public:
     }
 
 private:
+    GameContext* getGameContext()
+    {
+        // In a real implementation, you'd access the context from somewhere
+        return nullptr; // Placeholder
+    }
+
     HealthState* getHealthState(GameContext* context)
     {
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->healthContext.playerHealth;
     }
 
     DiseaseManager* getDiseaseManager(GameContext* context)
     {
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->diseaseManager;
     }
 };
 
@@ -967,12 +1254,16 @@ private:
 
     HealthState* getHealthState(GameContext* context)
     {
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->healthContext.playerHealth;
     }
 
     DiseaseManager* getDiseaseManager(GameContext* context)
     {
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->diseaseManager;
     }
 };
 
@@ -1113,7 +1404,9 @@ private:
 
     DiseaseManager* getDiseaseManager(GameContext* context)
     {
-        return nullptr; // Placeholder
+        if (!context)
+            return nullptr;
+        return &context->diseaseManager;
     }
 };
 
@@ -1219,10 +1512,18 @@ void Symptom::applyStatEffects(GameContext* context) const
         // For example, apply to character stats
         if (statName == "strength") {
             // Temporary stat reduction
-            // context->playerStats.strengthModifier -= actualEffect;
+            context->playerStats.modifiers["strength"] -= actualEffect;
         } else if (statName == "stamina") {
             // Reduce max stamina
-            // context->healthContext.playerHealth.maxStamina -= actualEffect;
+            context->healthContext.playerHealth.maxStamina -= actualEffect;
+        } else if (statName == "constitution") {
+            context->playerStats.modifiers["constitution"] -= actualEffect;
+        } else if (statName == "dexterity") {
+            context->playerStats.modifiers["dexterity"] -= actualEffect;
+        } else if (statName == "intelligence") {
+            context->playerStats.modifiers["intelligence"] -= actualEffect;
+        } else if (statName == "wisdom") {
+            context->playerStats.modifiers["wisdom"] -= actualEffect;
         }
         // Add other stats as needed
     }
@@ -1403,360 +1704,82 @@ void setupDiseaseHealthSystem(TAController& controller)
         },
         healthRoot, "Back to Health");
 
-    // Create disease nodes for common diseases
-    DiseaseNode* commonColdNode = dynamic_cast<DiseaseNode*>(
-        controller.createNode<DiseaseNode>("CommonColdDisease", "common_cold"));
+    // Initialize the disease manager
+    DiseaseManager diseaseManager;
 
-    DiseaseNode* plagueNode = dynamic_cast<DiseaseNode*>(
-        controller.createNode<DiseaseNode>("PlagueDisease", "black_plague"));
+    // Load disease data from JSON
+    if (!diseaseManager.loadFromJson("DiseaseHealth.json")) {
+        std::cerr << "Failed to load disease system data. Using default values." << std::endl;
 
-    DiseaseNode* feverNode = dynamic_cast<DiseaseNode*>(
-        controller.createNode<DiseaseNode>("MountainFeverDisease", "mountain_fever"));
+        // You could add fallback hardcoded values here if needed
+    }
 
-    // Create epidemic event nodes
-    EpidemicNode* plagueEpidemicNode = dynamic_cast<EpidemicNode*>(
-        controller.createNode<EpidemicNode>("PlagueEpidemic", "black_plague", "Village", 2.0f));
+    // Create disease nodes for each disease dynamically
+    for (const auto& [diseaseId, disease] : diseaseManager.diseases) {
+        DiseaseNode* diseaseNode = dynamic_cast<DiseaseNode*>(
+            controller.createNode<DiseaseNode>(diseaseId + "Disease", diseaseId));
 
-    EpidemicNode* feverEpidemicNode = dynamic_cast<EpidemicNode*>(
-        controller.createNode<EpidemicNode>("FeverEpidemic", "mountain_fever", "Mountain", 1.5f));
+        // Add transitions for this disease node
+        healthRoot->addTransition(
+            [diseaseId](const TAInput& input) {
+                return input.type == "view_disease" && std::get<std::string>(input.parameters.at("disease_id")) == diseaseId;
+            },
+            diseaseNode, "View " + disease.name);
+
+        diseaseNode->addTransition(
+            [](const TAInput& input) {
+                return input.type == "back_to_health";
+            },
+            healthRoot, "Back to Health Menu");
+    }
+
+    // Create epidemic event nodes based on JSON data
+    // For demonstration, we'll create epidemic nodes for a couple of diseases
+    if (diseaseManager.diseases.find("black_plague") != diseaseManager.diseases.end()) {
+        EpidemicNode* plagueEpidemicNode = dynamic_cast<EpidemicNode*>(
+            controller.createNode<EpidemicNode>("PlagueEpidemic", "black_plague", "Village", 2.0f));
+
+        // Add transitions for epidemic node
+        plagueEpidemicNode->addTransition(
+            [](const TAInput& input) {
+                return input.type == "epidemic_action" && std::get<std::string>(input.parameters.at("action")) == "ignore";
+            },
+            healthRoot, "Ignore Epidemic");
+    }
+
+    if (diseaseManager.diseases.find("mountain_fever") != diseaseManager.diseases.end()) {
+        EpidemicNode* feverEpidemicNode = dynamic_cast<EpidemicNode*>(
+            controller.createNode<EpidemicNode>("FeverEpidemic", "mountain_fever", "Mountain", 1.5f));
+
+        // Add transitions for epidemic node
+        feverEpidemicNode->addTransition(
+            [](const TAInput& input) {
+                return input.type == "epidemic_action" && std::get<std::string>(input.parameters.at("action")) == "ignore";
+            },
+            healthRoot, "Ignore Epidemic");
+    }
 
     // Register the health system
     controller.setSystemRoot("HealthSystem", healthRoot);
 
-    // Initialize the disease manager and health context
-    // This would be integrated with your existing GameContext
-    DiseaseManager diseaseManager;
+    // Initialize player health state from JSON
+    if (controller.gameContext.healthContext.playerHealth) {
+        std::ifstream file("DiseaseHealth.json");
+        if (file.is_open()) {
+            json j;
+            file >> j;
+            file.close();
 
-    // Create diseases
-    Disease commonCold("common_cold", "Common Cold");
-    commonCold.description = "A mild respiratory illness characterized by sneezing, congestion, and coughing.";
-    commonCold.incubationPeriod = 1;
-    commonCold.naturalDuration = 5;
-    commonCold.contagiousness = 0.4f;
-    commonCold.resistanceThreshold = 0.1f;
-    commonCold.isChronic = false;
-    commonCold.addVector("air");
-    commonCold.addVector("contact");
-    commonCold.addRegion("Village");
-    commonCold.addRegion("Town");
-
-    // Add symptoms to common cold
-    Symptom coldCough("Cough", "A persistent cough that may disrupt sleep.");
-    Symptom coldCongestion("Congestion", "Nasal congestion making breathing difficult.");
-    Symptom coldFatigue("Fatigue", "Mild tiredness and reduced energy.", SymptomSeverity::MILD);
-
-    coldCough.statEffects["stamina"] = -5.0f;
-    coldCongestion.statEffects["stamina"] = -3.0f;
-    coldFatigue.statEffects["strength"] = -1.0f;
-    coldFatigue.statEffects["stamina"] = -10.0f;
-
-    commonCold.addSymptom(coldCough);
-    commonCold.addSymptom(coldCongestion);
-    commonCold.addSymptom(coldFatigue);
-
-    // Register the disease
-    diseaseManager.registerDisease(commonCold);
-
-    // Create Black Plague
-    Disease plague("black_plague", "Black Plague");
-    plague.description = "A deadly disease characterized by swollen lymph nodes, fever, and often fatal if untreated.";
-    plague.incubationPeriod = 3;
-    plague.naturalDuration = 14;
-    plague.contagiousness = 0.7f;
-    plague.resistanceThreshold = 0.4f;
-    plague.isChronic = false;
-    plague.addVector("air");
-    plague.addVector("contact");
-    plague.addVector("vermin");
-    plague.addRegion("Village");
-    plague.addRegion("Town");
-    plague.addRegion("Slums");
-
-    // Add symptoms to plague
-    Symptom plagueFever("High Fever", "Dangerously elevated body temperature.");
-    Symptom plagueBuboes("Buboes", "Painful, swollen lymph nodes.");
-    Symptom plagueWeakness("Extreme Weakness", "Severe fatigue and inability to perform physical tasks.");
-
-    plagueFever.statEffects["constitution"] = -10.0f;
-    plagueFever.statEffects["stamina"] = -15.0f;
-    plagueBuboes.statEffects["dexterity"] = -8.0f;
-    plagueBuboes.statEffects["strength"] = -5.0f;
-    plagueWeakness.statEffects["strength"] = -15.0f;
-    plagueWeakness.statEffects["stamina"] = -25.0f;
-
-    // Add custom effects
-    plagueFever.onUpdateEffect = [](GameContext* context) {
-        // Apply damage over time from fever
-        if (context) {
-            HealthState* health = &context->healthContext.playerHealth;
-            if (health) {
-                health->takeDamage(0.5f); // Damage per update
-            }
+            controller.gameContext.healthContext.playerHealth->initFromJson(j["defaultHealthState"]);
         }
-    };
+    }
 
-    plague.addSymptom(plagueFever);
-    plague.addSymptom(plagueBuboes);
-    plague.addSymptom(plagueWeakness);
-
-    // Register the plague
-    diseaseManager.registerDisease(plague);
-
-    // Create Mountain Fever
-    Disease mountainFever("mountain_fever", "Mountain Fever");
-    mountainFever.description = "A severe illness contracted in mountainous regions, causing high fever and delirium.";
-    mountainFever.incubationPeriod = 2;
-    mountainFever.naturalDuration = 10;
-    mountainFever.contagiousness = 0.3f;
-    mountainFever.resistanceThreshold = 0.3f;
-    mountainFever.isChronic = false;
-    mountainFever.addVector("water");
-    mountainFever.addVector("insect");
-    mountainFever.addRegion("Mountain");
-    mountainFever.addRegion("Forest");
-
-    // Add symptoms to mountain fever
-    Symptom feverChills("Chills", "Uncontrollable shivering despite high body temperature.");
-    Symptom feverDelirium("Delirium", "Confusion and hallucinations due to high fever.");
-    Symptom feverJointPain("Joint Pain", "Severe pain in joints making movement difficult.");
-
-    feverChills.statEffects["constitution"] = -5.0f;
-    feverChills.statEffects["dexterity"] = -3.0f;
-    feverDelirium.statEffects["intelligence"] = -10.0f;
-    feverDelirium.statEffects["wisdom"] = -8.0f;
-    feverJointPain.statEffects["dexterity"] = -12.0f;
-    feverJointPain.statEffects["strength"] = -7.0f;
-
-    mountainFever.addSymptom(feverChills);
-    mountainFever.addSymptom(feverDelirium);
-    mountainFever.addSymptom(feverJointPain);
-
-    // Register the mountain fever
-    diseaseManager.registerDisease(mountainFever);
-
-    // Create healing methods
-    HealingMethod restMethod("rest_healing", "Bed Rest");
-    restMethod.description = "Simply resting in a comfortable bed helps the body recover naturally.";
-    restMethod.setEffectiveness("common_cold", 0.4f);
-    restMethod.setEffectiveness("mountain_fever", 0.2f);
-    restMethod.setEffectiveness("black_plague", 0.05f);
-
-    // Requirement check and effect application
-    restMethod.requirementCheck = [](GameContext* context) {
-        // Check if in a suitable location for rest
-        // For example, check if in an inn or player home
-        return true; // Simplified for example
-    };
-
-    restMethod.applyEffect = [](GameContext* context, const std::string& diseaseId) {
-        if (!context)
-            return;
-
-        HealthState* health = &context->healthContext.playerHealth;
-        if (!health)
-            return;
-
-        // Improve health
-        health->heal(10.0f);
-
-        // Chance to recover based on disease
-        float recoveryChance = 0.0f;
-
-        if (diseaseId == "common_cold") {
-            recoveryChance = 0.4f;
-        } else if (diseaseId == "mountain_fever") {
-            recoveryChance = 0.2f;
-        } else if (diseaseId == "black_plague") {
-            recoveryChance = 0.05f;
-        }
-
-        float roll = static_cast<float>(rand()) / RAND_MAX;
-        if (roll < recoveryChance) {
-            health->recoverFromDisease(diseaseId, context->worldState.daysPassed, true);
-        } else {
-            std::cout << "The bed rest helped, but you're still suffering from the illness." << std::endl;
-        }
-    };
-
-    diseaseManager.registerHealingMethod(restMethod);
-
-    // Create herb potion method
-    HealingMethod herbPotion("herb_potion", "Herbal Remedy");
-    herbPotion.description = "A medicinal tea made from various healing herbs.";
-    herbPotion.setEffectiveness("common_cold", 0.6f);
-    herbPotion.setEffectiveness("mountain_fever", 0.4f);
-    herbPotion.setEffectiveness("black_plague", 0.1f);
-
-    herbPotion.requirementCheck = [](GameContext* context) {
-        // Check if player has the necessary herbs
-        if (!context)
-            return false;
-
-        return context->playerInventory.hasItem("medicinal_herbs", 2);
-    };
-
-    herbPotion.applyEffect = [](GameContext* context, const std::string& diseaseId) {
-        if (!context)
-            return;
-
-        // Consume herbs
-        context->playerInventory.removeItem("medicinal_herbs", 2);
-
-        HealthState* health = &context->healthContext.playerHealth;
-        if (!health)
-            return;
-
-        // Improve health
-        health->heal(15.0f);
-
-        // Chance to recover based on disease
-        float recoveryChance = 0.0f;
-
-        if (diseaseId == "common_cold") {
-            recoveryChance = 0.6f;
-        } else if (diseaseId == "mountain_fever") {
-            recoveryChance = 0.4f;
-        } else if (diseaseId == "black_plague") {
-            recoveryChance = 0.1f;
-        }
-
-        float roll = static_cast<float>(rand()) / RAND_MAX;
-        if (roll < recoveryChance) {
-            health->recoverFromDisease(diseaseId, context->worldState.daysPassed, true);
-        } else {
-            std::cout << "The herbal remedy provided some relief, but hasn't cured you completely." << std::endl;
-        }
-    };
-
-    diseaseManager.registerHealingMethod(herbPotion);
-
-    // Create temple healing method
-    HealingMethod templeHealing("temple_healing", "Temple Healing");
-    templeHealing.description = "Healing rituals performed by priests or clerics at temples.";
-    templeHealing.setEffectiveness("common_cold", 0.8f);
-    templeHealing.setEffectiveness("mountain_fever", 0.7f);
-    templeHealing.setEffectiveness("black_plague", 0.5f);
-
-    templeHealing.requirementCheck = [](GameContext* context) {
-        // Check if at a temple location
-        if (!context)
-            return false;
-
-        // This would check location in your actual implementation
-        return true;
-    };
-
-    templeHealing.applyEffect = [](GameContext* context, const std::string& diseaseId) {
-        if (!context)
-            return;
-
-        HealthState* health = &context->healthContext.playerHealth;
-        if (!health)
-            return;
-
-        // Healing cost (gold)
-        int cost = 0;
-        if (diseaseId == "common_cold")
-            cost = 20;
-        else if (diseaseId == "mountain_fever")
-            cost = 50;
-        else if (diseaseId == "black_plague")
-            cost = 100;
-
-        // Would need to check/remove gold in implementation
-
-        // Improve health
-        health->heal(30.0f);
-
-        // Chance to recover based on disease
-        float recoveryChance = 0.0f;
-
-        if (diseaseId == "common_cold") {
-            recoveryChance = 0.8f;
-        } else if (diseaseId == "mountain_fever") {
-            recoveryChance = 0.7f;
-        } else if (diseaseId == "black_plague") {
-            recoveryChance = 0.5f;
-        }
-
-        float roll = static_cast<float>(rand()) / RAND_MAX;
-        if (roll < recoveryChance) {
-            health->recoverFromDisease(diseaseId, context->worldState.daysPassed, true);
-            std::cout << "The temple ritual was successful! You have been cured." << std::endl;
-        } else {
-            std::cout << "The temple healing has improved your condition, but the disease persists." << std::endl;
-        }
-    };
-
-    diseaseManager.registerHealingMethod(templeHealing);
-
-    // Create alchemical cure method
-    HealingMethod alchemyCure("alchemy_cure", "Alchemical Remedy");
-    alchemyCure.description = "A powerful alchemical potion that can cure most diseases.";
-    alchemyCure.setEffectiveness("common_cold", 0.9f);
-    alchemyCure.setEffectiveness("mountain_fever", 0.8f);
-    alchemyCure.setEffectiveness("black_plague", 0.7f);
-
-    alchemyCure.requirementCheck = [](GameContext* context) {
-        // Check if player has rare healing potion
-        if (!context)
-            return false;
-
-        return context->playerInventory.hasItem("strong_healing_potion", 1);
-    };
-
-    alchemyCure.applyEffect = [](GameContext* context, const std::string& diseaseId) {
-        if (!context)
-            return;
-
-        // Consume potion
-        context->playerInventory.removeItem("strong_healing_potion", 1);
-
-        HealthState* health = &context->healthContext.playerHealth;
-        if (!health)
-            return;
-
-        // Improve health
-        health->heal(50.0f);
-
-        // Chance to recover based on disease
-        float recoveryChance = 0.0f;
-
-        if (diseaseId == "common_cold") {
-            recoveryChance = 0.9f;
-        } else if (diseaseId == "mountain_fever") {
-            recoveryChance = 0.8f;
-        } else if (diseaseId == "black_plague") {
-            recoveryChance = 0.7f;
-        }
-
-        float roll = static_cast<float>(rand()) / RAND_MAX;
-        if (roll < recoveryChance) {
-            health->recoverFromDisease(diseaseId, context->worldState.daysPassed, true);
-            std::cout << "The potent alchemical remedy has purged the disease from your body!" << std::endl;
-        } else {
-            std::cout << "Despite the powerful remedy, traces of the disease remain in your system." << std::endl;
-        }
-    };
-
-    diseaseManager.registerHealingMethod(alchemyCure);
-
-    // Set region disease risks
-    diseaseManager.setRegionRisk("Village", 1.0f);
-    diseaseManager.setRegionRisk("Town", 1.2f);
-    diseaseManager.setRegionRisk("City", 1.5f);
-    diseaseManager.setRegionRisk("Slums", 2.0f);
-    diseaseManager.setRegionRisk("Forest", 0.8f);
-    diseaseManager.setRegionRisk("Mountain", 1.0f);
-    diseaseManager.setRegionRisk("Desert", 0.5f);
-    diseaseManager.setRegionRisk("Swamp", 1.8f);
+    // Add disease manager to game context
+    controller.gameContext.diseaseManager = diseaseManager;
 
     std::cout << "Disease and Health System initialized with "
               << diseaseManager.diseases.size() << " diseases and "
               << diseaseManager.healingMethods.size() << " healing methods." << std::endl;
-
-    // In a full implementation, you would attach the diseaseManager to your game context
-    // context.healthContext.diseaseManager = diseaseManager;
 }
 
 // Example usage of the disease system in a game loop
@@ -1765,7 +1788,6 @@ void exampleDiseaseSystemUsage(TAController& controller)
     GameContext* context = &controller.gameContext;
 
     // Initialize your health context and disease manager in your game context
-    // This would need to be adapted to your game structure
     setupDiseaseHealthSystem(controller);
 
     // Example of checking for disease exposure during travel
@@ -1774,17 +1796,18 @@ void exampleDiseaseSystemUsage(TAController& controller)
     std::cout << "You are traveling to the Mountain region..." << std::endl;
 
     // Simulate travel to mountain region
-    // This would call your disease manager's checkExposure method
-    // diseaseManager.checkExposure(context, "Mountain", "air");
+    context->diseaseManager.checkExposure(context, "Mountain", "air");
 
     // Example of disease progression during rest
     std::cout << "\n=== RESTING WHILE DISEASED ===\n"
               << std::endl;
     std::cout << "You decide to rest at an inn..." << std::endl;
 
-    // Simulate resting
-    // This would call your RestNode's applyRest method
-    // restNode->applyRest(8, context);
+    // Get the rest node and simulate resting
+    RestNode* restNode = dynamic_cast<RestNode*>(controller.getNode("RestNode"));
+    if (restNode) {
+        restNode->applyRest(8, context);
+    }
 
     // Example of treating a disease
     std::cout << "\n=== TREATING A DISEASE ===\n"
@@ -1792,16 +1815,20 @@ void exampleDiseaseSystemUsage(TAController& controller)
     std::cout << "You visit a healer to treat your Mountain Fever..." << std::endl;
 
     // Simulate using a healing method
-    // const HealingMethod* method = diseaseManager.getHealingMethodById("temple_healing");
-    // if (method) method->apply(context, "mountain_fever");
+    const HealingMethod* method = context->diseaseManager.getHealingMethodById("temple_healing");
+    if (method)
+        method->apply(context, "mountain_fever");
 
     // Example of an epidemic event
     std::cout << "\n=== EPIDEMIC EVENT ===\n"
               << std::endl;
     std::cout << "News spreads of a plague outbreak in the nearby town..." << std::endl;
 
-    // This would be triggered by entering the epidemic node
-    // controller.processInput("HealthSystem", {});
+    // Simulate epidemic event
+    EpidemicNode* epidemicNode = dynamic_cast<EpidemicNode*>(controller.getNode("PlagueEpidemic"));
+    if (epidemicNode) {
+        epidemicNode->onEnter(context);
+    }
 
     std::cout << "\nDisease and Health System demo complete." << std::endl;
 }

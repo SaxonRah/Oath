@@ -1,0 +1,122 @@
+{
+    "npcs": [
+        {
+            "id": "elder_marius",
+            "name": "Elder Marius",
+            "description": "The wise leader of the village",
+            "relationshipValue": 0,
+            "rootDialogue": "ElderGreeting",
+            "dialogueNodes": [
+                {
+                    "id": "ElderGreeting",
+                    "speakerName": "Elder Marius",
+                    "dialogueText": "Greetings, traveler. Our village faces difficult times.",
+                    "responses": [
+                        {
+                            "text": "What threat does the village face?",
+                            "targetNode": "AskThreat",
+                            "requirements": []
+                        },
+                        {
+                            "text": "Is there something I can help with?",
+                            "targetNode": "AskHelp",
+                            "requirements": []
+                        },
+                        {
+                            "text": "I need to go. Farewell.",
+                            "targetNode": "Farewell",
+                            "requirements": []
+                        }
+                    ]
+                },
+                {
+                    "id": "AskThreat",
+                    "speakerName": "Elder Marius",
+                    "dialogueText": "Bandits have been raiding nearby settlements. I fear we're next.",
+                    "responses": [
+                        {
+                            "text": "How can I help against these bandits?",
+                            "targetNode": "AskHelp",
+                            "requirements": []
+                        },
+                        {
+                            "text": "I'll be on my way.",
+                            "targetNode": "Farewell",
+                            "requirements": []
+                        }
+                    ]
+                },
+                {
+                    "id": "AskHelp",
+                    "speakerName": "Elder Marius",
+                    "dialogueText": "We need someone skilled to help prepare our defenses.",
+                    "responses": [
+                        {
+                            "text": "I'll help defend the village.",
+                            "targetNode": "AcceptQuest",
+                            "requirements": [],
+                            "effects": [
+                                {
+                                    "type": "quest",
+                                    "action": "activate",
+                                    "target": "MainQuest"
+                                },
+                                {
+                                    "type": "knowledge",
+                                    "action": "add",
+                                    "target": "village_under_threat"
+                                },
+                                {
+                                    "type": "faction",
+                                    "action": "change",
+                                    "target": "villagers",
+                                    "amount": 5
+                                }
+                            ]
+                        },
+                        {
+                            "text": "I'm not interested in helping.",
+                            "targetNode": "RejectQuest",
+                            "requirements": []
+                        },
+                        {
+                            "text": "I need to think about it.",
+                            "targetNode": "Farewell",
+                            "requirements": []
+                        }
+                    ]
+                },
+                {
+                    "id": "AcceptQuest",
+                    "speakerName": "Elder Marius",
+                    "dialogueText": "Thank you! This means a lot to our community. We need the walls repaired, the militia trained, and supplies gathered.",
+                    "responses": [
+                        {
+                            "text": "I'll get started right away.",
+                            "targetNode": "Farewell",
+                            "requirements": []
+                        }
+                    ]
+                },
+                {
+                    "id": "RejectQuest",
+                    "speakerName": "Elder Marius",
+                    "dialogueText": "I understand. Perhaps you'll reconsider when you have time.",
+                    "responses": [
+                        {
+                            "text": "Goodbye.",
+                            "targetNode": "Farewell",
+                            "requirements": []
+                        }
+                    ]
+                },
+                {
+                    "id": "Farewell",
+                    "speakerName": "Elder Marius",
+                    "dialogueText": "Safe travels, friend. Return if you need anything.",
+                    "responses": []
+                }
+            ]
+        }
+    ]
+}

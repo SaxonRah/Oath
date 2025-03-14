@@ -24,4 +24,4 @@ The implementation follows your tree automata pattern with clear state transitio
 
 The demo execution shows a player interacting with the Sun God, visiting a temple, making offerings, performing rituals, and praying for blessings.
 
-This system would add significant depth to your Daggerfall-like game by creating meaningful choices based on which deity (or deities) the player aligns with, and providing mechanical benefits through the religious favor system.
+This system would add significant depth to your Oath game by creating meaningful choices based on which deity (or deities) the player aligns with, and providing mechanical benefits through the religious favor system.
