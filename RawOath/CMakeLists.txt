@@ -10,32 +10,33 @@ include_directories(${CMAKE_SOURCE_DIR}/Source/Include)
 
 # Define source files with main() functions that will each become executables
 set(MAIN_SOURCES
-    Source/Oath_RPGSystems.cpp
     Source/Oath_RPGSystems_New.cpp
     Source/Oath_RPGSystems_JSON.cpp
-    Source/Systems/System_AdvancedWeather.cpp
     Source/Systems/System_AdvancedWeather_JSON.cpp
-    Source/Systems/System_CrimeLaw.cpp
     Source/Systems/System_CrimeLaw_JSON.cpp
-    Source/Systems/System_DiseaseHealth.cpp
     Source/Systems/System_DiseaseHealth_JSON.cpp
-    Source/Systems/System_EconomyMarket.cpp
     Source/Systems/System_EconomyMarket_JSON.cpp
-    Source/Systems/System_FactionReputation.cpp
     Source/Systems/System_FactionReputation_JSON.cpp
-    Source/Systems/System_Mount.cpp
     Source/Systems/System_Mount_JSON.cpp
-    Source/Systems/System_NPCRelationships.cpp
     Source/Systems/System_NPCRelationships_JSON.cpp
-    Source/Systems/System_ReligionDeity.cpp
     Source/Systems/System_ReligionDeity_JSON.cpp
-    Source/Systems/System_SpellCrafting.cpp
     Source/Systems/System_SpellCrafting_JSON.cpp
-    Source/Generators/World/Generator_World.cpp
+    # Source/Oath_RPGSystems.cpp
+    # Source/Systems/System_AdvancedWeather.cpp
+    # Source/Systems/System_CrimeLaw.cpp
+    # Source/Systems/System_DiseaseHealth.cpp
+    # Source/Systems/System_EconomyMarket.cpp
+    # Source/Systems/System_FactionReputation.cpp
+    # Source/Systems/System_Mount.cpp
+    # Source/Systems/System_NPCRelationships.cpp
+    # Source/Systems/System_ReligionDeity.cpp
+    # Source/Systems/System_SpellCrafting.cpp
+    # Source/Generators/World/Generator_World.cpp
 )
 
 # Define the primary executable from the main RPG systems file
-add_executable(${PROJECT_NAME} Source/Oath_RPGSystems.cpp)
+add_executable(${PROJECT_NAME} Source/Oath_RPGSystems_New.cpp)
+# add_executable(${PROJECT_NAME} Source/Oath_RPGSystems_JSON.cpp)
 
 # Create individual executables for each file with main()
 foreach(SOURCE_FILE ${MAIN_SOURCES})
