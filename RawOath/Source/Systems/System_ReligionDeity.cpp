@@ -2141,6 +2141,7 @@ private:
     }
 
     // Create blessings for different deities
+    // Create blessings for different deities
     void createBlessings()
     {
         // Sun God Blessings
@@ -2149,16 +2150,29 @@ private:
         sunMinorBlessing->blessingDescription = "A minor blessing from the Sun God that grants improved vision in darkness and resistance to fear.";
         sunMinorBlessing->effects.push_back({ "stat", "wisdom", 1, "Wisdom +1 while active" });
         sunMinorBlessing->effects.push_back({ "protection", "fear", 25, "25% resistance to fear effects" });
-
         blessings.push_back(sunMinorBlessing);
+
+        BlessingNode* sunModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SunModerateBlessing", "Dawn's Revelation", "sun_god", BlessingNode::MODERATE));
+        sunModerateBlessing->blessingDescription = "The sun reveals all that is hidden. Grants the ability to detect traps, secret doors, and illusions more easily.";
+        sunModerateBlessing->effects.push_back({ "skill", "perception", 3, "+3 to Perception checks" });
+        sunModerateBlessing->effects.push_back({ "ability", "detect_hidden", 0, "Ability to detect hidden objects once per hour" });
+        blessings.push_back(sunModerateBlessing);
 
         BlessingNode* sunMajorBlessing = dynamic_cast<BlessingNode*>(
             createNode<BlessingNode>("SunMajorBlessing", "Radiant Protection", "sun_god", BlessingNode::MAJOR));
         sunMajorBlessing->blessingDescription = "A powerful blessing that provides significant protection against undead and grants healing abilities.";
         sunMajorBlessing->effects.push_back({ "protection", "undead", 50, "50% damage reduction against undead" });
         sunMajorBlessing->effects.push_back({ "ability", "minor_heal", 0, "Ability to cast Minor Heal once per day" });
-
         blessings.push_back(sunMajorBlessing);
+
+        BlessingNode* sunGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SunGreaterBlessing", "Solar Purification", "sun_god", BlessingNode::GREATER));
+        sunGreaterBlessing->blessingDescription = "Your presence purifies the corruption around you. Your weapons deal additional holy damage, and you resist dark magic.";
+        sunGreaterBlessing->effects.push_back({ "damage_bonus", "holy", 5, "+5 holy damage with all attacks" });
+        sunGreaterBlessing->effects.push_back({ "protection", "dark_magic", 40, "40% resistance to dark magic" });
+        sunGreaterBlessing->effects.push_back({ "ability", "purify_area", 0, "Ability to purify a corrupted area once per day" });
+        blessings.push_back(sunGreaterBlessing);
 
         BlessingNode* sunDivineBlessing = dynamic_cast<BlessingNode*>(
             createNode<BlessingNode>("SunDivineBlessing", "Sun's Champion", "sun_god", BlessingNode::DIVINE));
@@ -2166,7 +2180,7 @@ private:
         sunDivineBlessing->effects.push_back({ "stat", "strength", 3, "Strength +3 while active" });
         sunDivineBlessing->effects.push_back({ "stat", "charisma", 3, "Charisma +3 while active" });
         sunDivineBlessing->effects.push_back({ "ability", "divine_radiance", 0, "Ability to emit a powerful burst of sunlight once per day" });
-
+        sunDivineBlessing->effects.push_back({ "passive", "undead_bane", 0, "Undead flee from your presence unless powerful" });
         blessings.push_back(sunDivineBlessing);
 
         // Moon Goddess Blessings
@@ -2174,16 +2188,84 @@ private:
             createNode<BlessingNode>("MoonMinorBlessing", "Night's Embrace", "moon_goddess", BlessingNode::MINOR));
         moonMinorBlessing->blessingDescription = "A minor blessing that improves stealth at night and enhances dream recall.";
         moonMinorBlessing->effects.push_back({ "skill", "stealth", 2, "+2 to Stealth skill at night" });
-
+        moonMinorBlessing->effects.push_back({ "passive", "dream_memory", 0, "Remember dreams with perfect clarity" });
         blessings.push_back(moonMinorBlessing);
+
+        BlessingNode* moonModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("MoonModerateBlessing", "Lunar Insight", "moon_goddess", BlessingNode::MODERATE));
+        moonModerateBlessing->blessingDescription = "The moon's gentle light reveals hidden truths and enhances magical perception.";
+        moonModerateBlessing->effects.push_back({ "skill", "magic", 2, "+2 to Magic skill" });
+        moonModerateBlessing->effects.push_back({ "ability", "detect_magic", 0, "Ability to detect magical auras once per hour" });
+        blessings.push_back(moonModerateBlessing);
+
+        BlessingNode* moonMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("MoonMajorBlessing", "Veil Walker", "moon_goddess", BlessingNode::MAJOR));
+        moonMajorBlessing->blessingDescription = "Move between shadows with unnatural ease, and see clearly in complete darkness.";
+        moonMajorBlessing->effects.push_back({ "skill", "stealth", 4, "+4 to Stealth skill at night" });
+        moonMajorBlessing->effects.push_back({ "ability", "shadow_step", 0, "Ability to teleport between shadows once per hour" });
+        moonMajorBlessing->effects.push_back({ "passive", "night_vision", 0, "Perfect vision in darkness" });
+        blessings.push_back(moonMajorBlessing);
+
+        BlessingNode* moonGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("MoonGreaterBlessing", "Dreamweaver", "moon_goddess", BlessingNode::GREATER));
+        moonGreaterBlessing->blessingDescription = "Manipulate dreams and illusions with the power of the moon, bending reality to your will.";
+        moonGreaterBlessing->effects.push_back({ "stat", "intelligence", 2, "Intelligence +2 while active" });
+        moonGreaterBlessing->effects.push_back({ "stat", "wisdom", 2, "Wisdom +2 while active" });
+        moonGreaterBlessing->effects.push_back({ "ability", "create_illusion", 0, "Create convincing illusions three times per day" });
+        moonGreaterBlessing->effects.push_back({ "ability", "dreamwalk", 0, "Enter others' dreams once per night" });
+        blessings.push_back(moonGreaterBlessing);
+
+        BlessingNode* moonDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("MoonDivineBlessing", "Lunar Avatar", "moon_goddess", BlessingNode::DIVINE));
+        moonDivineBlessing->blessingDescription = "Become a living conduit of the Moon Goddess's power, with mastery over shadows, dreams, and illusions.";
+        moonDivineBlessing->effects.push_back({ "skill", "magic", 5, "+5 to Magic skill" });
+        moonDivineBlessing->effects.push_back({ "ability", "moonlight_form", 0, "Transform into moonlight once per day" });
+        moonDivineBlessing->effects.push_back({ "passive", "dream_manipulation", 0, "Shape and control dreams at will" });
+        moonDivineBlessing->effects.push_back({ "damage_bonus", "illusion", 10, "+10 to effectiveness of illusion magic" });
+        blessings.push_back(moonDivineBlessing);
 
         // Earth Mother Blessings
         BlessingNode* earthMinorBlessing = dynamic_cast<BlessingNode*>(
             createNode<BlessingNode>("EarthMinorBlessing", "Nature's Touch", "earth_mother", BlessingNode::MINOR));
         earthMinorBlessing->blessingDescription = "A connection to nature that allows easier foraging and identification of plants.";
         earthMinorBlessing->effects.push_back({ "skill", "survival", 2, "+2 to Survival skill when foraging" });
-
+        earthMinorBlessing->effects.push_back({ "passive", "plant_identification", 0, "Automatically identify common plants and herbs" });
         blessings.push_back(earthMinorBlessing);
+
+        BlessingNode* earthModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("EarthModerateBlessing", "Wild Growth", "earth_mother", BlessingNode::MODERATE));
+        earthModerateBlessing->blessingDescription = "Plants respond to your presence, growing faster and stronger near you.";
+        earthModerateBlessing->effects.push_back({ "stat", "constitution", 1, "Constitution +1 while active" });
+        earthModerateBlessing->effects.push_back({ "ability", "accelerate_growth", 0, "Accelerate plant growth once per day" });
+        earthModerateBlessing->effects.push_back({ "passive", "herb_potency", 0, "Herbs you gather are 25% more potent" });
+        blessings.push_back(earthModerateBlessing);
+
+        BlessingNode* earthMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("EarthMajorBlessing", "Woodland Harmony", "earth_mother", BlessingNode::MAJOR));
+        earthMajorBlessing->blessingDescription = "Animals recognize you as a friend of nature, and the forest itself seems to aid your passage.";
+        earthMajorBlessing->effects.push_back({ "skill", "animal_handling", 3, "+3 to Animal Handling skill" });
+        earthMajorBlessing->effects.push_back({ "ability", "speak_with_animals", 0, "Speak with animals once per day" });
+        earthMajorBlessing->effects.push_back({ "passive", "woodland_speed", 0, "Move through natural terrain without hindrance" });
+        blessings.push_back(earthMajorBlessing);
+
+        BlessingNode* earthGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("EarthGreaterBlessing", "Gaia's Bounty", "earth_mother", BlessingNode::GREATER));
+        earthGreaterBlessing->blessingDescription = "Your connection to the earth grants you incredible vitality and healing powers.";
+        earthGreaterBlessing->effects.push_back({ "stat", "constitution", 3, "Constitution +3 while active" });
+        earthGreaterBlessing->effects.push_back({ "passive", "natural_regeneration", 0, "Regenerate health slowly while outdoors" });
+        earthGreaterBlessing->effects.push_back({ "ability", "nature's_cure", 0, "Cure poison and disease once per day" });
+        earthGreaterBlessing->effects.push_back({ "protection", "poison", 75, "75% resistance to natural poisons" });
+        blessings.push_back(earthGreaterBlessing);
+
+        BlessingNode* earthDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("EarthDivineBlessing", "Earth's Guardian", "earth_mother", BlessingNode::DIVINE));
+        earthDivineBlessing->blessingDescription = "Become a true champion of nature, able to call upon the power of the earth itself.";
+        earthDivineBlessing->effects.push_back({ "stat", "strength", 2, "Strength +2 while active" });
+        earthDivineBlessing->effects.push_back({ "stat", "constitution", 4, "Constitution +4 while active" });
+        earthDivineBlessing->effects.push_back({ "ability", "entangle", 0, "Command plants to entangle foes once per day" });
+        earthDivineBlessing->effects.push_back({ "ability", "wild_shape", 0, "Transform into a creature of the forest once per day" });
+        earthDivineBlessing->effects.push_back({ "passive", "nature's_ally", 0, "Wild animals assist you in combat" });
+        blessings.push_back(earthDivineBlessing);
 
         // War God Blessings
         BlessingNode* warMinorBlessing = dynamic_cast<BlessingNode*>(
@@ -2191,10 +2273,269 @@ private:
         warMinorBlessing->blessingDescription = "A blessing that grants courage in battle and improves combat reflexes.";
         warMinorBlessing->effects.push_back({ "stat", "strength", 1, "Strength +1 while active" });
         warMinorBlessing->effects.push_back({ "protection", "fear", 50, "50% resistance to fear in combat" });
-
         blessings.push_back(warMinorBlessing);
 
-        // Add more blessings for other deities...
+        BlessingNode* warModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WarModerateBlessing", "Battle Precision", "war_god", BlessingNode::MODERATE));
+        warModerateBlessing->blessingDescription = "Your strikes land with uncanny precision, finding weaknesses in your enemy's defenses.";
+        warModerateBlessing->effects.push_back({ "skill", "combat", 2, "+2 to Combat skill" });
+        warModerateBlessing->effects.push_back({ "passive", "critical_chance", 0, "5% increased critical hit chance" });
+        blessings.push_back(warModerateBlessing);
+
+        BlessingNode* warMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WarMajorBlessing", "Unyielding Stance", "war_god", BlessingNode::MAJOR));
+        warMajorBlessing->blessingDescription = "Stand your ground against any foe, shrugging off wounds that would fell a lesser warrior.";
+        warMajorBlessing->effects.push_back({ "stat", "strength", 2, "Strength +2 while active" });
+        warMajorBlessing->effects.push_back({ "stat", "constitution", 2, "Constitution +2 while active" });
+        warMajorBlessing->effects.push_back({ "protection", "physical", 15, "15% reduction to all physical damage" });
+        warMajorBlessing->effects.push_back({ "ability", "second_wind", 0, "Recover from exhaustion once per battle" });
+        blessings.push_back(warMajorBlessing);
+
+        BlessingNode* warGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WarGreaterBlessing", "Battle Fury", "war_god", BlessingNode::GREATER));
+        warGreaterBlessing->blessingDescription = "Enter a state of divine fury in battle, striking with supernatural speed and power.";
+        warGreaterBlessing->effects.push_back({ "stat", "strength", 4, "Strength +4 while in combat" });
+        warGreaterBlessing->effects.push_back({ "ability", "whirlwind_attack", 0, "Attack all enemies around you once per battle" });
+        warGreaterBlessing->effects.push_back({ "passive", "battle_trance", 0, "Enter a trance when below 25% health, increasing damage by 25%" });
+        blessings.push_back(warGreaterBlessing);
+
+        BlessingNode* warDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WarDivineBlessing", "Avatar of War", "war_god", BlessingNode::DIVINE));
+        warDivineBlessing->blessingDescription = "Become a living embodiment of the War God's power, unstoppable in battle.";
+        warDivineBlessing->effects.push_back({ "stat", "strength", 5, "Strength +5 while active" });
+        warDivineBlessing->effects.push_back({ "stat", "constitution", 3, "Constitution +3 while active" });
+        warDivineBlessing->effects.push_back({ "ability", "war_cry", 0, "Unleash a terrible war cry that frightens enemies once per day" });
+        warDivineBlessing->effects.push_back({ "passive", "weapon_mastery", 0, "Expert proficiency with all weapons" });
+        warDivineBlessing->effects.push_back({ "passive", "battle_intuition", 0, "Sense ambushes and predict enemy tactics" });
+        blessings.push_back(warDivineBlessing);
+
+        // Trade God Blessings
+        BlessingNode* tradeMinorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TradeMinorBlessing", "Merchant's Tongue", "trade_god", BlessingNode::MINOR));
+        tradeMinorBlessing->blessingDescription = "Words flow smoothly in negotiations, helping you secure better deals.";
+        tradeMinorBlessing->effects.push_back({ "skill", "persuasion", 2, "+2 to Persuasion skill when trading" });
+        tradeMinorBlessing->effects.push_back({ "passive", "better_prices", 0, "10% better prices when buying or selling" });
+        blessings.push_back(tradeMinorBlessing);
+
+        BlessingNode* tradeModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TradeModerateBlessing", "Fortune's Favor", "trade_god", BlessingNode::MODERATE));
+        tradeModerateBlessing->blessingDescription = "Luck smiles upon your financial ventures, and valuable items seem to find their way to you.";
+        tradeModerateBlessing->effects.push_back({ "stat", "charisma", 1, "Charisma +1 while active" });
+        tradeModerateBlessing->effects.push_back({ "passive", "treasure_sense", 0, "Increased chance to find valuable items" });
+        tradeModerateBlessing->effects.push_back({ "passive", "lucky_deals", 0, "15% chance for rare items to appear in merchant stocks" });
+        blessings.push_back(tradeModerateBlessing);
+
+        BlessingNode* tradeMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TradeMajorBlessing", "Master Negotiator", "trade_god", BlessingNode::MAJOR));
+        tradeMajorBlessing->blessingDescription = "Your reputation as a fair trader precedes you, opening doors and opportunities everywhere.";
+        tradeMajorBlessing->effects.push_back({ "stat", "charisma", 2, "Charisma +2 while active" });
+        tradeMajorBlessing->effects.push_back({ "skill", "persuasion", 3, "+3 to Persuasion skill" });
+        tradeMajorBlessing->effects.push_back({ "passive", "merchant_reputation", 0, "Access to exclusive merchant inventories" });
+        tradeMajorBlessing->effects.push_back({ "ability", "appraise", 0, "Perfectly appraise any item's value once per day" });
+        blessings.push_back(tradeMajorBlessing);
+
+        BlessingNode* tradeGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TradeGreaterBlessing", "Golden Touch", "trade_god", BlessingNode::GREATER));
+        tradeGreaterBlessing->blessingDescription = "Everything you touch seems to turn to profit, and wealth accumulates around you.";
+        tradeGreaterBlessing->effects.push_back({ "stat", "charisma", 3, "Charisma +3 while active" });
+        tradeGreaterBlessing->effects.push_back({ "passive", "gold_premium", 0, "Find 25% more gold in treasures" });
+        tradeGreaterBlessing->effects.push_back({ "passive", "investment_return", 0, "Investments yield double returns" });
+        tradeGreaterBlessing->effects.push_back({ "ability", "transmute", 0, "Convert common materials to precious ones once per week" });
+        blessings.push_back(tradeGreaterBlessing);
+
+        BlessingNode* tradeDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TradeDivineBlessing", "Master of Exchange", "trade_god", BlessingNode::DIVINE));
+        tradeDivineBlessing->blessingDescription = "You embody the principles of fair exchange and prosperity, becoming a living conduit of wealth.";
+        tradeDivineBlessing->effects.push_back({ "stat", "charisma", 4, "Charisma +4 while active" });
+        tradeDivineBlessing->effects.push_back({ "stat", "intelligence", 2, "Intelligence +2 while active" });
+        tradeDivineBlessing->effects.push_back({ "ability", "trade_network", 0, "Access a divine trade network once per day" });
+        tradeDivineBlessing->effects.push_back({ "passive", "prosperity_aura", 0, "Nearby allies and settlements experience economic growth" });
+        tradeDivineBlessing->effects.push_back({ "passive", "universal_trader", 0, "Can trade with any being, even those who don't speak your language" });
+        blessings.push_back(tradeDivineBlessing);
+
+        // Death Goddess Blessings
+        BlessingNode* deathMinorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("DeathMinorBlessing", "Death's Whisper", "death_goddess", BlessingNode::MINOR));
+        deathMinorBlessing->blessingDescription = "Sense the presence of the dead and communicate with lingering spirits.";
+        deathMinorBlessing->effects.push_back({ "ability", "detect_undead", 0, "Sense undead within 100 feet" });
+        deathMinorBlessing->effects.push_back({ "protection", "undead", 10, "10% resistance to undead attacks" });
+        blessings.push_back(deathMinorBlessing);
+
+        BlessingNode* deathModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("DeathModerateBlessing", "Soul Warden", "death_goddess", BlessingNode::MODERATE));
+        deathModerateBlessing->blessingDescription = "Your presence calms restless spirits, and you can glimpse beyond the veil of death.";
+        deathModerateBlessing->effects.push_back({ "skill", "spirit_magic", 2, "+2 to Spirit Magic skill" });
+        deathModerateBlessing->effects.push_back({ "ability", "speak_with_dead", 0, "Speak with the recently deceased once per day" });
+        deathModerateBlessing->effects.push_back({ "passive", "calm_undead", 0, "Lesser undead will not attack without provocation" });
+        blessings.push_back(deathModerateBlessing);
+
+        BlessingNode* deathMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("DeathMajorBlessing", "Death's Reprieve", "death_goddess", BlessingNode::MAJOR));
+        deathMajorBlessing->blessingDescription = "The Keeper of Souls grants you influence over the boundary between life and death.";
+        deathMajorBlessing->effects.push_back({ "stat", "wisdom", 2, "Wisdom +2 while active" });
+        deathMajorBlessing->effects.push_back({ "ability", "death_ward", 0, "Survive a fatal blow once per week" });
+        deathMajorBlessing->effects.push_back({ "passive", "spirit_sight", 0, "See invisible and ethereal beings" });
+        deathMajorBlessing->effects.push_back({ "damage_bonus", "undead", 20, "+20% damage against undead" });
+        blessings.push_back(deathMajorBlessing);
+
+        BlessingNode* deathGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("DeathGreaterBlessing", "Soul Shepherd", "death_goddess", BlessingNode::GREATER));
+        deathGreaterBlessing->blessingDescription = "Command the dead and guide souls to their proper rest with authority granted by the Death Goddess.";
+        deathGreaterBlessing->effects.push_back({ "stat", "wisdom", 3, "Wisdom +3 while active" });
+        deathGreaterBlessing->effects.push_back({ "ability", "command_undead", 0, "Command lesser undead once per day" });
+        deathGreaterBlessing->effects.push_back({ "ability", "soul_anchor", 0, "Prevent a dying person from becoming undead once per week" });
+        deathGreaterBlessing->effects.push_back({ "passive", "death_resistance", 0, "Immunity to death magic" });
+        blessings.push_back(deathGreaterBlessing);
+
+        BlessingNode* deathDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("DeathDivineBlessing", "Death's Emissary", "death_goddess", BlessingNode::DIVINE));
+        deathDivineBlessing->blessingDescription = "Become a true agent of the Death Goddess, with dominion over life, death, and the afterlife.";
+        deathDivineBlessing->effects.push_back({ "stat", "wisdom", 4, "Wisdom +4 while active" });
+        deathDivineBlessing->effects.push_back({ "stat", "charisma", 2, "Charisma +2 while active" });
+        deathDivineBlessing->effects.push_back({ "ability", "death_gate", 0, "Open a temporary passage to the realm of the dead once per month" });
+        deathDivineBlessing->effects.push_back({ "ability", "resurrect", 0, "Return a dead soul to life once per season" });
+        deathDivineBlessing->effects.push_back({ "passive", "deathless", 0, "Age at one-tenth the normal rate" });
+        blessings.push_back(deathDivineBlessing);
+
+        // Trickster Blessings
+        BlessingNode* tricksterMinorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TricksterMinorBlessing", "Lucky Mischief", "trickster", BlessingNode::MINOR));
+        tricksterMinorBlessing->blessingDescription = "Small bits of luck and coincidence seem to work in your favor, especially when causing mischief.";
+        tricksterMinorBlessing->effects.push_back({ "skill", "sleight_of_hand", 2, "+2 to Sleight of Hand skill" });
+        tricksterMinorBlessing->effects.push_back({ "passive", "lucky_escape", 0, "10% chance to automatically escape when caught in traps" });
+        blessings.push_back(tricksterMinorBlessing);
+
+        BlessingNode* tricksterModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TricksterModerateBlessing", "Confounding Presence", "trickster", BlessingNode::MODERATE));
+        tricksterModerateBlessing->blessingDescription = "Your very presence causes minor confusion and distraction, making you harder to pin down.";
+        tricksterModerateBlessing->effects.push_back({ "stat", "dexterity", 1, "Dexterity +1 while active" });
+        tricksterModerateBlessing->effects.push_back({ "skill", "evasion", 2, "+2 to Evasion skill" });
+        tricksterModerateBlessing->effects.push_back({ "ability", "minor_illusion", 0, "Create a small illusory distraction three times per day" });
+        blessings.push_back(tricksterModerateBlessing);
+
+        BlessingNode* tricksterMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TricksterMajorBlessing", "Fortune's Fool", "trickster", BlessingNode::MAJOR));
+        tricksterMajorBlessing->blessingDescription = "Even in the direst circumstances, luck bends in improbable ways to save you from harm.";
+        tricksterMajorBlessing->effects.push_back({ "stat", "dexterity", 2, "Dexterity +2 while active" });
+        tricksterMajorBlessing->effects.push_back({ "passive", "unlikely_dodge", 0, "15% chance to avoid any attack completely" });
+        tricksterMajorBlessing->effects.push_back({ "ability", "twist_fate", 0, "Reroll any single die roll once per day" });
+        tricksterMajorBlessing->effects.push_back({ "passive", "chaotic_magic", 0, "Your spells have unpredictable but often beneficial side effects" });
+        blessings.push_back(tricksterMajorBlessing);
+
+        BlessingNode* tricksterGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TricksterGreaterBlessing", "Reality Bender", "trickster", BlessingNode::GREATER));
+        tricksterGreaterBlessing->blessingDescription = "The lines between reality and illusion blur around you, allowing you to reshape minor aspects of the world.";
+        tricksterGreaterBlessing->effects.push_back({ "stat", "dexterity", 3, "Dexterity +3 while active" });
+        tricksterGreaterBlessing->effects.push_back({ "stat", "charisma", 2, "Charisma +2 while active" });
+        tricksterGreaterBlessing->effects.push_back({ "ability", "false_appearance", 0, "Create a perfect disguise illusion twice per day" });
+        tricksterGreaterBlessing->effects.push_back({ "ability", "chaos_bolt", 0, "Cast an unpredictable but powerful spell once per day" });
+        tricksterGreaterBlessing->effects.push_back({ "passive", "slippery_mind", 0, "50% resistance to mind-affecting magic" });
+        blessings.push_back(tricksterGreaterBlessing);
+
+        BlessingNode* tricksterDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("TricksterDivineBlessing", "Chaos Incarnate", "trickster", BlessingNode::DIVINE));
+        tricksterDivineBlessing->blessingDescription = "You become a living embodiment of chaos and trickery, able to bend reality to your whims.";
+        tricksterDivineBlessing->effects.push_back({ "stat", "dexterity", 4, "Dexterity +4 while active" });
+        tricksterDivineBlessing->effects.push_back({ "stat", "charisma", 3, "Charisma +3 while active" });
+        tricksterDivineBlessing->effects.push_back({ "ability", "reality_warp", 0, "Bend reality in a small area once per day" });
+        tricksterDivineBlessing->effects.push_back({ "ability", "perfect_disguise", 0, "Become anyone or anything once per day" });
+        tricksterDivineBlessing->effects.push_back({ "passive", "chaotic_protection", 0, "Unpredictable protection that sometimes turns attacks back on attackers" });
+        tricksterDivineBlessing->effects.push_back({ "passive", "luck_manipulation", 0, "Influence probability in your favor once per hour" });
+        blessings.push_back(tricksterDivineBlessing);
+
+        // Sea God Blessings
+        BlessingNode* seaMinorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SeaMinorBlessing", "Mariner's Favor", "sea_god", BlessingNode::MINOR));
+        seaMinorBlessing->blessingDescription = "Never lose your way on the water, and move with the grace of the tides.";
+        seaMinorBlessing->effects.push_back({ "skill", "swimming", 3, "+3 to Swimming skill" });
+        seaMinorBlessing->effects.push_back({ "passive", "water_breathing", 0, "Hold your breath three times longer than normal" });
+        seaMinorBlessing->effects.push_back({ "passive", "sea_navigation", 0, "Always know your direction at sea" });
+        blessings.push_back(seaMinorBlessing);
+
+        BlessingNode* seaModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SeaModerateBlessing", "Ocean's Grace", "sea_god", BlessingNode::MODERATE));
+        seaModerateBlessing->blessingDescription = "The water welcomes you as one of its own, granting you speed and endurance at sea.";
+        seaModerateBlessing->effects.push_back({ "stat", "constitution", 1, "Constitution +1 while active" });
+        seaModerateBlessing->effects.push_back({ "ability", "water_sprint", 0, "Swim at incredible speed for short bursts three times per day" });
+        seaModerateBlessing->effects.push_back({ "passive", "sea_resistance", 0, "Resist cold and pressure in deep water" });
+        blessings.push_back(seaModerateBlessing);
+
+        BlessingNode* seaMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SeaMajorBlessing", "Tide Commander", "sea_god", BlessingNode::MAJOR));
+        seaMajorBlessing->blessingDescription = "Command the power of water itself, bending small currents to your will.";
+        seaMajorBlessing->effects.push_back({ "stat", "wisdom", 2, "Wisdom +2 while active" });
+        seaMajorBlessing->effects.push_back({ "ability", "water_control", 0, "Manipulate small amounts of water twice per day" });
+        seaMajorBlessing->effects.push_back({ "ability", "water_breathing", 0, "Breathe underwater for one hour per day" });
+        seaMajorBlessing->effects.push_back({ "passive", "sea_communication", 0, "Speak with sea creatures" });
+        blessings.push_back(seaMajorBlessing);
+
+        BlessingNode* seaGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SeaGreaterBlessing", "Ocean's Wrath", "sea_god", BlessingNode::GREATER));
+        seaGreaterBlessing->blessingDescription = "Channel the destructive power of the sea, calling forth waves and storms.";
+        seaGreaterBlessing->effects.push_back({ "stat", "strength", 2, "Strength +2 while active" });
+        seaGreaterBlessing->effects.push_back({ "stat", "constitution", 2, "Constitution +2 while active" });
+        seaGreaterBlessing->effects.push_back({ "ability", "tidal_wave", 0, "Create a powerful wave of water once per day" });
+        seaGreaterBlessing->effects.push_back({ "ability", "call_storm", 0, "Summon a localized storm once per week" });
+        seaGreaterBlessing->effects.push_back({ "passive", "water_affinity", 0, "All water-based magic is 50% more effective" });
+        blessings.push_back(seaGreaterBlessing);
+
+        BlessingNode* seaDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("SeaDivineBlessing", "Lord of Tides", "sea_god", BlessingNode::DIVINE));
+        seaDivineBlessing->blessingDescription = "Become one with the endless sea, commanding waters and storms with the authority of the Sea God himself.";
+        seaDivineBlessing->effects.push_back({ "stat", "strength", 3, "Strength +3 while active" });
+        seaDivineBlessing->effects.push_back({ "stat", "constitution", 3, "Constitution +3 while active" });
+        seaDivineBlessing->effects.push_back({ "stat", "wisdom", 2, "Wisdom +2 while active" });
+        seaDivineBlessing->effects.push_back({ "ability", "water_form", 0, "Transform into water once per day" });
+        seaDivineBlessing->effects.push_back({ "ability", "maelstrom", 0, "Create a devastating whirlpool once per month" });
+        seaDivineBlessing->effects.push_back({ "passive", "sea_mastery", 0, "Complete control over water and weather at sea" });
+        seaDivineBlessing->effects.push_back({ "passive", "sea_king", 0, "Sea creatures recognize and obey you" });
+        blessings.push_back(seaDivineBlessing);
+
+        // Wisdom Goddess Blessings
+        BlessingNode* wisdomMinorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WisdomMinorBlessing", "Scholar's Insight", "wisdom_goddess", BlessingNode::MINOR));
+        wisdomMinorBlessing->blessingDescription = "Your mind works with greater clarity, recalling information with perfect precision.";
+        wisdomMinorBlessing->effects.push_back({ "stat", "intelligence", 1, "Intelligence +1 while active" });
+        wisdomMinorBlessing->effects.push_back({ "passive", "perfect_recall", 0, "Perfectly remember anything you've read or seen" });
+        blessings.push_back(wisdomMinorBlessing);
+
+        BlessingNode* wisdomModerateBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WisdomModerateBlessing", "Mind's Clarity", "wisdom_goddess", BlessingNode::MODERATE));
+        wisdomModerateBlessing->blessingDescription = "Your thoughts flow without distraction, allowing deep concentration and logical reasoning.";
+        wisdomModerateBlessing->effects.push_back({ "stat", "intelligence", 2, "Intelligence +2 while active" });
+        wisdomModerateBlessing->effects.push_back({ "skill", "logic", 3, "+3 to Logic and reasoning checks" });
+        wisdomModerateBlessing->effects.push_back({ "passive", "language_comprehension", 0, "Understand the general meaning of unknown languages" });
+        blessings.push_back(wisdomModerateBlessing);
+
+        BlessingNode* wisdomMajorBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WisdomMajorBlessing", "Foresight", "wisdom_goddess", BlessingNode::MAJOR));
+        wisdomMajorBlessing->blessingDescription = "Glimpse possible futures, anticipating dangers and opportunities before they arise.";
+        wisdomMajorBlessing->effects.push_back({ "stat", "wisdom", 2, "Wisdom +2 while active" });
+        wisdomMajorBlessing->effects.push_back({ "stat", "intelligence", 1, "Intelligence +1 while active" });
+        wisdomMajorBlessing->effects.push_back({ "ability", "anticipate", 0, "Predict an opponent's next action once per combat" });
+        wisdomMajorBlessing->effects.push_back({ "passive", "danger_sense", 0, "Cannot be surprised by traps or ambushes" });
+        blessings.push_back(wisdomMajorBlessing);
+
+        BlessingNode* wisdomGreaterBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WisdomGreaterBlessing", "Mind's Mastery", "wisdom_goddess", BlessingNode::GREATER));
+        wisdomGreaterBlessing->blessingDescription = "Your intellect transcends normal human limitations, comprehending complex patterns instantly.";
+        wisdomGreaterBlessing->effects.push_back({ "stat", "intelligence", 3, "Intelligence +3 while active" });
+        wisdomGreaterBlessing->effects.push_back({ "stat", "wisdom", 3, "Wisdom +3 while active" });
+        wisdomGreaterBlessing->effects.push_back({ "ability", "comprehend_knowledge", 0, "Instantly understand a complex text or concept once per day" });
+        wisdomGreaterBlessing->effects.push_back({ "ability", "mind_shield", 0, "Protect against mental attacks and illusions once per day" });
+        wisdomGreaterBlessing->effects.push_back({ "passive", "analytical_insight", 0, "Identify patterns and solutions to complex problems automatically" });
+        blessings.push_back(wisdomGreaterBlessing);
+
+        BlessingNode* wisdomDivineBlessing = dynamic_cast<BlessingNode*>(
+            createNode<BlessingNode>("WisdomDivineBlessing", "Omniscience", "wisdom_goddess", BlessingNode::DIVINE));
+        wisdomDivineBlessing->blessingDescription = "Your mind approaches that of the Wisdom Goddess herself, with knowledge and foresight beyond mortal comprehension.";
+        wisdomDivineBlessing->effects.push_back({ "stat", "intelligence", 5, "Intelligence +5 while active" });
+        wisdomDivineBlessing->effects.push_back({ "stat", "wisdom", 5, "Wisdom +5 while active" });
+        wisdomDivineBlessing->effects.push_back({ "ability", "fate_vision", 0, "See the most probable future once per week" });
+        wisdomDivineBlessing->effects.push_back({ "ability", "universal_language", 0, "Understand and speak any language" });
+        wisdomDivineBlessing->effects.push_back({ "passive", "tactical_mastery", 0, "Always know the optimal strategy in any conflict" });
+        wisdomDivineBlessing->effects.push_back({ "passive", "knowledge_incarnate", 0, "Access to universal knowledge on specific topics once per day" });
+        blessings.push_back(wisdomDivineBlessing);
     }
 
     // Create religious quests
