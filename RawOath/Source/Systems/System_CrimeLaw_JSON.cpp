@@ -1,4 +1,7 @@
-// System_CrimeLaw.cpp
+// System_CrimeLaw_JSON.cpp
+
+#include "System_CrimeLaw_JSON.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <fstream>
@@ -7,7 +10,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <queue>
 #include <random>
 #include <set>
@@ -16,7 +18,10 @@
 #include <variant>
 #include <vector>
 
-// Forward declarations from RawOathFull.cpp
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+// Forward declarations
 class TANode;
 class TAController;
 class Inventory;
@@ -29,8 +34,6 @@ struct NodeID;
 struct TAInput;
 struct TAAction;
 struct TATransitionRule;
-
-using json = nlohmann::json;
 
 //----------------------------------------
 // GLOBAL JSON CONFIG

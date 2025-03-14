@@ -1,4 +1,7 @@
-// System_EconomyMarket.cpp
+// System_EconomyMarket_JSON.cpp
+
+#include "System_EconomyMarket_JSON.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <ctime>
@@ -8,7 +11,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <queue>
 #include <random>
 #include <set>
@@ -17,10 +19,10 @@
 #include <variant>
 #include <vector>
 
-// For convenience
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-// Forward declarations from RawOathFull.cpp
+// Forward declarations
 class TANode;
 class TAController;
 class Inventory;

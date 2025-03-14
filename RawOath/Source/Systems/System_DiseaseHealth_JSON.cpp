@@ -1,4 +1,7 @@
-// System_DiseaseHealth.cpp
+// System_DiseaseHealth_JSON.cpp
+
+#include "System_DiseaseHealth_JSON.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <fstream>
@@ -7,7 +10,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <queue>
 #include <random>
 #include <set>
@@ -15,6 +17,9 @@
 #include <string>
 #include <variant>
 #include <vector>
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 // Forward declarations of existing system components
 class TANode;
@@ -27,15 +32,9 @@ class TATransitionRule;
 class NodeID;
 class Item;
 
-// Disease and Health System
-// This implementation adds a comprehensive disease and health system to the RawOath framework
-
 //----------------------------------------
 // DISEASE AND HEALTH SYSTEM
 //----------------------------------------
-
-// Using json library
-using json = nlohmann::json;
 
 // Forward declarations for health system
 class Disease;
