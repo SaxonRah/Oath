@@ -1,4 +1,7 @@
-// System_NPCRelationships.cpp
+// System_NPCRelationships_JSON.cpp
+
+#include "System_NPCRelationships_JSON.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <ctime>
@@ -6,14 +9,12 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <random>
 #include <set>
 #include <string>
 #include <vector>
 
-
-// For convenience
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 // Forward declarations for Raw Oath types

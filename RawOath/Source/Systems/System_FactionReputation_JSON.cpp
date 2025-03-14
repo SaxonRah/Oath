@@ -1,4 +1,7 @@
-// System_FactionReputation.cpp
+// System_FactionReputation_JSON.cpp
+
+#include "System_FactionReputation_JSON.h"
+
 #include <algorithm>
 #include <ctime>
 #include <filesystem>
@@ -8,7 +11,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <queue>
 #include <random>
 #include <set>
@@ -17,10 +19,10 @@
 #include <variant>
 #include <vector>
 
-// Using nlohmann json for modern C++ JSON handling
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-// Forward declarations from RawOathFull.cpp
+// Forward declarations
 class TANode;
 class TAController;
 class Inventory;
