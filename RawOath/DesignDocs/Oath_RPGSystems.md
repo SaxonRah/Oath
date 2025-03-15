@@ -112,3 +112,73 @@ The demonstration in `main()` shows:
 - Clean separation of systems through interfaces
 - File I/O validation with integrity checks
 - Memory management for dynamically created nodes
+
+# Proposed Directory Tree
+```
+/oath/
+├── CMakeLists.txt
+├── main.cpp                        # Main entry point
+├── core/
+│   ├── NodeID.hpp                  # NodeID structure
+│   ├── NodeID.cpp
+│   ├── TAAction.hpp                # Action structure
+│   ├── TAController.hpp            # Main controller
+│   ├── TAController.cpp
+│   ├── TAInput.hpp                 # Input structure
+│   ├── TANode.hpp                  # Base node class
+│   ├── TANode.cpp
+│   └── TATransitionRule.hpp        # Transition rule structure
+├── data/
+│   ├── CharacterStats.hpp          # Character stats
+│   ├── CharacterStats.cpp
+│   ├── GameContext.hpp             # Game context structure
+│   ├── GameContext.cpp
+│   ├── Inventory.hpp               # Inventory and items
+│   ├── Inventory.cpp
+│   ├── Item.hpp                    # Item structure
+│   ├── Item.cpp
+│   ├── Recipe.hpp                  # Crafting recipes
+│   ├── Recipe.cpp
+│   ├── WorldState.hpp              # World state
+│   └── WorldState.cpp
+├── systems/
+│   ├── crafting/
+│   │   ├── CraftingNode.hpp        # Crafting stations
+│   │   └── CraftingNode.cpp
+│   ├── dialogue/
+│   │   ├── DialogueNode.hpp        # Dialogue nodes
+│   │   ├── DialogueNode.cpp
+│   │   ├── NPC.hpp                 # NPC class
+│   │   └── NPC.cpp
+│   ├── progression/
+│   │   ├── ClassNode.hpp           # Character class nodes
+│   │   ├── ClassNode.cpp
+│   │   ├── SkillNode.hpp           # Skill nodes
+│   │   └── SkillNode.cpp
+│   ├── quest/
+│   │   ├── QuestNode.hpp           # Quest nodes
+│   │   └── QuestNode.cpp
+│   └── world/
+│       ├── LocationNode.hpp        # Location nodes
+│       ├── LocationNode.cpp
+│       ├── RegionNode.hpp          # Region nodes
+│       ├── RegionNode.cpp
+│       ├── TimeNode.hpp            # Time system
+│       └── TimeNode.cpp
+├── utils/
+│   ├── JSONLoader.hpp              # JSON loading utilities
+│   ├── JSONLoader.cpp
+│   ├── JSONSerializer.hpp          # JSON serialization utilities
+│   └── JSONSerializer.cpp
+└── resources/
+    ├── json/
+    │   ├── quests.json           # Quest definitions
+    │   ├── npcs.json             # NPC and dialogue data
+    │   ├── skills.json           # Skills and character classes
+    │   ├── crafting.json         # Crafting recipes
+    │   └── world.json            # World, regions, and locations
+    ├── saves/                    # Directory for saved games
+    │   ├── save_001.json
+    │   └── ...
+    └── config/                   # Configuration files
+        └── settings.json         # Game settings

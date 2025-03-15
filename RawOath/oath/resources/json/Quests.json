@@ -1,0 +1,140 @@
+{
+    "quests": [
+        {
+            "id": "MainQuest",
+            "title": "Defend the Village",
+            "description": "The village is under threat. Prepare its defenses!",
+            "state": "Available",
+            "isAcceptingState": false,
+            "rewards": [
+                {
+                    "type": "experience",
+                    "amount": 500,
+                    "itemId": ""
+                },
+                {
+                    "type": "gold",
+                    "amount": 200,
+                    "itemId": ""
+                },
+                {
+                    "type": "faction",
+                    "amount": 25,
+                    "itemId": "villagers"
+                },
+                {
+                    "type": "item",
+                    "amount": 1,
+                    "itemId": "defenders_shield"
+                }
+            ],
+            "requirements": [],
+            "subquests": [
+                {
+                    "id": "RepairWalls",
+                    "title": "Repair the Walls",
+                    "description": "The village walls are in disrepair. Fix them!",
+                    "state": "Available",
+                    "isAcceptingState": false,
+                    "rewards": [
+                        {
+                            "type": "experience",
+                            "amount": 100,
+                            "itemId": ""
+                        },
+                        {
+                            "type": "gold",
+                            "amount": 50,
+                            "itemId": ""
+                        },
+                        {
+                            "type": "faction",
+                            "amount": 10,
+                            "itemId": "villagers"
+                        }
+                    ],
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "crafting",
+                            "value": 1
+                        }
+                    ],
+                    "transitions": [
+                        {
+                            "action": "repair_complete",
+                            "target": "MainQuest",
+                            "description": "Complete wall repairs"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrainMilitia",
+                    "title": "Train the Militia",
+                    "description": "The villagers need combat training.",
+                    "state": "Available",
+                    "isAcceptingState": false,
+                    "rewards": [
+                        {
+                            "type": "experience",
+                            "amount": 150,
+                            "itemId": ""
+                        },
+                        {
+                            "type": "skill",
+                            "amount": 1,
+                            "itemId": "combat"
+                        }
+                    ],
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "combat",
+                            "value": 2
+                        }
+                    ],
+                    "transitions": [
+                        {
+                            "action": "training_complete",
+                            "target": "MainQuest",
+                            "description": "Complete militia training"
+                        }
+                    ]
+                },
+                {
+                    "id": "GatherSupplies",
+                    "title": "Gather Supplies",
+                    "description": "The village needs food and resources.",
+                    "state": "Available",
+                    "isAcceptingState": false,
+                    "rewards": [
+                        {
+                            "type": "experience",
+                            "amount": 100,
+                            "itemId": ""
+                        },
+                        {
+                            "type": "item",
+                            "amount": 1,
+                            "itemId": "rare_herb"
+                        }
+                    ],
+                    "requirements": [
+                        {
+                            "type": "skill",
+                            "target": "survival",
+                            "value": 1
+                        }
+                    ],
+                    "transitions": [
+                        {
+                            "action": "supplies_gathered",
+                            "target": "MainQuest",
+                            "description": "Finish gathering supplies"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

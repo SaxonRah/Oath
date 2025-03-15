@@ -12,26 +12,15 @@ include_directories(${CMAKE_SOURCE_DIR}/Source/Public)
 # Define source files with main() functions that will each become executables
 set(MAIN_SOURCES
     Source/Oath_JSON.cpp
-    Source/System_AdvancedWeather_JSON.cpp
-    Source/System_CrimeLaw_JSON.cpp
-    Source/System_DiseaseHealth_JSON.cpp
-    Source/System_EconomyMarket_JSON.cpp
-    Source/System_FactionReputation_JSON.cpp
-    Source/System_Mount_JSON.cpp
-    Source/System_NPCRelationships_JSON.cpp
-    Source/System_ReligionDeity_JSON.cpp
-    Source/System_SpellCrafting_JSON.cpp
-    # Old/Oath_RPGSystems.cpp
-    # Old/System_AdvancedWeather.cpp
-    # Old/System_CrimeLaw.cpp
-    # Old/System_DiseaseHealth.cpp
-    # Old/System_EconomyMarket.cpp
-    # Old/System_FactionReputation.cpp
-    # Old/System_Mount.cpp
-    # Old/System_NPCRelationships.cpp
-    # Old/System_ReligionDeity.cpp
-    # Old/System_SpellCrafting.cpp
-    # Old/Generators/World/Generator_World.cpp
+    # Source/System_AdvancedWeather_JSON.cpp
+    # Source/System_CrimeLaw_JSON.cpp
+    # Source/System_DiseaseHealth_JSON.cpp
+    # Source/System_EconomyMarket_JSON.cpp
+    # Source/System_FactionReputation_JSON.cpp
+    # Source/System_Mount_JSON.cpp
+    # Source/System_NPCRelationships_JSON.cpp
+    # Source/System_ReligionDeity_JSON.cpp
+    # Source/System_SpellCrafting_JSON.cpp
 )
 
 # Define the primary executable from the main RPG systems file
@@ -59,11 +48,11 @@ foreach(SOURCE_FILE ${MAIN_SOURCES})
 endforeach()
 
 # Add test files
-add_executable(Test_Generator_NPC Source/Generators/NPC/Test_Generator_NPC.cpp)
-set_target_properties(Test_Generator_NPC PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
-)
+# add_executable(Test_Generator_NPC Source/Generators/NPC/Test_Generator_NPC.cpp)
+# set_target_properties(Test_Generator_NPC PROPERTIES
+#     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
+#     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
+# )
 
 # Global settings for debug configuration
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
@@ -74,5 +63,5 @@ foreach(SOURCE_FILE ${MAIN_SOURCES})
     get_filename_component(EXECUTABLE_NAME ${SOURCE_FILE} NAME_WE)
     install(TARGETS ${EXECUTABLE_NAME} DESTINATION bin)
 endforeach()
-install(TARGETS Test_Generator_NPC DESTINATION bin/tests)
+# install(TARGETS Test_Generator_NPC DESTINATION bin/tests)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/ DESTINATION bin/data)
