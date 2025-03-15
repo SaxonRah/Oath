@@ -4,7 +4,6 @@
 #include "../systems/dialogue/NPC.hpp"
 #include "TANode.hpp"
 
-
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -13,6 +12,10 @@
 #include <string>
 #include <vector>
 
+// Forward declaration
+struct GameContext;
+class NPC;
+class TANode;
 
 // The main automaton controller
 class TAController {

@@ -1,11 +1,19 @@
 #pragma once
 
+#include "../../core/TAAction.hpp"
+#include "../../core/TAInput.hpp"
 #include "../../core/TANode.hpp"
 #include "../../data/GameContext.hpp"
 
 #include <functional>
 #include <string>
 #include <vector>
+
+// Forward declaration
+class TANode;
+struct TAAction;
+struct TAInput;
+struct GameContext;
 
 // Skill node for character progression
 class SkillNode : public TANode {

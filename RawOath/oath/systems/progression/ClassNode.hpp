@@ -1,12 +1,18 @@
 #pragma once
 
 #include "../../core/TANode.hpp"
+#include "../../data/GameContext.hpp"
 #include "SkillNode.hpp"
 
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
+// Forward declaration
+class TANode;
+struct GameContext;
+class SkillNode;
 
 // Class specialization node
 class ClassNode : public TANode {

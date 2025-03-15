@@ -6,7 +6,6 @@
 #include "TAInput.hpp"
 #include "TATransitionRule.hpp"
 
-
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -15,6 +14,12 @@
 #include <variant>
 #include <vector>
 
+// Forward declaration
+struct GameContext;
+struct NodeID;
+class TANode;
+struct TAInput;
+struct TATransitionRule;
 
 // Core node class for tree automata system
 class TANode {

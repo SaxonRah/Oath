@@ -7,6 +7,13 @@
 #include "nlohmann/json.hpp"
 #include <string>
 
+// Forward declaration
+struct CharacterStats;
+class Inventory;
+struct WorldState;
+class TAController;
+class json;
+
 // JSON serialization functions
 nlohmann::json serializeCharacterStats(const CharacterStats& stats);
 void deserializeCharacterStats(const nlohmann::json& statsData, CharacterStats& stats);

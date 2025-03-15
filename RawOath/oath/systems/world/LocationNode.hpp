@@ -1,11 +1,19 @@
 #pragma once
 
+#include "../../core/TAAction.hpp"
 #include "../../core/TANode.hpp"
+#include "../../data/GameContext.hpp"
 #include "../../systems/dialogue/NPC.hpp"
 
 #include <map>
 #include <string>
 #include <vector>
+
+// Forward declaration
+class TANode;
+struct TAAction;
+struct GameContext;
+class NPC;
 
 // Location node for world state
 class LocationNode : public TANode {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../core/TAAction.hpp"
+#include "../../core/TANode.hpp"
 #include "../../data/GameContext.hpp"
 #include "LocationNode.hpp"
 
@@ -7,6 +9,12 @@
 #include <random>
 #include <string>
 #include <vector>
+
+// Forward declaration
+class TANode;
+struct TAAction;
+struct GameContext;
+class LocationNode;
 
 // Region node for world map
 class RegionNode : public TANode {

@@ -7,7 +7,9 @@
 #include <string>
 #include <vector>
 
-class NPC; // Forward declaration
+// Forward declaration
+class TANode;
+struct GameContext;
 
 // Dialogue node for conversation trees
 class DialogueNode : public TANode {

@@ -5,6 +5,8 @@
 #include <functional>
 #include <string>
 
+// Forward declaration
+struct TAInput;
 
 // Available actions from a state
 struct TAAction {

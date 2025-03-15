@@ -3,18 +3,19 @@ project(Oath VERSION 0.1.0 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-include_directories(${CMAKE_SOURCE_DIR}oath/include)
-include_directories(${CMAKE_SOURCE_DIR}oath/include/nlohmann)
-include_directories(${CMAKE_SOURCE_DIR}oath/core)
-include_directories(${CMAKE_SOURCE_DIR}oath/data)
-include_directories(${CMAKE_SOURCE_DIR}oath/systems/quest)
-include_directories(${CMAKE_SOURCE_DIR}oath/systems/dialogue)
-include_directories(${CMAKE_SOURCE_DIR}oath/systems/progression)
-include_directories(${CMAKE_SOURCE_DIR}oath/systems/crafting)
-include_directories(${CMAKE_SOURCE_DIR}oath/utils)
+include_directories(${CMAKE_SOURCE_DIR}/oath/include/nlohmann)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/quest)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/dialogue)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/progression)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/crafting)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/core)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/data)
+# include_directories(${CMAKE_SOURCE_DIR}/oath/utils)
+include_directories(${CMAKE_SOURCE_DIR}/oath/include)
+include_directories(${CMAKE_SOURCE_DIR}/oath)
+include_directories(${CMAKE_SOURCE_DIR})
 
 # Set source files by directory
 set(CORE_SOURCES

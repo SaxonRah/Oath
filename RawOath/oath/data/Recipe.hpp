@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 
+// Forward declaration
+struct GameContext;
+struct Item;
+
 // Recipe for crafting items
 class Recipe {
 public:

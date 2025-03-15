@@ -1,5 +1,7 @@
 #include "Recipe.hpp"
 
+#include <iostream>
+
 Recipe::Recipe(const std::string& id, const std::string& recipeName)
     : recipeId(id)
     , name(recipeName)

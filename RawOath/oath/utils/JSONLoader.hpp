@@ -8,6 +8,10 @@
 #include <fstream>
 #include <iostream>
 
+// Forward declaration
+class TAController;
+class json;
+
 // Load game data from JSON files
 bool loadGameData(TAController& controller);
 

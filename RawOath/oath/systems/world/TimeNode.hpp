@@ -1,9 +1,15 @@
 #pragma once
 
+#include "../../core/TAAction.hpp"
 #include "../../core/TANode.hpp"
 #include "../../data/GameContext.hpp"
 
 #include <string>
+
+// Forward declaration
+class TANode;
+struct TAAction;
+struct GameContext;
 
 // Time/Season system
 class TimeNode : public TANode {

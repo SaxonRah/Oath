@@ -9,10 +9,10 @@
 #include "../systems/world/RegionNode.hpp"
 #include "../systems/world/TimeNode.hpp"
 
+#include "../../include/nlohmann/json.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 // Functions to load game data from JSON
 bool loadGameData(TAController& controller)

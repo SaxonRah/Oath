@@ -5,6 +5,10 @@
 #include <functional>
 #include <string>
 
+// Forward declaration
+struct TAInput;
+class TANode;
+
 // Transition rule
 struct TATransitionRule {
     std::function<bool(const TAInput&)> condition;

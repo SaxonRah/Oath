@@ -1,11 +1,11 @@
 #include "TAController.hpp"
 #include "../utils/JSONSerializer.hpp"
 
+#include "../../include/nlohmann/json.hpp"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 template <typename T, typename... Args>
 T* TAController::createNode(const std::string& name, Args&&... args)

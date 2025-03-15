@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+// Forward declaration
+class TANode;
+class Recipe;
+
 // Crafting station node
 class CraftingNode : public TANode {
 public:

@@ -6,7 +6,9 @@
 #include <map>
 #include <string>
 
-class DialogueNode; // Forward declaration
+// Forward declaration
+struct GameContext;
+class DialogueNode;
 
 // NPC class for dialogue interactions
 class NPC {
