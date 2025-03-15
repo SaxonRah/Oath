@@ -1,21 +1,14 @@
-#pragma once
-
-#include "../../core/TANode.hpp"
-#include "../../data/GameContext.hpp"
-
-#include <string>
-#include <vector>
-
+// Quest-specific node implementation
 class QuestNode : public TANode {
 public:
-    // Quest state
+    // Quest state (Available, Active, Completed, Failed)
     std::string questState;
 
     // Quest details
     std::string questTitle;
     std::string questDescription;
 
-    // Reward structure
+    // Rewards for completion
     struct QuestReward {
         std::string type;
         int amount;
@@ -23,17 +16,30 @@ public:
     };
     std::vector<QuestReward> rewards;
 
-    // Requirement structure
+    // Requirements to access this quest
     struct QuestRequirement {
-        std::string type;
-        std::string target;
-        int value;
+        std::string type; // skill, item, faction, etc.
+        std::string target; // skill name, item id, faction name, etc.
+        int value; // required value
 
         bool check(const GameContext& context) const;
     };
     std::vector<QuestRequirement> requirements;
 
-    // Methods
     QuestNode(const std::string& name);
-    // ...other methods as in original implementation
+
+    // Process player action and return next state
+    bool processAction(const std::string& playerAction, TANode*& outNextNode);
+
+    // Check if player can access this quest
+    bool canAccess(const GameContext& context) const;
+
+    // Activate child quests when this node is entered
+    void onEnter(GameContext* context) override;
+
+    // Award rewards when completing quest
+    void onExit(GameContext* context) override;
+
+    // Get available actions specific to quests
+    std::vector<TAAction> getAvailableActions() override;
 };

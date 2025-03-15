@@ -132,7 +132,6 @@ The demonstration in `main()` shows:
 │   ├── CharacterStats.hpp          # Character stats
 │   ├── CharacterStats.cpp
 │   ├── GameContext.hpp             # Game context structure
-│   ├── GameContext.cpp
 │   ├── Inventory.hpp               # Inventory and items
 │   ├── Inventory.cpp
 │   ├── Item.hpp                    # Item structure

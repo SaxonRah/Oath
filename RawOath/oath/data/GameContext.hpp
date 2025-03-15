@@ -4,10 +4,10 @@
 #include "Inventory.hpp"
 #include "WorldState.hpp"
 
-
 #include <map>
 #include <string>
 
+// Context for all systems
 struct GameContext {
     CharacterStats playerStats;
     WorldState worldState;
