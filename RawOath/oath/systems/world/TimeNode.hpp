@@ -1,3 +1,10 @@
+#pragma once
+
+#include "../../core/TANode.hpp"
+#include "../../data/GameContext.hpp"
+
+#include <string>
+
 // Time/Season system
 class TimeNode : public TANode {
 public:

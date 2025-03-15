@@ -1,4 +1,6 @@
-#include <LocationNode.hpp>
+#include "LocationNode.hpp"
+
+#include <iostream>
 
 bool LocationNode::AccessCondition::check(const GameContext& context) const
 {

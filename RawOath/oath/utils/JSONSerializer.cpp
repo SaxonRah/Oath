@@ -1,4 +1,6 @@
-#include <JSONSerializer.hpp>
+#include "JSONSerializer.hpp"
+
+#include <nlohmann/json.hpp>
 
 nlohmann::json serializeCharacterStats(const CharacterStats& stats)
 {

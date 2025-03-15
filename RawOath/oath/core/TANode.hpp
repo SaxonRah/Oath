@@ -1,3 +1,21 @@
+#pragma once
+
+#include "../data/GameContext.hpp"
+#include "NodeID.hpp"
+#include "TAAction.hpp"
+#include "TAInput.hpp"
+#include "TATransitionRule.hpp"
+
+
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <string>
+#include <variant>
+#include <vector>
+
+
 // Core node class for tree automata system
 class TANode {
 public:

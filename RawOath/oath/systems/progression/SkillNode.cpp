@@ -1,4 +1,4 @@
-#include <SkillNode.hpp>
+#include "SkillNode.hpp"
 
 bool SkillNode::SkillRequirement::check(const GameContext& context) const
 {

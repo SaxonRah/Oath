@@ -1,3 +1,8 @@
+#pragma once
+
+#include <map>
+#include <string>
+
 // Game world state structure
 struct WorldState {
     std::map<std::string, std::string> locationStates;

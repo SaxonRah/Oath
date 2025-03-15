@@ -1,16 +1,20 @@
+#include "core/TAAction.hpp"
+#include "core/TAController.hpp"
+#include "core/TAInput.hpp"
+#include "data/GameContext.hpp"
+#include "data/Item.hpp"
+#include "systems/crafting/CraftingNode.hpp"
+#include "systems/dialogue/NPC.hpp"
+#include "systems/progression/SkillNode.hpp"
+#include "systems/quest/QuestNode.hpp"
+#include "systems/world/TimeNode.hpp"
+#include "utils/JSONLoader.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
-
-
-// Core includes
-#include "core/TAController.hpp"
-#include "core/TAInput.hpp"
-
-// Utils includes
-#include "utils/JSONLoader.hpp"
 
 int main()
 {

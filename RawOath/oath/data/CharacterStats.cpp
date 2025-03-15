@@ -1,4 +1,4 @@
-#include <CharacterStats.hpp>
+#include "CharacterStats.hpp"
 
 CharacterStats::CharacterStats()
 {

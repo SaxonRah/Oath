@@ -1,3 +1,11 @@
+#pragma once
+
+#include "Item.hpp"
+
+#include <string>
+#include <vector>
+
+// Inventory system for crafting
 class Inventory {
 public:
     std::vector<Item> items;

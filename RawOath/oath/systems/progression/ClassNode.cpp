@@ -1,4 +1,6 @@
-#include <ClassNode.hpp>
+#include "ClassNode.hpp"
+
+#include <iostream>
 
 ClassNode::ClassNode(const std::string& name, const std::string& classType)
     : TANode(name)

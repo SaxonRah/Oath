@@ -1,4 +1,6 @@
-#include <TimeNode.hpp>
+#include "TimeNode.hpp"
+
+#include <iostream>
 
 TimeNode::TimeNode(const std::string& name)
     : TANode(name)

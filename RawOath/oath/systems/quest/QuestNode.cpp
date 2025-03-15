@@ -1,4 +1,6 @@
-#include <QuestNode.hpp>
+#include "QuestNode.hpp"
+
+#include <iostream>
 
 bool QuestNode::QuestRequirement::check(const GameContext& context) const
 {

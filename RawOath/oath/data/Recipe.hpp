@@ -1,3 +1,12 @@
+#pragma once
+
+#include "GameContext.hpp"
+#include "Item.hpp"
+
+#include <map>
+#include <string>
+#include <vector>
+
 // Recipe for crafting items
 class Recipe {
 public:

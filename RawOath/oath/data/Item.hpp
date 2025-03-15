@@ -1,4 +1,10 @@
-// Inventory and item system for crafting
+#pragma once
+
+#include <map>
+#include <string>
+#include <variant>
+
+// Item system for crafting
 struct Item {
     std::string id;
     std::string name;

@@ -1,3 +1,13 @@
+#pragma once
+
+#include "../../data/GameContext.hpp"
+#include "LocationNode.hpp"
+
+#include <functional>
+#include <random>
+#include <string>
+#include <vector>
+
 // Region node for world map
 class RegionNode : public TANode {
 public:

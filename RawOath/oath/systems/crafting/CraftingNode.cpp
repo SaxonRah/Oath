@@ -1,4 +1,6 @@
-#include <CraftingNode.hpp>
+#include "CraftingNode.hpp"
+
+#include <iostream>
 
 CraftingNode::CraftingNode(const std::string& name, const std::string& type)
     : TANode(name)

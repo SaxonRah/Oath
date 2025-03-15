@@ -1,12 +1,18 @@
 #pragma once
 
+#include "../data/GameContext.hpp"
+#include "../systems/dialogue/NPC.hpp"
+#include "TANode.hpp"
+
+
+#include <fstream>
+#include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "../data/GameContext.hpp"
-#include "TANode.hpp"
 
 // The main automaton controller
 class TAController {

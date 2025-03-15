@@ -4,7 +4,8 @@
 #include "../data/Inventory.hpp"
 #include "../data/WorldState.hpp"
 
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
+#include <string>
 
 // JSON serialization functions
 nlohmann::json serializeCharacterStats(const CharacterStats& stats);

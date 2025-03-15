@@ -5,7 +5,7 @@
             "name": "Debug C++",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/TreeAutomataRPG",
+            "program": "${workspaceFolder}/build/Oath",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -21,9 +21,9 @@
             ],
             "preLaunchTask": "CMake Build",
             "windows": {
-                "program": "${workspaceFolder}/build/Debug/TreeAutomataRPG.exe",
+                "program": "${workspaceFolder}/build/Debug/Oath.exe",
                 "MIMode": "gdb",
-                "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe"  // Adjust path for your GDB location
+                "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe" // Adjust path for your GDB location
             },
             "osx": {
                 "MIMode": "lldb"

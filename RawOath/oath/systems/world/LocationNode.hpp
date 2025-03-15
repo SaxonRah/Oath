@@ -1,3 +1,12 @@
+#pragma once
+
+#include "../../core/TANode.hpp"
+#include "../../systems/dialogue/NPC.hpp"
+
+#include <map>
+#include <string>
+#include <vector>
+
 // Location node for world state
 class LocationNode : public TANode {
 public:

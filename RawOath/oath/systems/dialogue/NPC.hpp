@@ -1,3 +1,13 @@
+#pragma once
+
+#include "../../data/GameContext.hpp"
+#include "DialogueNode.hpp"
+
+#include <map>
+#include <string>
+
+class DialogueNode; // Forward declaration
+
 // NPC class for dialogue interactions
 class NPC {
 public:

@@ -1,3 +1,10 @@
+#pragma once
+
+#include "TAInput.hpp"
+
+#include <functional>
+#include <string>
+
 // Transition rule
 struct TATransitionRule {
     std::function<bool(const TAInput&)> condition;

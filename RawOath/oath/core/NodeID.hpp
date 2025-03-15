@@ -1,3 +1,8 @@
+#pragma once
+
+#include <sstream>
+#include <string>
+
 // A unique identifier for nodes
 struct NodeID {
     unsigned int data1;

@@ -1,3 +1,9 @@
+#pragma once
+
+#include <map>
+#include <string>
+#include <variant>
+
 // An input that can trigger transitions
 struct TAInput {
     std::string type;

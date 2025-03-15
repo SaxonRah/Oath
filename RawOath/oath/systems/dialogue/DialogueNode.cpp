@@ -1,4 +1,4 @@
-#include <DialogueNode.hpp>
+#include "DialogueNode.hpp"
 
 DialogueNode::DialogueResponse::DialogueResponse(
     const std::string& responseText, TANode* target,

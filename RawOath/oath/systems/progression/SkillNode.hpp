@@ -1,3 +1,12 @@
+#pragma once
+
+#include "../../core/TANode.hpp"
+#include "../../data/GameContext.hpp"
+
+#include <functional>
+#include <string>
+#include <vector>
+
 // Skill node for character progression
 class SkillNode : public TANode {
 public:

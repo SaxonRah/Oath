@@ -1,7 +1,12 @@
 #pragma once
 
 #include "../core/TAController.hpp"
-#include <nlohmann/json.hpp>
+
+#include "nlohmann/json.hpp"
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 
 // Load game data from JSON files
 bool loadGameData(TAController& controller);

@@ -1,4 +1,6 @@
-#include <NodeID.hpp>
+#include "NodeID.hpp"
+
+#include <sstream>
 
 bool NodeID::operator==(const NodeID& other) const
 {

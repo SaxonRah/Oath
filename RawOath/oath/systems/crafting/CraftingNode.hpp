@@ -1,3 +1,11 @@
+#pragma once
+
+#include "../../core/TANode.hpp"
+#include "../../data/Recipe.hpp"
+
+#include <string>
+#include <vector>
+
 // Crafting station node
 class CraftingNode : public TANode {
 public:

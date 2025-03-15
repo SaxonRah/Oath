@@ -1,3 +1,10 @@
+#pragma once
+
+#include <map>
+#include <set>
+#include <string>
+
+
 // Character stats structure for progression and dialogue systems
 struct CharacterStats {
     int strength = 10;

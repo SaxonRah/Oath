@@ -1,3 +1,14 @@
+#pragma once
+
+#include "../../core/TANode.hpp"
+#include "../../data/GameContext.hpp"
+
+#include <functional>
+#include <string>
+#include <vector>
+
+class NPC; // Forward declaration
+
 // Dialogue node for conversation trees
 class DialogueNode : public TANode {
 public:

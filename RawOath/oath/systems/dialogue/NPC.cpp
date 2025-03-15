@@ -1,4 +1,6 @@
-#include <NPC.hpp>
+#include "NPC.hpp"
+
+#include <iostream>
 
 NPC::NPC(const std::string& npcName, const std::string& desc)
     : name(npcName)

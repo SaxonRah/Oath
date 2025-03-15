@@ -1,4 +1,7 @@
-#include <TANode.hpp>
+#include "TANode.hpp"
+
+#include <algorithm>
+#include <iostream>
 
 TANode::TANode(const std::string& name)
     : nodeID(NodeID::Generate())

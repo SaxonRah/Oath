@@ -1,4 +1,18 @@
-#include <JSONLoader.hpp>
+#include "JSONLoader.hpp"
+#include "../systems/crafting/CraftingNode.hpp"
+#include "../systems/dialogue/DialogueNode.hpp"
+#include "../systems/dialogue/NPC.hpp"
+#include "../systems/progression/ClassNode.hpp"
+#include "../systems/progression/SkillNode.hpp"
+#include "../systems/quest/QuestNode.hpp"
+#include "../systems/world/LocationNode.hpp"
+#include "../systems/world/RegionNode.hpp"
+#include "../systems/world/TimeNode.hpp"
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <nlohmann/json.hpp>
 
 // Functions to load game data from JSON
 bool loadGameData(TAController& controller)
