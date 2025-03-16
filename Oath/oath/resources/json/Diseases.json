@@ -1,0 +1,128 @@
+{
+    "diseases": [
+        {
+            "id": "mountain_fever",
+            "name": "Mountain Fever",
+            "description": "A common illness in mountainous regions caused by exposure to certain fungi. Characterized by high fever and respiratory issues.",
+            "incubationPeriod": 2,
+            "naturalDuration": 7,
+            "contagiousness": 0.3,
+            "resistanceThreshold": 0.2,
+            "isChronic": false,
+            "regions": [
+                "Mountain",
+                "Highland"
+            ],
+            "vectors": [
+                "air",
+                "water"
+            ],
+            "symptoms": [
+                {
+                    "name": "Fever",
+                    "description": "High temperature and chills",
+                    "initialSeverity": "MILD",
+                    "hasDamageOverTime": true,
+                    "damagePerUpdate": 1.0,
+                    "statEffects": {
+                        "strength": -10,
+                        "constitution": -5
+                    }
+                },
+                {
+                    "name": "Coughing",
+                    "description": "Persistent dry cough",
+                    "initialSeverity": "MODERATE",
+                    "statEffects": {
+                        "stamina": -15
+                    }
+                }
+            ]
+        },
+        {
+            "id": "black_plague",
+            "name": "Black Plague",
+            "description": "A deadly disease that spreads rapidly in densely populated areas. Characterized by black spots on the skin and severe illness.",
+            "incubationPeriod": 3,
+            "naturalDuration": 14,
+            "contagiousness": 0.7,
+            "resistanceThreshold": 0.5,
+            "isChronic": false,
+            "regions": [
+                "Village",
+                "City"
+            ],
+            "vectors": [
+                "contact",
+                "air"
+            ],
+            "symptoms": [
+                {
+                    "name": "Black Spots",
+                    "description": "Dark lesions on the skin",
+                    "initialSeverity": "MODERATE",
+                    "statEffects": {
+                        "charisma": -20
+                    }
+                },
+                {
+                    "name": "Fever",
+                    "description": "High temperature and weakness",
+                    "initialSeverity": "SEVERE",
+                    "hasDamageOverTime": true,
+                    "damagePerUpdate": 2.5,
+                    "statEffects": {
+                        "strength": -15,
+                        "constitution": -10,
+                        "dexterity": -10
+                    }
+                }
+            ]
+        }
+    ],
+    "healingMethods": [
+        {
+            "id": "herbal_remedy",
+            "name": "Herbal Remedy",
+            "description": "A mixture of medicinal herbs that helps alleviate symptoms and boost recovery.",
+            "healAmount": 5.0,
+            "requiresItem": true,
+            "requiredItem": "medicinal_herbs",
+            "requiredAmount": 2,
+            "effectiveness": {
+                "mountain_fever": 0.4,
+                "black_plague": 0.1
+            }
+        },
+        {
+            "id": "temple_healing",
+            "name": "Temple Healing",
+            "description": "Healing rituals performed by temple priests that can cure many ailments.",
+            "healAmount": 20.0,
+            "requiresItem": false,
+            "requiresLocation": true,
+            "requiredLocationType": "temple",
+            "costs": {
+                "mountain_fever": 50,
+                "black_plague": 200
+            },
+            "effectiveness": {
+                "mountain_fever": 0.7,
+                "black_plague": 0.5
+            }
+        }
+    ],
+    "regionDiseaseRisks": {
+        "Mountain": 1.2,
+        "Highland": 1.0,
+        "Forest": 0.8,
+        "Village": 1.5,
+        "City": 2.0
+    },
+    "defaultHealthState": {
+        "maxHealth": 100.0,
+        "maxStamina": 100.0,
+        "naturalHealRate": 1.0,
+        "diseaseResistance": 0.1
+    }
+}

@@ -64,6 +64,17 @@ set(SYSTEM_DIALOGUE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/dialogue/NPC.cpp
 )
 
+set(HEALTH_SYSTEM_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Symptom.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Immunity.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Disease.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealingMethod.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthState.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/DiseaseManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthNodes.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthSetup.cpp
+)
+
 set(SYSTEM_PROGRESSION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/progression/SkillNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/progression/ClassNode.cpp
@@ -95,6 +106,7 @@ set(SOURCES
     ${SYSTEM_CRIME_SOURCES}
     ${SYSTEM_QUEST_SOURCES}
     ${SYSTEM_DIALOGUE_SOURCES}
+    ${SYSTEM_HEALTH_SOURCES}
     ${SYSTEM_PROGRESSION_SOURCES}
     ${SYSTEM_CRAFTING_SOURCES}
     ${SYSTEM_WEATHER_SOURCES}
