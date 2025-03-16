@@ -1,0 +1,434 @@
+{
+    "npcs": [
+        {
+            "id": "blacksmith",
+            "name": "John the Blacksmith",
+            "type": "extended",
+            "needs": {
+                "hunger": {
+                    "initialValue": 0.8,
+                    "decayRate": 0.1
+                },
+                "thirst": {
+                    "initialValue": 0.9,
+                    "decayRate": 0.15
+                },
+                "sleep": {
+                    "initialValue": 0.7,
+                    "decayRate": 0.05
+                },
+                "social": {
+                    "initialValue": 0.6,
+                    "decayRate": 0.03
+                },
+                "wealth": {
+                    "initialValue": 0.5,
+                    "decayRate": 0.01
+                }
+            },
+            "stats": {
+                "strength": 8,
+                "intelligence": 5,
+                "agility": 6,
+                "endurance": 7,
+                "charisma": 4
+            },
+            "skills": {
+                "blacksmithing": 80,
+                "bartering": 40,
+                "speech": 30
+            },
+            "inventory": {
+                "iron_ingot": 20,
+                "steel_ingot": 5,
+                "hammer": 2,
+                "iron_sword": 1
+            },
+            "factionStanding": {
+                "merchants_guild": 0.6,
+                "town_guard": 0.3
+            },
+            "relationships": {
+                "baker": 0.7,
+                "innkeeper": 0.5,
+                "mayor": 0.2
+            },
+            "schedule": [
+                {
+                    "priority": 1,
+                    "actionId": "sleep",
+                    "locationId": "blacksmith_house",
+                    "startHour": 22,
+                    "endHour": 6
+                },
+                {
+                    "priority": 2,
+                    "actionId": "eat_breakfast",
+                    "locationId": "blacksmith_house",
+                    "startHour": 6,
+                    "endHour": 7
+                },
+                {
+                    "priority": 3,
+                    "actionId": "work_forge",
+                    "locationId": "blacksmith_shop",
+                    "startHour": 8,
+                    "endHour": 12
+                },
+                {
+                    "priority": 4,
+                    "actionId": "eat_lunch",
+                    "locationId": "tavern",
+                    "startHour": 12,
+                    "endHour": 13
+                },
+                {
+                    "priority": 5,
+                    "actionId": "work_forge",
+                    "locationId": "blacksmith_shop",
+                    "startHour": 13,
+                    "endHour": 18
+                },
+                {
+                    "priority": 6,
+                    "actionId": "eat_dinner",
+                    "locationId": "tavern",
+                    "startHour": 18,
+                    "endHour": 20
+                },
+                {
+                    "priority": 7,
+                    "actionId": "socialize",
+                    "locationId": "tavern",
+                    "startHour": 20,
+                    "endHour": 22
+                }
+            ]
+        },
+        {
+            "id": "baker",
+            "name": "Mary the Baker",
+            "type": "extended",
+            "needs": {
+                "hunger": {
+                    "initialValue": 0.8,
+                    "decayRate": 0.1
+                },
+                "thirst": {
+                    "initialValue": 0.9,
+                    "decayRate": 0.15
+                },
+                "sleep": {
+                    "initialValue": 0.7,
+                    "decayRate": 0.05
+                },
+                "social": {
+                    "initialValue": 0.7,
+                    "decayRate": 0.03
+                },
+                "wealth": {
+                    "initialValue": 0.5,
+                    "decayRate": 0.01
+                },
+                "spirituality": {
+                    "initialValue": 0.6,
+                    "decayRate": 0.01
+                }
+            },
+            "stats": {
+                "strength": 4,
+                "intelligence": 6,
+                "agility": 5,
+                "endurance": 5,
+                "charisma": 7
+            },
+            "skills": {
+                "baking": 75,
+                "bartering": 50,
+                "speech": 60
+            },
+            "inventory": {
+                "flour": 30,
+                "bread": 10,
+                "cake": 3,
+                "pie": 2
+            },
+            "factionStanding": {
+                "merchants_guild": 0.5,
+                "temple": 0.7
+            },
+            "relationships": {
+                "blacksmith": 0.7,
+                "innkeeper": 0.6,
+                "mayor": 0.3
+            },
+            "schedule": [
+                {
+                    "priority": 1,
+                    "actionId": "sleep",
+                    "locationId": "bakery_house",
+                    "startHour": 21,
+                    "endHour": 4
+                },
+                {
+                    "priority": 2,
+                    "actionId": "bake_bread",
+                    "locationId": "bakery",
+                    "startHour": 4,
+                    "endHour": 7
+                },
+                {
+                    "priority": 3,
+                    "actionId": "eat_breakfast",
+                    "locationId": "bakery_house",
+                    "startHour": 7,
+                    "endHour": 8
+                },
+                {
+                    "priority": 4,
+                    "actionId": "sell_bread",
+                    "locationId": "bakery",
+                    "startHour": 8,
+                    "endHour": 12
+                },
+                {
+                    "priority": 5,
+                    "actionId": "eat_lunch",
+                    "locationId": "bakery_house",
+                    "startHour": 12,
+                    "endHour": 13
+                },
+                {
+                    "priority": 6,
+                    "actionId": "sell_bread",
+                    "locationId": "bakery",
+                    "startHour": 13,
+                    "endHour": 16
+                },
+                {
+                    "priority": 7,
+                    "actionId": "pray",
+                    "locationId": "temple",
+                    "startHour": 16,
+                    "endHour": 17
+                },
+                {
+                    "priority": 8,
+                    "actionId": "eat_dinner",
+                    "locationId": "tavern",
+                    "startHour": 18,
+                    "endHour": 19
+                },
+                {
+                    "priority": 9,
+                    "actionId": "socialize",
+                    "locationId": "tavern",
+                    "startHour": 19,
+                    "endHour": 21
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "sleep",
+            "type": "location",
+            "needEffects": {
+                "sleep": 0.9,
+                "hunger": -0.1,
+                "thirst": -0.1
+            },
+            "duration": 1.0,
+            "description": "Sleep to recover energy"
+        },
+        {
+            "id": "eat_breakfast",
+            "type": "location",
+            "needEffects": {
+                "hunger": 0.6,
+                "thirst": 0.4
+            },
+            "duration": 0.5,
+            "description": "Eat breakfast"
+        },
+        {
+            "id": "eat_lunch",
+            "type": "location",
+            "needEffects": {
+                "hunger": 0.7,
+                "thirst": 0.5,
+                "social": 0.2
+            },
+            "duration": 0.5,
+            "description": "Eat lunch"
+        },
+        {
+            "id": "eat_dinner",
+            "type": "location",
+            "needEffects": {
+                "hunger": 0.8,
+                "thirst": 0.5,
+                "social": 0.3
+            },
+            "duration": 0.5,
+            "description": "Eat dinner"
+        },
+        {
+            "id": "work_forge",
+            "type": "crafting",
+            "needEffects": {
+                "wealth": 0.3,
+                "sleep": -0.2,
+                "hunger": -0.2,
+                "thirst": -0.3
+            },
+            "recipeId": "iron_sword",
+            "craftingStationId": "forge",
+            "duration": 1.0,
+            "description": "Work at the forge crafting items"
+        },
+        {
+            "id": "bake_bread",
+            "type": "crafting",
+            "needEffects": {
+                "wealth": 0.2,
+                "sleep": -0.1,
+                "hunger": -0.1,
+                "thirst": -0.2
+            },
+            "recipeId": "bread",
+            "craftingStationId": "oven",
+            "duration": 1.0,
+            "description": "Bake bread"
+        },
+        {
+            "id": "sell_bread",
+            "type": "economic",
+            "needEffects": {
+                "wealth": 0.4,
+                "social": 0.3,
+                "sleep": -0.1
+            },
+            "activityType": "sell",
+            "resources": {
+                "bread": 5
+            },
+            "duration": 1.0,
+            "description": "Sell bread to customers"
+        },
+        {
+            "id": "socialize",
+            "type": "social",
+            "needEffects": {
+                "social": 0.7,
+                "sleep": -0.1
+            },
+            "targetNpcId": "any",
+            "interactionType": "chat",
+            "duration": 1.0,
+            "description": "Socialize with others"
+        },
+        {
+            "id": "pray",
+            "type": "religious",
+            "needEffects": {
+                "spirituality": 0.8
+            },
+            "deityId": "sun_god",
+            "ritualType": "prayer",
+            "duration": 0.5,
+            "description": "Pray to deity"
+        }
+    ],
+    "locations": [
+        {
+            "id": "blacksmith_house",
+            "name": "Blacksmith's House",
+            "type": "house",
+            "region": "town_center"
+        },
+        {
+            "id": "blacksmith_shop",
+            "name": "Blacksmith's Shop",
+            "type": "shop",
+            "region": "town_center"
+        },
+        {
+            "id": "bakery_house",
+            "name": "Baker's House",
+            "type": "house",
+            "region": "town_center"
+        },
+        {
+            "id": "bakery",
+            "name": "Bakery",
+            "type": "shop",
+            "region": "town_center"
+        },
+        {
+            "id": "tavern",
+            "name": "Town Tavern",
+            "type": "tavern",
+            "region": "town_center"
+        },
+        {
+            "id": "temple",
+            "name": "Temple of the Sun",
+            "type": "temple",
+            "region": "town_center"
+        },
+        {
+            "id": "market",
+            "name": "Town Market",
+            "type": "market",
+            "region": "town_center"
+        }
+    ],
+    "factions": [
+        {
+            "id": "merchants_guild",
+            "name": "Merchants Guild",
+            "description": "Association of merchants and shop owners"
+        },
+        {
+            "id": "town_guard",
+            "name": "Town Guard",
+            "description": "Protectors of the town"
+        },
+        {
+            "id": "temple",
+            "name": "Temple of the Sun",
+            "description": "Religious organization worshipping the sun god"
+        }
+    ],
+    "deities": [
+        {
+            "id": "sun_god",
+            "name": "The Radiant One",
+            "domains": [
+                "light",
+                "healing",
+                "protection"
+            ],
+            "rituals": [
+                "prayer",
+                "offering",
+                "ceremony"
+            ]
+        },
+        {
+            "id": "moon_goddess",
+            "name": "The Silver Lady",
+            "domains": [
+                "night",
+                "magic",
+                "dreams"
+            ],
+            "rituals": [
+                "prayer",
+                "meditation",
+                "divination"
+            ]
+        }
+    ]
+}
