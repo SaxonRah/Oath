@@ -69,7 +69,8 @@ void WeatherSystemNode::generateWeatherForecasts()
         forecast.accuracy = accuracyDistribution(rng) * (1.0f - (day * 0.1f));
 
         // For now, just predict the current global weather with some randomness
-        if (rng() % 100 < static_cast<int>(forecast.accuracy * 100)) {
+        // if (rng() % 100 < static_cast<int>(forecast.accuracy * 100)) {
+        if (static_cast<unsigned int>(rng() % 100) < static_cast<unsigned int>(forecast.accuracy * 100)) {
             forecast.predictedType = globalWeather.type;
             forecast.predictedIntensity = globalWeather.intensity;
         } else {
@@ -210,9 +211,10 @@ void WeatherSystemNode::updateWeather(GameContext* context, int hoursElapsed)
         if (weatherConfig.contains("weatherDescriptions") && weatherConfig["weatherDescriptions"].contains(nextTypeStr)) {
             auto& descData = weatherConfig["weatherDescriptions"][nextTypeStr];
 
-            // Handle Clear weather with time of day
-            if (nextType == WeatherType::Clear && descData.contains(context->worldState.timeOfDay)) {
-                description = descData[context->worldState.timeOfDay].get<std::string>();
+            // FIXED: Replaced timeOfDay access with default description
+            // Handle Clear weather with a default description
+            if (nextType == WeatherType::Clear && descData.contains("default")) {
+                description = descData["default"].get<std::string>();
             }
             // Try intensity-specific description
             else if (descData.contains(nextIntensityStr)) {
@@ -353,8 +355,8 @@ void WeatherSystemNode::updateWeather(GameContext* context, int hoursElapsed)
             }
         }
 
-        // Apply weather effects to current region
-        std::string currentRegion = context->worldState.worldFlags["current_region_name"] ? std::get<std::string>(context->stateData.at("current_region")) : "default";
+        // FIXED: Get current region name from the class variable instead of context->stateData
+        std::string currentRegion = currentRegionName;
 
         WeatherCondition currentWeather = getCurrentWeather(currentRegion);
         currentWeather.applyEffects(context);
@@ -503,8 +505,8 @@ void WeatherSystemNode::onRegionEnter(GameContext* context, const std::string& r
     // Display weather description
     std::cout << currentWeather.description << std::endl;
 
-    // Store current region in context for future reference
-    context->stateData["current_region"] = regionName;
+    // FIXED: Store current region in class member instead of context->stateData
+    currentRegionName = regionName;
 
     // Check for weather events when entering region
     currentWeather.checkForEvents(context, rng);
@@ -602,10 +604,8 @@ void WeatherSystemNode::onEnter(GameContext* context)
 
     // Check if we need to initialize weather for the current region
     if (context) {
-        std::string currentRegion = "default";
-        if (context->stateData.find("current_region") != context->stateData.end() && std::holds_alternative<std::string>(context->stateData.at("current_region"))) {
-            currentRegion = std::get<std::string>(context->stateData.at("current_region"));
-        }
+        // FIXED: Used class variable instead of context->stateData
+        std::string currentRegion = currentRegionName;
 
         if (currentRegion != "default" && regionalWeather.find(currentRegion) == regionalWeather.end()) {
             // Initialize weather for this region
@@ -662,11 +662,8 @@ bool WeatherSystemNode::evaluateTransition(const TAInput& input, TANode*& outNex
         std::string action = std::get<std::string>(input.parameters.at("action"));
 
         if (action == "check_weather") {
-            // Get current region from context
-            std::string currentRegion = "default";
-            if (stateData.find("current_region") != stateData.end() && std::holds_alternative<std::string>(stateData.at("current_region"))) {
-                currentRegion = std::get<std::string>(stateData.at("current_region"));
-            }
+            // FIXED: Used class member variable instead of stateData
+            std::string currentRegion = currentRegionName;
 
             // Display detailed weather report
             std::cout << getWeatherReport(currentRegion) << std::endl;
