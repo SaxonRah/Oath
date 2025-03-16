@@ -131,6 +131,31 @@ set(SYSTEM_RELATIONSHIP_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/RelationshipSystemController.cpp
 )
 
+set(SYSTEM_RELIGION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/BlessingNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/DeityNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/PrayerNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/ReligionController.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/ReligiousGameContext.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/ReligiousQuestNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/ReligiousStats.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/RitualNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/religion/TempleNode.cpp
+)
+
+set(SYSTEM_SPELLCRAFTING_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellComponent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellModifier.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellDelivery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellDesign.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellCraftingSystem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellCraftingNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellExaminationNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/SpellbookNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/spellcrafting/MagicTrainingNode.cpp
+)
+
 set(SYSTEM_WEATHER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherTypes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherCondition.cpp
@@ -161,6 +186,8 @@ set(SOURCES
     ${SYSTEM_PROGRESSION_SOURCES}
     ${SYSTEM_QUEST_SOURCES}
     ${SYSTEM_RELATIONSHIP_SOURCES}
+    ${SYSTEM_RELIGION_SOURCES}
+    ${SYSTEM_SPELLCRAFTING_SOURCES}
     ${SYSTEM_WEATHER_SOURCES}
     ${SYSTEM_WORLD_SOURCES}
 
