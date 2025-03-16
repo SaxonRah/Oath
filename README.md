@@ -1,3 +1,13 @@
+# TODO List
+- _TODO_Main.md
+- _TODO_CrimeLaw.md
+- _TODO_Economy.md
+- _TODO_Faction.md
+- _TODO_Mount.md
+- _TODO_Relationship.md
+- _TODO_Religion.md
+- _TODO_SpellCrafting.md
+
 ```
 oath/
 ├─ ai/
