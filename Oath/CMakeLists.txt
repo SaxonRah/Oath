@@ -79,6 +79,16 @@ set(SYSTEM_ECONOMY_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/economy/EconomicSystemNode.cpp
 )
 
+set(SYSTEM_FACTION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/FactionRelationship.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/Faction.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/FactionSystemNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/FactionQuestNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/FactionDialogueNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/FactionLocationNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/faction/PoliticalEvent.cpp
+)
+
 set(SYSTEM_HEALTH_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Symptom.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Immunity.cpp
@@ -89,6 +99,25 @@ set(SYSTEM_HEALTH_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthNodes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthSetup.cpp
 )
+
+set(SYSTEM_MOUNT_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountStats.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountEquipment.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountBreed.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountSystemConfig.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/Mount.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountStable.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountTrainingSession.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountStableNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountInteractionNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountTrainingNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountEquipmentShopNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountRacingNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountBreedingNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountSystemController.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/mount/MountSystem.cpp
+)
+
 
 set(SYSTEM_PROGRESSION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/progression/SkillNode.cpp
@@ -124,7 +153,9 @@ set(SOURCES
     ${SYSTEM_CRIME_SOURCES}
     ${SYSTEM_DIALOGUE_SOURCES}
     ${SYSTEM_ECONOMY_SOURCES}
+    ${SYSTEM_FACTION_SOURCES}
     ${SYSTEM_HEALTH_SOURCES}
+    ${SYSTEM_MOUNT_SOURCES}
     ${SYSTEM_PROGRESSION_SOURCES}
     ${SYSTEM_QUEST_SOURCES}
     ${SYSTEM_WEATHER_SOURCES}

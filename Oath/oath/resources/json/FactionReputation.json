@@ -1,0 +1,297 @@
+{
+    "rankTitles": {
+        "0": "Outsider",
+        "1": "Initiate",
+        "2": "Associate",
+        "3": "Member",
+        "4": "Trusted",
+        "5": "Guardian",
+        "6": "Defender",
+        "7": "Protector",
+        "8": "Elder",
+        "9": "Master",
+        "10": "Grandmaster"
+    },
+    "rankRequirements": {
+        "0": {
+            "reputation": 10,
+            "quests": 0
+        },
+        "1": {
+            "reputation": 20,
+            "quests": 2
+        },
+        "2": {
+            "reputation": 30,
+            "quests": 5
+        },
+        "3": {
+            "reputation": 40,
+            "quests": 10
+        },
+        "4": {
+            "reputation": 50,
+            "quests": 15
+        },
+        "5": {
+            "reputation": 60,
+            "quests": 20
+        },
+        "6": {
+            "reputation": 70,
+            "quests": 25
+        },
+        "7": {
+            "reputation": 80,
+            "quests": 30
+        },
+        "8": {
+            "reputation": 90,
+            "quests": 40
+        },
+        "9": {
+            "reputation": 100,
+            "quests": 50
+        }
+    },
+    "reputationStates": {
+        "hated": -100,
+        "despised": -70,
+        "hostile": -30,
+        "unfriendly": -10,
+        "neutral": 10,
+        "friendly": 30,
+        "honored": 70,
+        "revered": 90,
+        "exalted": 100
+    },
+    "relationStates": {
+        "war": -75,
+        "hostile": -50,
+        "unfriendly": -20,
+        "neutral": 20,
+        "friendly": 50,
+        "cordial": 75,
+        "allied": 100
+    },
+    "factions": {
+        "merchants_guild": {
+            "id": "merchants_guild",
+            "name": "Merchants Guild",
+            "description": "A powerful coalition of traders, bankers, and business owners who control much of the kingdom's economy.",
+            "territories": [
+                "market_district",
+                "harbor_district"
+            ],
+            "leaders": [
+                "guildmaster_harren",
+                "treasurer_elise"
+            ],
+            "primaryCulture": "mixed",
+            "politicalAlignment": "neutral",
+            "economicPower": 80,
+            "militaryPower": 30,
+            "politicalInfluence": 70,
+            "currentState": "growing",
+            "playerKnown": true
+        },
+        "noble_houses": {
+            "id": "noble_houses",
+            "name": "Noble Houses",
+            "description": "The aristocratic families who traditionally rule the kingdom and hold hereditary titles.",
+            "territories": [
+                "noble_quarter",
+                "royal_palace"
+            ],
+            "leaders": [
+                "king_rodric",
+                "duchess_isabelle"
+            ],
+            "primaryCulture": "imperial",
+            "politicalAlignment": "conservative",
+            "economicPower": 70,
+            "militaryPower": 60,
+            "politicalInfluence": 90,
+            "currentState": "stable",
+            "playerKnown": true
+        },
+        "city_guard": {
+            "id": "city_guard",
+            "name": "City Guard",
+            "description": "The official peacekeeping force that maintains order within the city walls.",
+            "territories": [
+                "guard_barracks",
+                "prison_district"
+            ],
+            "leaders": [
+                "captain_marcus",
+                "lieutenant_gareth"
+            ],
+            "primaryCulture": "imperial",
+            "politicalAlignment": "lawful",
+            "economicPower": 40,
+            "militaryPower": 70,
+            "politicalInfluence": 50,
+            "currentState": "stable",
+            "playerKnown": true
+        },
+        "mages_guild": {
+            "id": "mages_guild",
+            "name": "Mages Guild",
+            "description": "A secretive organization of magic practitioners who study and regulate arcane knowledge.",
+            "territories": [
+                "arcane_district",
+                "wizard_tower"
+            ],
+            "leaders": [
+                "archmage_valeria",
+                "enchanter_theodore"
+            ],
+            "primaryCulture": "scholarly",
+            "politicalAlignment": "progressive",
+            "economicPower": 60,
+            "militaryPower": 50,
+            "politicalInfluence": 60,
+            "currentState": "stable",
+            "playerKnown": true
+        },
+        "thieves_guild": {
+            "id": "thieves_guild",
+            "name": "Shadow Network",
+            "description": "An underground criminal organization that deals in theft, smuggling, and information trading.",
+            "territories": [
+                "undercity",
+                "dockside"
+            ],
+            "leaders": [
+                "shadowmaster",
+                "the_fence"
+            ],
+            "primaryCulture": "mixed",
+            "politicalAlignment": "chaotic",
+            "economicPower": 50,
+            "militaryPower": 40,
+            "politicalInfluence": 30,
+            "currentState": "stable",
+            "playerKnown": false
+        },
+        "desert_nomads": {
+            "id": "desert_nomads",
+            "name": "Desert Nomads",
+            "description": "Tribal warriors and traders from the eastern deserts who control the spice routes.",
+            "territories": [
+                "eastern_desert",
+                "caravan_routes"
+            ],
+            "leaders": [
+                "sheikh_jalaal",
+                "caravan_mistress"
+            ],
+            "primaryCulture": "desert",
+            "politicalAlignment": "traditional",
+            "economicPower": 60,
+            "militaryPower": 50,
+            "politicalInfluence": 20,
+            "currentState": "stable",
+            "playerKnown": false
+        }
+    },
+    "factionRelations": {
+        "merchants_guild": {
+            "noble_houses": 40,
+            "city_guard": 60,
+            "mages_guild": 30,
+            "thieves_guild": -50,
+            "desert_nomads": 20
+        },
+        "noble_houses": {
+            "merchants_guild": 40,
+            "city_guard": 80,
+            "mages_guild": 10,
+            "thieves_guild": -70,
+            "desert_nomads": -20
+        },
+        "city_guard": {
+            "merchants_guild": 60,
+            "noble_houses": 80,
+            "mages_guild": 30,
+            "thieves_guild": -90,
+            "desert_nomads": 0
+        },
+        "mages_guild": {
+            "merchants_guild": 30,
+            "noble_houses": 10,
+            "city_guard": 30,
+            "thieves_guild": -30,
+            "desert_nomads": 20
+        },
+        "thieves_guild": {
+            "merchants_guild": -50,
+            "noble_houses": -70,
+            "city_guard": -90,
+            "mages_guild": -30,
+            "desert_nomads": 10
+        },
+        "desert_nomads": {
+            "merchants_guild": 20,
+            "noble_houses": -20,
+            "city_guard": 0,
+            "mages_guild": 20,
+            "thieves_guild": 10
+        }
+    },
+    "politicalEvents": [
+        {
+            "name": "Trade Route Ambush Campaign",
+            "description": "A series of coordinated attacks on merchant caravans has strained relations between the Merchants Guild and the authorities.",
+            "factionPowerShifts": {
+                "merchants_guild": -10,
+                "thieves_guild": 15,
+                "city_guard": -5
+            },
+            "relationShifts": [
+                {
+                    "factionA": "merchants_guild",
+                    "factionB": "city_guard",
+                    "amount": -15
+                },
+                {
+                    "factionA": "merchants_guild",
+                    "factionB": "noble_houses",
+                    "amount": -10
+                },
+                {
+                    "factionA": "thieves_guild",
+                    "factionB": "desert_nomads",
+                    "amount": 10
+                }
+            ]
+        },
+        {
+            "name": "Desert-Merchant Trade Alliance",
+            "description": "The Merchants Guild has negotiated an exclusive trade agreement with the Desert Nomads, securing access to rare spices and materials.",
+            "factionPowerShifts": {
+                "merchants_guild": 15,
+                "desert_nomads": 20,
+                "noble_houses": -5
+            },
+            "relationShifts": [
+                {
+                    "factionA": "merchants_guild",
+                    "factionB": "desert_nomads",
+                    "amount": 30
+                },
+                {
+                    "factionA": "noble_houses",
+                    "factionB": "desert_nomads",
+                    "amount": 10
+                },
+                {
+                    "factionA": "noble_houses",
+                    "factionB": "merchants_guild",
+                    "amount": -5
+                }
+            ]
+        }
+    ]
+}
