@@ -6,13 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 include_directories(${CMAKE_SOURCE_DIR}/oath/include/nlohmann)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/quest)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/dialogue)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/progression)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/systems/crafting)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/core)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/data)
-# include_directories(${CMAKE_SOURCE_DIR}/oath/utils)
 include_directories(${CMAKE_SOURCE_DIR}/oath/include)
 include_directories(${CMAKE_SOURCE_DIR}/oath)
 include_directories(${CMAKE_SOURCE_DIR})
@@ -128,6 +121,15 @@ set(SYSTEM_QUEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/quest/QuestNode.cpp
 )
 
+set(SYSTEM_RELATIONSHIP_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/RelationshipConfig.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/RelationshipNPC.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/NPCRelationshipManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/NPCInteractionNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/NPCInfoNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/RelationshipBrowserNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/relationship/RelationshipSystemController.cpp
+)
 
 set(SYSTEM_WEATHER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherTypes.cpp
@@ -158,6 +160,7 @@ set(SOURCES
     ${SYSTEM_MOUNT_SOURCES}
     ${SYSTEM_PROGRESSION_SOURCES}
     ${SYSTEM_QUEST_SOURCES}
+    ${SYSTEM_RELATIONSHIP_SOURCES}
     ${SYSTEM_WEATHER_SOURCES}
     ${SYSTEM_WORLD_SOURCES}
 
