@@ -1,20 +1,10 @@
 #include "TAController.hpp"
-#include "../utils/JSONSerializer.hpp"
 
 #include "../../include/nlohmann/json.hpp"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-
-template <typename T, typename... Args>
-T* TAController::createNode(const std::string& name, Args&&... args)
-{
-    auto node = std::make_unique<T>(name, std::forward<Args>(args)...);
-    T* nodePtr = node.get();
-    ownedNodes.push_back(std::move(node));
-    return nodePtr;
-}
 
 bool TAController::processInput(const std::string& systemName, const TAInput& input)
 {
@@ -137,7 +127,8 @@ TANode* TAController::findNodeByPersistentID(const std::string& persistentID)
 
     // If not found, try to extract just the node name
     std::string nodeName = persistentID;
-    size_t lastSlash = persistentID.find_last_of('/');
+    // size_t lastSlash = persistentID.find_last_of('/');
+    size_t lastSlash = persistentID.find_last_of("/");
     if (lastSlash != std::string::npos) {
         nodeName = persistentID.substr(lastSlash + 1);
     }
@@ -325,7 +316,10 @@ bool TAController::loadState_old(const std::string& filename)
         // Read system name
         size_t nameLength;
         file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
-        std::string name(nameLength, ' ');
+        // std::string name(nameLength, ' ');
+        // std::string name(nameLength, '\0');
+        std::string name;
+        name.resize(nameLength);
         file.read(&name[0], nameLength);
 
         // Check if this system exists
@@ -348,7 +342,10 @@ bool TAController::loadState_old(const std::string& filename)
             size_t nodeNameLength;
             file.read(reinterpret_cast<char*>(&nodeNameLength),
                 sizeof(nodeNameLength));
-            std::string nodeName(nodeNameLength, ' ');
+            // std::string nodeName(nodeNameLength, ' ');
+            // std::string nodeName(nodeNameLength, '\0');
+            std::string nodeName;
+            nodeName.resize(nodeNameLength);
             file.read(&nodeName[0], nodeNameLength);
 
             // First try to find by ID (faster)
@@ -387,7 +384,10 @@ bool TAController::loadState_old(const std::string& filename)
     for (size_t i = 0; i < knownFactsSize; i++) {
         size_t factLength;
         file.read(reinterpret_cast<char*>(&factLength), sizeof(factLength));
-        std::string fact(factLength, ' ');
+        // std::string fact(factLength, ' ');
+        // std::string fact(factLength, '\0');
+        std::string fact;
+        fact.resize(factLength);
         file.read(&fact[0], factLength);
         gameContext.playerStats.knownFacts.insert(fact);
     }
@@ -401,12 +401,12 @@ bool TAController::saveState(const std::string& filename)
     initializePersistentIDs();
 
     try {
-        json saveData;
+        nlohmann::json saveData;
 
         // Save systems and current nodes
-        json systemsData = json::array();
+        nlohmann::json systemsData = nlohmann::json::array();
         for (const auto& [name, root] : systemRoots) {
-            json systemEntry;
+            nlohmann::json systemEntry;
             systemEntry["name"] = name;
 
             // Save current node if it exists
@@ -415,7 +415,7 @@ bool TAController::saveState(const std::string& filename)
                 systemEntry["currentNodeID"] = currentNodes[name]->nodeID.persistentID;
 
                 // Serialize node state
-                json stateData;
+                nlohmann::json stateData;
                 for (const auto& [key, value] : currentNodes[name]->stateData) {
                     if (std::holds_alternative<int>(value)) {
                         stateData[key] = std::get<int>(value);
@@ -473,7 +473,7 @@ bool TAController::loadState(const std::string& filename)
             return false;
         }
 
-        json saveData = json::parse(inFile);
+        nlohmann::json saveData = nlohmann::json::parse(inFile);
 
         // Clear current state
         currentNodes.clear();

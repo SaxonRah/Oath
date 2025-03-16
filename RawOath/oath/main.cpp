@@ -205,7 +205,7 @@ int main()
     }
 
     // Save the game state
-    std::string saveFilePath = savePath / "game_save.json";
+    std::string saveFilePath = savePath.string() + "/game_save.json";
     controller.saveState(saveFilePath);
     std::cout << "Game state saved to " << saveFilePath << std::endl;
 
@@ -295,6 +295,7 @@ int main()
     std::cin >> choice;
 
     if (choice == 'i' || choice == 'I') {
+        // if (choice == "i" || choice == "I") {
         bool running = true;
         std::string command;
 

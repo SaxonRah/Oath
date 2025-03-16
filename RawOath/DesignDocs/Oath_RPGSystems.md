@@ -181,3 +181,4 @@ The demonstration in `main()` shows:
     │   └── ...
     └── config/                   # Configuration files
         └── settings.json         # Game settings
+```

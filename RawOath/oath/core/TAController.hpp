@@ -2,6 +2,11 @@
 
 #include "../data/GameContext.hpp"
 #include "../systems/dialogue/NPC.hpp"
+#include "../utils/JSONSerializer.hpp"
+
+#include "../systems/world/LocationNode.hpp"
+#include "../systems/world/RegionNode.hpp"
+
 #include "TANode.hpp"
 
 #include <fstream>
@@ -16,6 +21,8 @@
 struct GameContext;
 class NPC;
 class TANode;
+class LocationNode;
+class RegionNode;
 
 // The main automaton controller
 class TAController {
@@ -76,3 +83,12 @@ private:
     TANode* findNodeByName(TANode* startNode, const std::string& name);
     bool isNodeReachableFromNode(TANode* startNode, const NodeID& targetId);
 };
+
+template <typename T, typename... Args>
+T* TAController::createNode(const std::string& name, Args&&... args)
+{
+    auto node = std::make_unique<T>(name, std::forward<Args>(args)...);
+    T* nodePtr = node.get();
+    ownedNodes.push_back(std::move(node));
+    return nodePtr;
+}

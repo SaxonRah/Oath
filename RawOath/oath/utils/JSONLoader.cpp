@@ -28,7 +28,7 @@ bool loadGameData(TAController& controller)
         // Load quests
         std::ifstream questFile("data/quests.json");
         if (questFile.is_open()) {
-            json questData = json::parse(questFile);
+            nlohmann::json questData = nlohmann::json::parse(questFile);
             loadQuestsFromJSON(controller, questData);
             std::cout << "Loaded quest data" << std::endl;
         } else {
@@ -38,7 +38,7 @@ bool loadGameData(TAController& controller)
         // Load NPCs and dialogue
         std::ifstream npcFile("data/npcs.json");
         if (npcFile.is_open()) {
-            json npcData = json::parse(npcFile);
+            nlohmann::json npcData = nlohmann::json::parse(npcFile);
             loadNPCsFromJSON(controller, npcData);
             std::cout << "Loaded NPC data" << std::endl;
         } else {
@@ -48,7 +48,7 @@ bool loadGameData(TAController& controller)
         // Load skills and progression
         std::ifstream skillsFile("data/skills.json");
         if (skillsFile.is_open()) {
-            json skillsData = json::parse(skillsFile);
+            nlohmann::json skillsData = nlohmann::json::parse(skillsFile);
             loadSkillsFromJSON(controller, skillsData);
             std::cout << "Loaded skills data" << std::endl;
         } else {
@@ -58,7 +58,7 @@ bool loadGameData(TAController& controller)
         // Load crafting recipes
         std::ifstream craftingFile("data/crafting.json");
         if (craftingFile.is_open()) {
-            json craftingData = json::parse(craftingFile);
+            nlohmann::json craftingData = nlohmann::json::parse(craftingFile);
             loadCraftingFromJSON(controller, craftingData);
             std::cout << "Loaded crafting data" << std::endl;
         } else {
@@ -68,7 +68,7 @@ bool loadGameData(TAController& controller)
         // Load world data
         std::ifstream worldFile("data/world.json");
         if (worldFile.is_open()) {
-            json worldData = json::parse(worldFile);
+            nlohmann::json worldData = nlohmann::json::parse(worldFile);
             loadWorldFromJSON(controller, worldData);
             std::cout << "Loaded world data" << std::endl;
         } else {
@@ -83,7 +83,7 @@ bool loadGameData(TAController& controller)
 }
 
 // Load quests from JSON
-void loadQuestsFromJSON(TAController& controller, const json& questData)
+void loadQuestsFromJSON(TAController& controller, const nlohmann::json& questData)
 {
     for (const auto& questEntry : questData["quests"]) {
         // Create main quest node
@@ -133,6 +133,9 @@ void loadQuestsFromJSON(TAController& controller, const json& questData)
                 reward.type = rewardData["type"];
                 reward.amount = rewardData["amount"];
                 reward.itemId = rewardData["itemId"];
+                reward.type = rewardData["type"];
+                reward.amount = rewardData["amount"];
+                reward.itemId = rewardData["itemId"];
                 subquest->rewards.push_back(reward);
             }
 
@@ -176,7 +179,7 @@ void loadQuestsFromJSON(TAController& controller, const json& questData)
 }
 
 // Load NPCs and dialogue from JSON
-void loadNPCsFromJSON(TAController& controller, const json& npcData)
+void loadNPCsFromJSON(TAController& controller, const nlohmann::json& npcData)
 {
     std::map<std::string, NPC*> npcs;
     std::map<std::string, DialogueNode*> dialogueNodes;
@@ -268,7 +271,7 @@ void loadNPCsFromJSON(TAController& controller, const json& npcData)
 }
 
 // Load skills and progression from JSON
-void loadSkillsFromJSON(TAController& controller, const json& skillsData)
+void loadSkillsFromJSON(TAController& controller, const nlohmann::json& skillsData)
 {
     // Create skill tree root
     TANode* skillTreeRoot = controller.createNode("SkillTreeRoot");
@@ -395,7 +398,7 @@ void loadSkillsFromJSON(TAController& controller, const json& skillsData)
 }
 
 // Load crafting from JSON
-void loadCraftingFromJSON(TAController& controller, const json& craftingData)
+void loadCraftingFromJSON(TAController& controller, const nlohmann::json& craftingData)
 {
     TANode* craftingRoot = controller.createNode("CraftingRoot");
 
@@ -455,7 +458,7 @@ void loadCraftingFromJSON(TAController& controller, const json& craftingData)
 }
 
 // Load world from JSON
-void loadWorldFromJSON(TAController& controller, const json& worldData)
+void loadWorldFromJSON(TAController& controller, const nlohmann::json& worldData)
 {
     std::map<std::string, RegionNode*> regions;
     std::map<std::string, LocationNode*> locations;
@@ -617,15 +620,15 @@ void createDefaultJSONFiles()
     // Create quests.json
     std::ofstream questFile("data/quests.json");
     if (questFile.is_open()) {
-        json questData;
-        questData["quests"] = json::array({ { { "id", "MainQuest" },
+        nlohmann::json questData;
+        questData["quests"] = nlohmann::json::array({ { { "id", "MainQuest" },
             { "title", "Defend the Village" },
             { "description", "The village is under threat. Prepare its defenses!" },
             { "state", "Available" },
             { "isAcceptingState", false },
-            { "rewards", json::array({ { { "type", "experience" }, { "amount", 500 }, { "itemId", "" } }, { { "type", "gold" }, { "amount", 200 }, { "itemId", "" } }, { { "type", "faction" }, { "amount", 25 }, { "itemId", "villagers" } }, { { "type", "item" }, { "amount", 1 }, { "itemId", "defenders_shield" } } }) },
-            { "requirements", json::array() },
-            { "subquests", json::array({ { { "id", "RepairWalls" }, { "title", "Repair the Walls" }, { "description", "The village walls are in disrepair. Fix them!" }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", json::array({ { { "type", "experience" }, { "amount", 100 }, { "itemId", "" } }, { { "type", "gold" }, { "amount", 50 }, { "itemId", "" } }, { { "type", "faction" }, { "amount", 10 }, { "itemId", "villagers" } } }) }, { "requirements", json::array({ { { "type", "skill" }, { "target", "crafting" }, { "value", 1 } } }) }, { "transitions", json::array({ { { "action", "repair_complete" }, { "target", "MainQuest" }, { "description", "Complete wall repairs" } } }) } }, { { "id", "TrainMilitia" }, { "title", "Train the Militia" }, { "description", "The villagers need combat training." }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", json::array({ { { "type", "experience" }, { "amount", 150 }, { "itemId", "" } }, { { "type", "skill" }, { "amount", 1 }, { "itemId", "combat" } } }) }, { "requirements", json::array({ { { "type", "skill" }, { "target", "combat" }, { "value", 2 } } }) }, { "transitions", json::array({ { { "action", "training_complete" }, { "target", "MainQuest" }, { "description", "Complete militia training" } } }) } }, { { "id", "GatherSupplies" }, { "title", "Gather Supplies" }, { "description", "The village needs food and resources." }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", json::array({ { { "type", "experience" }, { "amount", 100 }, { "itemId", "" } }, { { "type", "item" }, { "amount", 1 }, { "itemId", "rare_herb" } } }) }, { "requirements", json::array({ { { "type", "skill" }, { "target", "survival" }, { "value", 1 } } }) }, { "transitions", json::array({ { { "action", "supplies_gathered" }, { "target", "MainQuest" }, { "description", "Finish gathering supplies" } } }) } } }) } } });
+            { "rewards", nlohmann::json::array({ { { "type", "experience" }, { "amount", 500 }, { "itemId", "" } }, { { "type", "gold" }, { "amount", 200 }, { "itemId", "" } }, { { "type", "faction" }, { "amount", 25 }, { "itemId", "villagers" } }, { { "type", "item" }, { "amount", 1 }, { "itemId", "defenders_shield" } } }) },
+            { "requirements", nlohmann::json::array() },
+            { "subquests", nlohmann::json::array({ { { "id", "RepairWalls" }, { "title", "Repair the Walls" }, { "description", "The village walls are in disrepair. Fix them!" }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", nlohmann::json::array({ { { "type", "experience" }, { "amount", 100 }, { "itemId", "" } }, { { "type", "gold" }, { "amount", 50 }, { "itemId", "" } }, { { "type", "faction" }, { "amount", 10 }, { "itemId", "villagers" } } }) }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "crafting" }, { "value", 1 } } }) }, { "transitions", nlohmann::json::array({ { { "action", "repair_complete" }, { "target", "MainQuest" }, { "description", "Complete wall repairs" } } }) } }, { { "id", "TrainMilitia" }, { "title", "Train the Militia" }, { "description", "The villagers need combat training." }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", nlohmann::json::array({ { { "type", "experience" }, { "amount", 150 }, { "itemId", "" } }, { { "type", "skill" }, { "amount", 1 }, { "itemId", "combat" } } }) }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "combat" }, { "value", 2 } } }) }, { "transitions", nlohmann::json::array({ { { "action", "training_complete" }, { "target", "MainQuest" }, { "description", "Complete militia training" } } }) } }, { { "id", "GatherSupplies" }, { "title", "Gather Supplies" }, { "description", "The village needs food and resources." }, { "state", "Available" }, { "isAcceptingState", false }, { "rewards", nlohmann::json::array({ { { "type", "experience" }, { "amount", 100 }, { "itemId", "" } }, { { "type", "item" }, { "amount", 1 }, { "itemId", "rare_herb" } } }) }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "survival" }, { "value", 1 } } }) }, { "transitions", nlohmann::json::array({ { { "action", "supplies_gathered" }, { "target", "MainQuest" }, { "description", "Finish gathering supplies" } } }) } } }) } } });
         questFile << std::setw(4) << questData << std::endl;
         questFile.close();
     }
@@ -633,13 +636,13 @@ void createDefaultJSONFiles()
     // Create npcs.json
     std::ofstream npcFile("data/npcs.json");
     if (npcFile.is_open()) {
-        json npcData;
-        npcData["npcs"] = json::array({ { { "id", "elder_marius" },
+        nlohmann::json npcData;
+        npcData["npcs"] = nlohmann::json::array({ { { "id", "elder_marius" },
             { "name", "Elder Marius" },
             { "description", "The wise leader of the village" },
             { "relationshipValue", 0 },
             { "rootDialogue", "ElderGreeting" },
-            { "dialogueNodes", json::array({ { { "id", "ElderGreeting" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Greetings, traveler. Our village faces difficult times." }, { "responses", json::array({ { { "text", "What threat does the village face?" }, { "targetNode", "AskThreat" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "Is there something I can help with?" }, { "targetNode", "AskHelp" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "I need to go. Farewell." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "AskThreat" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Bandits have been raiding nearby settlements. I fear we're next." }, { "responses", json::array({ { { "text", "How can I help against these bandits?" }, { "targetNode", "AskHelp" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "I'll be on my way." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "AskHelp" }, { "speakerName", "Elder Marius" }, { "dialogueText", "We need someone skilled to help prepare our defenses." }, { "responses", json::array({ { { "text", "I'll help defend the village." }, { "targetNode", "AcceptQuest" }, { "requirements", json::array() }, { "effects", json::array({ { { "type", "quest" }, { "action", "activate" }, { "target", "MainQuest" } }, { { "type", "knowledge" }, { "action", "add" }, { "target", "village_under_threat" } }, { { "type", "faction" }, { "action", "change" }, { "target", "villagers" }, { "amount", 5 } } }) } }, { { "text", "I'm not interested in helping." }, { "targetNode", "RejectQuest" }, { "requirements", json::array() }, { "effects", json::array() } }, { { "text", "I need to think about it." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "AcceptQuest" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Thank you! This means a lot to our community. We need the walls repaired, the militia trained, and supplies gathered." }, { "responses", json::array({ { { "text", "I'll get started right away." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "RejectQuest" }, { "speakerName", "Elder Marius" }, { "dialogueText", "I understand. Perhaps you'll reconsider when you have time." }, { "responses", json::array({ { { "text", "Goodbye." }, { "targetNode", "Farewell" }, { "requirements", json::array() }, { "effects", json::array() } } }) } }, { { "id", "Farewell" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Safe travels, friend. Return if you need anything." }, { "responses", json::array() } } }) } } });
+            { "dialogueNodes", nlohmann::json::array({ { { "id", "ElderGreeting" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Greetings, traveler. Our village faces difficult times." }, { "responses", nlohmann::json::array({ { { "text", "What threat does the village face?" }, { "targetNode", "AskThreat" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } }, { { "text", "Is there something I can help with?" }, { "targetNode", "AskHelp" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } }, { { "text", "I need to go. Farewell." }, { "targetNode", "Farewell" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } } }) } }, { { "id", "AskThreat" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Bandits have been raiding nearby settlements. I fear we're next." }, { "responses", nlohmann::json::array({ { { "text", "How can I help against these bandits?" }, { "targetNode", "AskHelp" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } }, { { "text", "I'll be on my way." }, { "targetNode", "Farewell" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } } }) } }, { { "id", "AskHelp" }, { "speakerName", "Elder Marius" }, { "dialogueText", "We need someone skilled to help prepare our defenses." }, { "responses", nlohmann::json::array({ { { "text", "I'll help defend the village." }, { "targetNode", "AcceptQuest" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array({ { { "type", "quest" }, { "action", "activate" }, { "target", "MainQuest" } }, { { "type", "knowledge" }, { "action", "add" }, { "target", "village_under_threat" } }, { { "type", "faction" }, { "action", "change" }, { "target", "villagers" }, { "amount", 5 } } }) } }, { { "text", "I'm not interested in helping." }, { "targetNode", "RejectQuest" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } }, { { "text", "I need to think about it." }, { "targetNode", "Farewell" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } } }) } }, { { "id", "AcceptQuest" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Thank you! This means a lot to our community. We need the walls repaired, the militia trained, and supplies gathered." }, { "responses", nlohmann::json::array({ { { "text", "I'll get started right away." }, { "targetNode", "Farewell" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } } }) } }, { { "id", "RejectQuest" }, { "speakerName", "Elder Marius" }, { "dialogueText", "I understand. Perhaps you'll reconsider when you have time." }, { "responses", nlohmann::json::array({ { { "text", "Goodbye." }, { "targetNode", "Farewell" }, { "requirements", nlohmann::json::array() }, { "effects", nlohmann::json::array() } } }) } }, { { "id", "Farewell" }, { "speakerName", "Elder Marius" }, { "dialogueText", "Safe travels, friend. Return if you need anything." }, { "responses", nlohmann::json::array() } } }) } } });
         npcFile << std::setw(4) << npcData << std::endl;
         npcFile.close();
     }
@@ -647,43 +650,43 @@ void createDefaultJSONFiles()
     // Create skills.json
     std::ofstream skillsFile("data/skills.json");
     if (skillsFile.is_open()) {
-        json skillsData;
+        nlohmann::json skillsData;
         // Add skills data
-        skillsData["skills"] = json::array({ { { "id", "CombatBasics" },
-                                                 { "skillName", "combat" },
-                                                 { "description", "Basic combat techniques and weapon handling." },
-                                                 { "level", 0 },
-                                                 { "maxLevel", 5 },
-                                                 { "requirements", json::array() },
-                                                 { "effects", json::array({ { { "type", "stat" }, { "target", "strength" }, { "value", 1 } } }) },
-                                                 { "costs", json::array() },
-                                                 { "childSkills", json::array({ { { "id", "Swordsmanship" }, { "skillName", "swordsmanship" }, { "description", "Advanced sword techniques for greater damage and defense." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "combat" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "power_attack" }, { "value", 0 } } }) } }, { { "id", "Archery" }, { "skillName", "archery" }, { "description", "Precision with bows and other ranged weapons." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "combat" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "precise_shot" }, { "value", 0 } } }) } } }) } },
+        skillsData["skills"] = nlohmann::json::array({ { { "id", "CombatBasics" },
+                                                           { "skillName", "combat" },
+                                                           { "description", "Basic combat techniques and weapon handling." },
+                                                           { "level", 0 },
+                                                           { "maxLevel", 5 },
+                                                           { "requirements", nlohmann::json::array() },
+                                                           { "effects", nlohmann::json::array({ { { "type", "stat" }, { "target", "strength" }, { "value", 1 } } }) },
+                                                           { "costs", nlohmann::json::array() },
+                                                           { "childSkills", nlohmann::json::array({ { { "id", "Swordsmanship" }, { "skillName", "swordsmanship" }, { "description", "Advanced sword techniques for greater damage and defense." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "combat" }, { "level", 2 } } }) }, { "effects", nlohmann::json::array({ { { "type", "ability" }, { "target", "power_attack" }, { "value", 0 } } }) } }, { { "id", "Archery" }, { "skillName", "archery" }, { "description", "Precision with bows and other ranged weapons." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "combat" }, { "level", 2 } } }) }, { "effects", nlohmann::json::array({ { { "type", "ability" }, { "target", "precise_shot" }, { "value", 0 } } }) } } }) } },
             { { "id", "SurvivalBasics" },
                 { "skillName", "survival" },
                 { "description", "Basic survival skills for harsh environments." },
                 { "level", 0 },
                 { "maxLevel", 5 },
-                { "requirements", json::array() },
-                { "effects", json::array({ { { "type", "stat" }, { "target", "constitution" }, { "value", 1 } } }) },
-                { "costs", json::array() },
-                { "childSkills", json::array({ { { "id", "Herbalism" }, { "skillName", "herbalism" }, { "description", "Knowledge of medicinal and poisonous plants." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "survival" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "herbal_remedy" }, { "value", 0 } } }) } }, { { "id", "Tracking" }, { "skillName", "tracking" }, { "description", "Follow trails and find creatures in the wilderness." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "survival" }, { "level", 1 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "track_prey" }, { "value", 0 } } }) } } }) } },
+                { "requirements", nlohmann::json::array() },
+                { "effects", nlohmann::json::array({ { { "type", "stat" }, { "target", "constitution" }, { "value", 1 } } }) },
+                { "costs", nlohmann::json::array() },
+                { "childSkills", nlohmann::json::array({ { { "id", "Herbalism" }, { "skillName", "herbalism" }, { "description", "Knowledge of medicinal and poisonous plants." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "survival" }, { "level", 2 } } }) }, { "effects", nlohmann::json::array({ { { "type", "ability" }, { "target", "herbal_remedy" }, { "value", 0 } } }) } }, { { "id", "Tracking" }, { "skillName", "tracking" }, { "description", "Follow trails and find creatures in the wilderness." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "survival" }, { "level", 1 } } }) }, { "effects", nlohmann::json::array({ { { "type", "ability" }, { "target", "track_prey" }, { "value", 0 } } }) } } }) } },
             { { "id", "CraftingBasics" },
                 { "skillName", "crafting" },
                 { "description", "Basic crafting and repair techniques." },
                 { "level", 0 },
                 { "maxLevel", 5 },
-                { "requirements", json::array() },
-                { "effects", json::array({ { { "type", "stat" }, { "target", "dexterity" }, { "value", 1 } } }) },
-                { "costs", json::array() },
-                { "childSkills", json::array({ { { "id", "Blacksmithing" }, { "skillName", "blacksmithing" }, { "description", "Forge and improve metal weapons and armor." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "crafting" }, { "level", 2 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "forge_weapon" }, { "value", 0 } } }) } }, { { "id", "Alchemy" }, { "skillName", "alchemy" }, { "description", "Create potions and elixirs with magical effects." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", json::array({ { { "type", "skill" }, { "target", "crafting" }, { "level", 1 } }, { { "type", "skill" }, { "target", "herbalism" }, { "level", 1 } } }) }, { "effects", json::array({ { { "type", "ability" }, { "target", "brew_potion" }, { "value", 0 } } }) } } }) } } });
+                { "requirements", nlohmann::json::array() },
+                { "effects", nlohmann::json::array({ { { "type", "stat" }, { "target", "dexterity" }, { "value", 1 } } }) },
+                { "costs", nlohmann::json::array() },
+                { "childSkills", nlohmann::json::array({ { { "id", "Blacksmithing" }, { "skillName", "blacksmithing" }, { "description", "Forge and improve metal weapons and armor." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "crafting" }, { "level", 2 } } }) }, { "effects", nlohmann::json::array({ { { "type", "ability" }, { "target", "forge_weapon" }, { "value", 0 } } }) } }, { { "id", "Alchemy" }, { "skillName", "alchemy" }, { "description", "Create potions and elixirs with magical effects." }, { "level", 0 }, { "maxLevel", 5 }, { "requirements", nlohmann::json::array({ { { "type", "skill" }, { "target", "crafting" }, { "level", 1 } }, { { "type", "skill" }, { "target", "herbalism" }, { "level", 1 } } }) }, { "effects", nlohmann::json::array({ { { "type", "ability" }, { "target", "brew_potion" }, { "value", 0 } } }) } } }) } } });
 
         // Add classes data
-        skillsData["classes"] = json::array({ { { "id", "Warrior" },
-                                                  { "className", "Warrior" },
-                                                  { "description", "Masters of combat, strong and resilient." },
-                                                  { "statBonuses", { { "strength", 3 }, { "constitution", 2 } } },
-                                                  { "startingAbilities", { "weapon_specialization" } },
-                                                  { "classSkills", { "CombatBasics", "Swordsmanship" } } },
+        skillsData["classes"] = nlohmann::json::array({ { { "id", "Warrior" },
+                                                            { "className", "Warrior" },
+                                                            { "description", "Masters of combat, strong and resilient." },
+                                                            { "statBonuses", { { "strength", 3 }, { "constitution", 2 } } },
+                                                            { "startingAbilities", { "weapon_specialization" } },
+                                                            { "classSkills", { "CombatBasics", "Swordsmanship" } } },
             { { "id", "Ranger" },
                 { "className", "Ranger" },
                 { "description", "Wilderness experts, skilled with bow and blade." },
@@ -703,19 +706,19 @@ void createDefaultJSONFiles()
     // Create crafting.json
     std::ofstream craftingFile("data/crafting.json");
     if (craftingFile.is_open()) {
-        json craftingData;
-        craftingData["craftingStations"] = json::array({ { { "id", "BlacksmithStation" },
-                                                             { "stationType", "Blacksmith" },
-                                                             { "description", "A forge with anvil, hammers, and other metalworking tools." },
-                                                             { "recipes", json::array({ { { "recipeId", "sword_recipe" }, { "name", "Iron Sword" }, { "description", "A standard iron sword, good for combat." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "iron_ingot" }, { "quantity", 2 } }, { { "itemId", "leather_strips" }, { "quantity", 1 } } }) }, { "skillRequirements", { { "blacksmithing", 1 } } }, { "result", { { "itemId", "iron_sword" }, { "name", "Iron Sword" }, { "type", "weapon" }, { "quantity", 1 }, { "properties", { { "damage", 10 } } } } } }, { { "recipeId", "armor_recipe" }, { "name", "Leather Armor" }, { "description", "Basic protective gear made from leather." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "leather" }, { "quantity", 5 } }, { { "itemId", "metal_studs" }, { "quantity", 10 } } }) }, { "skillRequirements", { { "crafting", 2 } } }, { "result", { { "itemId", "leather_armor" }, { "name", "Leather Armor" }, { "type", "armor" }, { "quantity", 1 }, { "properties", { { "defense", 5 } } } } } } }) } },
+        nlohmann::json craftingData;
+        craftingData["craftingStations"] = nlohmann::json::array({ { { "id", "BlacksmithStation" },
+                                                                       { "stationType", "Blacksmith" },
+                                                                       { "description", "A forge with anvil, hammers, and other metalworking tools." },
+                                                                       { "recipes", nlohmann::json::array({ { { "recipeId", "sword_recipe" }, { "name", "Iron Sword" }, { "description", "A standard iron sword, good for combat." }, { "discovered", true }, { "ingredients", nlohmann::json::array({ { { "itemId", "iron_ingot" }, { "quantity", 2 } }, { { "itemId", "leather_strips" }, { "quantity", 1 } } }) }, { "skillRequirements", { { "blacksmithing", 1 } } }, { "result", { { "itemId", "iron_sword" }, { "name", "Iron Sword" }, { "type", "weapon" }, { "quantity", 1 }, { "properties", { { "damage", 10 } } } } } }, { { "recipeId", "armor_recipe" }, { "name", "Leather Armor" }, { "description", "Basic protective gear made from leather." }, { "discovered", true }, { "ingredients", nlohmann::json::array({ { { "itemId", "leather" }, { "quantity", 5 } }, { { "itemId", "metal_studs" }, { "quantity", 10 } } }) }, { "skillRequirements", { { "crafting", 2 } } }, { "result", { { "itemId", "leather_armor" }, { "name", "Leather Armor" }, { "type", "armor" }, { "quantity", 1 }, { "properties", { { "defense", 5 } } } } } } }) } },
             { { "id", "AlchemyStation" },
                 { "stationType", "Alchemy" },
                 { "description", "A workbench with alembics, mortars, and various containers for brewing." },
-                { "recipes", json::array({ { { "recipeId", "health_potion_recipe" }, { "name", "Minor Healing Potion" }, { "description", "A potion that restores a small amount of health." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "red_herb" }, { "quantity", 2 } }, { { "itemId", "water_flask" }, { "quantity", 1 } } }) }, { "skillRequirements", { { "alchemy", 1 } } }, { "result", { { "itemId", "minor_healing_potion" }, { "name", "Minor Healing Potion" }, { "type", "potion" }, { "quantity", 1 }, { "properties", { { "heal_amount", 25 } } } } } } }) } },
+                { "recipes", nlohmann::json::array({ { { "recipeId", "health_potion_recipe" }, { "name", "Minor Healing Potion" }, { "description", "A potion that restores a small amount of health." }, { "discovered", true }, { "ingredients", nlohmann::json::array({ { { "itemId", "red_herb" }, { "quantity", 2 } }, { { "itemId", "water_flask" }, { "quantity", 1 } } }) }, { "skillRequirements", { { "alchemy", 1 } } }, { "result", { { "itemId", "minor_healing_potion" }, { "name", "Minor Healing Potion" }, { "type", "potion" }, { "quantity", 1 }, { "properties", { { "heal_amount", 25 } } } } } } }) } },
             { { "id", "CookingStation" },
                 { "stationType", "Cooking" },
                 { "description", "A firepit with cooking pots and utensils." },
-                { "recipes", json::array({ { { "recipeId", "stew_recipe" }, { "name", "Hearty Stew" }, { "description", "A filling meal that provides temporary stat bonuses." }, { "discovered", true }, { "ingredients", json::array({ { { "itemId", "meat" }, { "quantity", 2 } }, { { "itemId", "vegetables" }, { "quantity", 3 } } }) }, { "skillRequirements", { { "cooking", 1 } } }, { "result", { { "itemId", "hearty_stew" }, { "name", "Hearty Stew" }, { "type", "food" }, { "quantity", 2 }, { "properties", { { "effect_duration", 300 } } } } } } }) } } });
+                { "recipes", nlohmann::json::array({ { { "recipeId", "stew_recipe" }, { "name", "Hearty Stew" }, { "description", "A filling meal that provides temporary stat bonuses." }, { "discovered", true }, { "ingredients", nlohmann::json::array({ { { "itemId", "meat" }, { "quantity", 2 } }, { { "itemId", "vegetables" }, { "quantity", 3 } } }) }, { "skillRequirements", { { "cooking", 1 } } }, { "result", { { "itemId", "hearty_stew" }, { "name", "Hearty Stew" }, { "type", "food" }, { "quantity", 2 }, { "properties", { { "effect_duration", 300 } } } } } } }) } } });
         craftingFile << std::setw(4) << craftingData << std::endl;
         craftingFile.close();
     }
@@ -723,28 +726,28 @@ void createDefaultJSONFiles()
     // Create world.json
     std::ofstream worldFile("data/world.json");
     if (worldFile.is_open()) {
-        json worldData;
-        worldData["regions"] = json::array({ { { "id", "VillageRegion" },
-                                                 { "regionName", "Oakvale Village" },
-                                                 { "description", "A peaceful farming village surrounded by wooden palisades." },
-                                                 { "controllingFaction", "villagers" },
-                                                 { "connectedRegions", { "ForestRegion", "MountainRegion" } },
-                                                 { "locations", json::array({ { { "id", "VillageCenter" }, { "locationName", "Village Center" }, { "description", "The bustling center of the village with a market and well." }, { "currentState", "normal" }, { "stateDescriptions", { { "damaged", "The village center shows signs of damage from bandit raids." }, { "rebuilt", "The village center has been rebuilt stronger than before." } } }, { "accessConditions", json::array() }, { "npcs", { "elder_marius" } }, { "activities", { "MainQuest" } } }, { { "id", "VillageInn" }, { "locationName", "The Sleeping Dragon Inn" }, { "description", "A cozy inn where travelers find rest and information." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", json::array() } }, { { "id", "VillageForge" }, { "locationName", "Blacksmith's Forge" }, { "description", "The local blacksmith's workshop with a roaring forge." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", { "BlacksmithStation" } } } }) },
-                                                 { "possibleEvents", json::array({ { { "name", "Bandit Raid" }, { "description", "A small group of bandits is attacking the village outskirts!" }, { "condition", { { "type", "worldflag" }, { "flag", "village_defended" }, { "value", false } } }, { "effect", { { "type", "location" }, { "target", "village" }, { "state", "under_attack" } } }, { "probability", 0.2 } } }) } },
+        nlohmann::json worldData;
+        worldData["regions"] = nlohmann::json::array({ { { "id", "VillageRegion" },
+                                                           { "regionName", "Oakvale Village" },
+                                                           { "description", "A peaceful farming village surrounded by wooden palisades." },
+                                                           { "controllingFaction", "villagers" },
+                                                           { "connectedRegions", { "ForestRegion", "MountainRegion" } },
+                                                           { "locations", nlohmann::json::array({ { { "id", "VillageCenter" }, { "locationName", "Village Center" }, { "description", "The bustling center of the village with a market and well." }, { "currentState", "normal" }, { "stateDescriptions", { { "damaged", "The village center shows signs of damage from bandit raids." }, { "rebuilt", "The village center has been rebuilt stronger than before." } } }, { "accessConditions", nlohmann::json::array() }, { "npcs", { "elder_marius" } }, { "activities", { "MainQuest" } } }, { { "id", "VillageInn" }, { "locationName", "The Sleeping Dragon Inn" }, { "description", "A cozy inn where travelers find rest and information." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", nlohmann::json::array() }, { "npcs", nlohmann::json::array() }, { "activities", nlohmann::json::array() } }, { { "id", "VillageForge" }, { "locationName", "Blacksmith's Forge" }, { "description", "The local blacksmith's workshop with a roaring forge." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", nlohmann::json::array() }, { "npcs", nlohmann::json::array() }, { "activities", { "BlacksmithStation" } } } }) },
+                                                           { "possibleEvents", nlohmann::json::array({ { { "name", "Bandit Raid" }, { "description", "A small group of bandits is attacking the village outskirts!" }, { "condition", { { "type", "worldflag" }, { "flag", "village_defended" }, { "value", false } } }, { "effect", { { "type", "location" }, { "target", "village" }, { "state", "under_attack" } } }, { "probability", 0.2 } } }) } },
             { { "id", "ForestRegion" },
                 { "regionName", "Green Haven Forest" },
                 { "description", "A dense forest with ancient trees and hidden paths." },
                 { "controllingFaction", "forest guardians" },
                 { "connectedRegions", { "VillageRegion", "MountainRegion" } },
-                { "locations", json::array({ { { "id", "ForestClearing" }, { "locationName", "Forest Clearing" }, { "description", "A peaceful clearing in the heart of the forest." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", json::array() } }, { { "id", "AncientGroves" }, { "locationName", "Ancient Groves" }, { "description", "An area with trees older than any human memory." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array({ { { "type", "skill" }, { "target", "survival" }, { "value", 2 } } }) }, { "npcs", json::array() }, { "activities", json::array() } } }) },
-                { "possibleEvents", json::array({ { { "name", "Rare Herb Sighting" }, { "description", "You spot a patch of rare medicinal herbs growing nearby." }, { "condition", { { "type", "skill" }, { "skill", "herbalism" }, { "value", 1 } } }, { "effect", { { "type", "item" }, { "item", "rare_herb" }, { "quantity", 1 } } }, { "probability", 0.3 } } }) } },
+                { "locations", nlohmann::json::array({ { { "id", "ForestClearing" }, { "locationName", "Forest Clearing" }, { "description", "A peaceful clearing in the heart of the forest." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", nlohmann::json::array() }, { "npcs", nlohmann::json::array() }, { "activities", nlohmann::json::array() } }, { { "id", "AncientGroves" }, { "locationName", "Ancient Groves" }, { "description", "An area with trees older than any human memory." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", nlohmann::json::array({ { { "type", "skill" }, { "target", "survival" }, { "value", 2 } } }) }, { "npcs", nlohmann::json::array() }, { "activities", nlohmann::json::array() } } }) },
+                { "possibleEvents", nlohmann::json::array({ { { "name", "Rare Herb Sighting" }, { "description", "You spot a patch of rare medicinal herbs growing nearby." }, { "condition", { { "type", "skill" }, { "skill", "herbalism" }, { "value", 1 } } }, { "effect", { { "type", "item" }, { "item", "rare_herb" }, { "quantity", 1 } } }, { "probability", 0.3 } } }) } },
             { { "id", "MountainRegion" },
                 { "regionName", "Stone Peak Mountains" },
                 { "description", "Rugged mountains with treacherous paths and hidden caves." },
                 { "controllingFaction", "mountainfolk" },
                 { "connectedRegions", { "VillageRegion", "ForestRegion" } },
-                { "locations", json::array({ { { "id", "MountainPass" }, { "locationName", "Mountain Pass" }, { "description", "A winding path through the mountains." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array() }, { "npcs", json::array() }, { "activities", json::array() } }, { { "id", "AbandonedMine" }, { "locationName", "Abandoned Mine" }, { "description", "An old mine, no longer in use. Rumors say something lurks within." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", json::array({ { { "type", "item" }, { "target", "torch" }, { "value", 1 } } }) }, { "npcs", json::array() }, { "activities", json::array() } } }) },
-                { "possibleEvents", json::array() } } });
+                { "locations", nlohmann::json::array({ { { "id", "MountainPass" }, { "locationName", "Mountain Pass" }, { "description", "A winding path through the mountains." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", nlohmann::json::array() }, { "npcs", nlohmann::json::array() }, { "activities", nlohmann::json::array() } }, { { "id", "AbandonedMine" }, { "locationName", "Abandoned Mine" }, { "description", "An old mine, no longer in use. Rumors say something lurks within." }, { "currentState", "normal" }, { "stateDescriptions", {} }, { "accessConditions", nlohmann::json::array({ { { "type", "item" }, { "target", "torch" }, { "value", 1 } } }) }, { "npcs", nlohmann::json::array() }, { "activities", nlohmann::json::array() } } }) },
+                { "possibleEvents", nlohmann::json::array() } } });
 
         worldData["timeSystem"] = {
             { "day", 1 },
