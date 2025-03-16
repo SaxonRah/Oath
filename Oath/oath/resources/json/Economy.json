@@ -1,0 +1,312 @@
+{
+    "commodities": [
+        {
+            "id": "iron_ore",
+            "name": "Iron Ore",
+            "basePrice": 10.0,
+            "supply": 100,
+            "demand": 80,
+            "baseSupply": 100,
+            "baseDemand": 80,
+            "origin": "Mountains",
+            "isLuxury": false,
+            "volatility": 0.1
+        },
+        {
+            "id": "timber",
+            "name": "Timber",
+            "basePrice": 5.0,
+            "supply": 150,
+            "demand": 100,
+            "baseSupply": 150,
+            "baseDemand": 100,
+            "origin": "Forest",
+            "isLuxury": false,
+            "volatility": 0.1
+        },
+        {
+            "id": "grain",
+            "name": "Grain",
+            "basePrice": 3.0,
+            "supply": 200,
+            "demand": 180,
+            "baseSupply": 200,
+            "baseDemand": 180,
+            "origin": "Plains",
+            "isLuxury": false,
+            "volatility": 0.2
+        },
+        {
+            "id": "spices",
+            "name": "Exotic Spices",
+            "basePrice": 50.0,
+            "supply": 20,
+            "demand": 60,
+            "baseSupply": 20,
+            "baseDemand": 60,
+            "origin": "Distant Lands",
+            "isLuxury": true,
+            "volatility": 0.4
+        },
+        {
+            "id": "silk",
+            "name": "Silk",
+            "basePrice": 100.0,
+            "supply": 10,
+            "demand": 40,
+            "baseSupply": 10,
+            "baseDemand": 40,
+            "origin": "Eastern Realm",
+            "isLuxury": true,
+            "volatility": 0.3
+        }
+    ],
+    "markets": [
+        {
+            "id": "riverside_market",
+            "name": "Riverside Market",
+            "type": "GENERAL",
+            "region": "Riverlands",
+            "wealthLevel": 1.2,
+            "ownerName": "Guildmaster Harrin",
+            "commodities": [
+                "grain",
+                "timber"
+            ]
+        },
+        {
+            "id": "mountain_forge",
+            "name": "Mountain Forge",
+            "type": "BLACKSMITH",
+            "region": "Mountains",
+            "wealthLevel": 1.0,
+            "ownerName": "Blacksmith Durgan",
+            "commodities": [
+                "iron_ore"
+            ]
+        },
+        {
+            "id": "coastal_bazaar",
+            "name": "Coastal Bazaar",
+            "type": "GENERAL",
+            "region": "Coast",
+            "wealthLevel": 1.5,
+            "ownerName": "Merchant Lyra",
+            "commodities": [
+                "silk",
+                "spices"
+            ]
+        }
+    ],
+    "tradeRoutes": [
+        {
+            "id": "mountain_river_route",
+            "name": "Mountain Pass",
+            "sourceMarket": "mountain_forge",
+            "destinationMarket": "riverside_market",
+            "distance": 100,
+            "dangerLevel": 0.2,
+            "tradedGoods": [
+                "iron_ore"
+            ]
+        },
+        {
+            "id": "coastal_river_route",
+            "name": "River Road",
+            "sourceMarket": "coastal_bazaar",
+            "destinationMarket": "riverside_market",
+            "distance": 150,
+            "dangerLevel": 0.1,
+            "tradedGoods": [
+                "silk",
+                "spices"
+            ]
+        }
+    ],
+    "economicEvents": [
+        {
+            "id": "winter_storms",
+            "name": "Winter Storms",
+            "description": "Severe winter storms have made travel difficult and disrupted supply lines.",
+            "duration": 14,
+            "affectedRegions": [
+                "Mountains",
+                "Riverlands"
+            ],
+            "commoditySupplyEffects": {
+                "iron_ore": 0.7,
+                "timber": 0.8
+            },
+            "commodityDemandEffects": {
+                "timber": 1.5
+            },
+            "tradeRouteDisruptions": {
+                "mountain_river_route": true
+            }
+        },
+        {
+            "id": "trade_festival",
+            "name": "Grand Trade Festival",
+            "description": "A grand trade festival has increased economic activity across all regions.",
+            "duration": 7,
+            "affectedRegions": [
+                "Riverlands",
+                "Coast",
+                "Mountains"
+            ],
+            "commoditySupplyEffects": {
+                "silk": 1.5,
+                "spices": 1.3
+            },
+            "commodityDemandEffects": {
+                "silk": 2.0,
+                "spices": 1.8,
+                "iron_ore": 1.3,
+                "grain": 1.5
+            }
+        }
+    ],
+    "investments": [
+        {
+            "id": "tavern_investment",
+            "name": "The Golden Goblet Tavern",
+            "description": "A popular tavern in the heart of Riverdale. Investing provides a steady income from drink sales.",
+            "marketId": "riverside_market",
+            "initialCost": 500,
+            "riskLevel": 0.2,
+            "returnRate": 0.05,
+            "marketSensitivity": 0.7,
+            "payoutInterval": 7
+        },
+        {
+            "id": "mine_investment",
+            "name": "Iron Peak Mine",
+            "description": "A productive iron mine in the mountains. Higher risk, but potentially higher rewards.",
+            "marketId": "mountain_forge",
+            "initialCost": 1000,
+            "riskLevel": 0.6,
+            "returnRate": 0.12,
+            "marketSensitivity": 1.5,
+            "payoutInterval": 14
+        },
+        {
+            "id": "shipping_investment",
+            "name": "Coastal Traders Guild",
+            "description": "Invest in a trading company that imports exotic goods from distant lands.",
+            "marketId": "coastal_bazaar",
+            "initialCost": 2000,
+            "riskLevel": 0.8,
+            "returnRate": 0.20,
+            "marketSensitivity": 1.8,
+            "payoutInterval": 30
+        }
+    ],
+    "properties": [
+        {
+            "id": "riverside_cottage",
+            "name": "Riverside Cottage",
+            "description": "A cozy cottage near the river with a small garden.",
+            "regionId": "Riverlands",
+            "type": "HOUSE",
+            "purchasePrice": 5000,
+            "weeklyIncome": 0,
+            "weeklyUpkeep": 20,
+            "storageCapacity": 100,
+            "upgrades": [
+                {
+                    "id": "garden_expansion",
+                    "name": "Garden Expansion",
+                    "description": "Expand the garden to grow more crops.",
+                    "cost": 500,
+                    "upkeepIncrease": 5
+                },
+                {
+                    "id": "reinforced_doors",
+                    "name": "Reinforced Doors",
+                    "description": "Improve security with stronger doors.",
+                    "cost": 300,
+                    "upkeepIncrease": 0
+                }
+            ]
+        },
+        {
+            "id": "market_shop",
+            "name": "Market District Shop",
+            "description": "A small shop in the market district, good for running a business.",
+            "regionId": "Riverlands",
+            "type": "SHOP",
+            "purchasePrice": 10000,
+            "weeklyIncome": 250,
+            "weeklyUpkeep": 100,
+            "storageCapacity": 500,
+            "upgrades": [
+                {
+                    "id": "shop_expansion",
+                    "name": "Shop Expansion",
+                    "description": "Expand the shop floor to sell more goods.",
+                    "cost": 2000,
+                    "upkeepIncrease": 50
+                },
+                {
+                    "id": "display_cases",
+                    "name": "Quality Display Cases",
+                    "description": "Attract more wealthy customers with better displays.",
+                    "cost": 800,
+                    "upkeepIncrease": 10
+                }
+            ],
+            "tenants": [
+                {
+                    "id": "apprentice",
+                    "name": "Jorrin (Apprentice)",
+                    "rentAmount": 50,
+                    "paymentInterval": 7,
+                    "reliability": 0.9
+                }
+            ]
+        },
+        {
+            "id": "mountain_estate",
+            "name": "Mountain View Estate",
+            "description": "A large estate in the mountains with land for farming and mining.",
+            "regionId": "Mountains",
+            "type": "ESTATE",
+            "purchasePrice": 25000,
+            "weeklyIncome": 100,
+            "weeklyUpkeep": 200,
+            "storageCapacity": 1000,
+            "upgrades": [
+                {
+                    "id": "mine_shaft",
+                    "name": "Mine Shaft",
+                    "description": "Dig a mine shaft to extract resources from your land.",
+                    "cost": 5000,
+                    "upkeepIncrease": 100
+                },
+                {
+                    "id": "hunting_grounds",
+                    "name": "Hunting Grounds",
+                    "description": "Develop part of the land for hunting.",
+                    "cost": 1500,
+                    "upkeepIncrease": 50
+                }
+            ],
+            "tenants": [
+                {
+                    "id": "groundskeeper",
+                    "name": "Old Mathias (Groundskeeper)",
+                    "rentAmount": 0,
+                    "paymentInterval": 30,
+                    "reliability": 1.0
+                },
+                {
+                    "id": "farmer_family",
+                    "name": "Tiller Family (Farmers)",
+                    "rentAmount": 100,
+                    "paymentInterval": 14,
+                    "reliability": 0.8
+                }
+            ]
+        }
+    ]
+}
