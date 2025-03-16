@@ -56,6 +56,12 @@ set(SYSTEM_WORLD_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/TimeNode.cpp
 )
 
+set(SYSTEM_WEATHER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherTypes.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherCondition.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherSystemNode.cpp
+)
+
 set(UTILS_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/utils/JSONLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/utils/JSONSerializer.cpp
@@ -70,6 +76,7 @@ set(SOURCES
     ${SYSTEM_PROGRESSION_SOURCES}
     ${SYSTEM_CRAFTING_SOURCES}
     ${SYSTEM_WORLD_SOURCES}
+    ${SYSTEM_WEATHER_SOURCES}
     ${UTILS_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/main.cpp
 )

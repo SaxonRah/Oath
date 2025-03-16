@@ -1,0 +1,490 @@
+{
+    "weatherChangeInterval": {
+        "min": 4,
+        "max": 12
+    },
+    "weatherTransitionProbabilities": {
+        "Clear": {
+            "Clear": 0.6,
+            "Cloudy": 0.3,
+            "Foggy": 0.05,
+            "Rainy": 0.05,
+            "Stormy": 0.0
+        },
+        "Cloudy": {
+            "Clear": 0.3,
+            "Cloudy": 0.4,
+            "Foggy": 0.1,
+            "Rainy": 0.15,
+            "Stormy": 0.05
+        },
+        "Foggy": {
+            "Clear": 0.2,
+            "Cloudy": 0.3,
+            "Foggy": 0.4,
+            "Rainy": 0.1,
+            "Stormy": 0.0
+        },
+        "Rainy": {
+            "Clear": 0.1,
+            "Cloudy": 0.2,
+            "Foggy": 0.1,
+            "Rainy": 0.5,
+            "Stormy": 0.1
+        },
+        "Stormy": {
+            "Clear": 0.05,
+            "Cloudy": 0.15,
+            "Foggy": 0.0,
+            "Rainy": 0.5,
+            "Stormy": 0.3
+        },
+        "Snowy": {
+            "Clear": 0.1,
+            "Cloudy": 0.3,
+            "Foggy": 0.1,
+            "Snowy": 0.4,
+            "Blizzard": 0.1
+        },
+        "Blizzard": {
+            "Clear": 0.0,
+            "Cloudy": 0.1,
+            "Foggy": 0.1,
+            "Snowy": 0.6,
+            "Blizzard": 0.2
+        },
+        "SandStorm": {
+            "Clear": 0.3,
+            "Cloudy": 0.2,
+            "Foggy": 0.0,
+            "SandStorm": 0.5
+        }
+    },
+    "intensityProbabilities": {
+        "Clear": {
+            "None": 0.0,
+            "Light": 0.3,
+            "Moderate": 0.5,
+            "Heavy": 0.2,
+            "Severe": 0.0
+        },
+        "Cloudy": {
+            "None": 0.0,
+            "Light": 0.4,
+            "Moderate": 0.4,
+            "Heavy": 0.2,
+            "Severe": 0.0
+        },
+        "Foggy": {
+            "None": 0.0,
+            "Light": 0.3,
+            "Moderate": 0.5,
+            "Heavy": 0.2,
+            "Severe": 0.0
+        },
+        "Rainy": {
+            "None": 0.0,
+            "Light": 0.4,
+            "Moderate": 0.4,
+            "Heavy": 0.15,
+            "Severe": 0.05
+        },
+        "Stormy": {
+            "None": 0.0,
+            "Light": 0.1,
+            "Moderate": 0.3,
+            "Heavy": 0.4,
+            "Severe": 0.2
+        },
+        "Snowy": {
+            "None": 0.0,
+            "Light": 0.4,
+            "Moderate": 0.4,
+            "Heavy": 0.15,
+            "Severe": 0.05
+        },
+        "Blizzard": {
+            "None": 0.0,
+            "Light": 0.1,
+            "Moderate": 0.3,
+            "Heavy": 0.4,
+            "Severe": 0.2
+        },
+        "SandStorm": {
+            "None": 0.0,
+            "Light": 0.2,
+            "Moderate": 0.4,
+            "Heavy": 0.3,
+            "Severe": 0.1
+        }
+    },
+    "seasonalModifiers": {
+        "spring": {
+            "Clear": 0.9,
+            "Cloudy": 1.1,
+            "Foggy": 1.5,
+            "Rainy": 1.5,
+            "Stormy": 1.2,
+            "Snowy": 0.3,
+            "Blizzard": 0.1,
+            "SandStorm": 0.8
+        },
+        "summer": {
+            "Clear": 1.5,
+            "Cloudy": 0.8,
+            "Foggy": 0.7,
+            "Rainy": 0.8,
+            "Stormy": 1.0,
+            "Snowy": 0.0,
+            "Blizzard": 0.0,
+            "SandStorm": 1.2
+        },
+        "autumn": {
+            "Clear": 1.0,
+            "Cloudy": 1.2,
+            "Foggy": 1.3,
+            "Rainy": 1.2,
+            "Stormy": 1.0,
+            "Snowy": 0.4,
+            "Blizzard": 0.1,
+            "SandStorm": 0.8
+        },
+        "winter": {
+            "Clear": 0.8,
+            "Cloudy": 1.0,
+            "Foggy": 1.0,
+            "Rainy": 0.6,
+            "Stormy": 0.8,
+            "Snowy": 1.6,
+            "Blizzard": 1.3,
+            "SandStorm": 0.4
+        }
+    },
+    "seasonalWeatherProbabilities": {
+        "spring": {
+            "Clear": 0.3,
+            "Cloudy": 0.3,
+            "Foggy": 0.15,
+            "Rainy": 0.2,
+            "Stormy": 0.05,
+            "Snowy": 0.0,
+            "Blizzard": 0.0,
+            "SandStorm": 0.0
+        },
+        "summer": {
+            "Clear": 0.5,
+            "Cloudy": 0.2,
+            "Foggy": 0.05,
+            "Rainy": 0.15,
+            "Stormy": 0.1,
+            "Snowy": 0.0,
+            "Blizzard": 0.0,
+            "SandStorm": 0.0
+        },
+        "autumn": {
+            "Clear": 0.25,
+            "Cloudy": 0.3,
+            "Foggy": 0.2,
+            "Rainy": 0.2,
+            "Stormy": 0.05,
+            "Snowy": 0.0,
+            "Blizzard": 0.0,
+            "SandStorm": 0.0
+        },
+        "winter": {
+            "Clear": 0.2,
+            "Cloudy": 0.25,
+            "Foggy": 0.1,
+            "Rainy": 0.05,
+            "Stormy": 0.05,
+            "Snowy": 0.3,
+            "Blizzard": 0.05,
+            "SandStorm": 0.0
+        }
+    },
+    "regionTypeWeatherProbabilities": {
+        "forest": {
+            "Clear": 0.2,
+            "Cloudy": 0.3,
+            "Foggy": 0.2,
+            "Rainy": 0.25,
+            "Stormy": 0.05
+        },
+        "mountain": {
+            "Clear": 0.3,
+            "Cloudy": 0.3,
+            "Foggy": 0.1,
+            "Rainy": 0.1,
+            "Stormy": 0.05,
+            "Snowy": 0.1,
+            "Blizzard": 0.05
+        },
+        "desert": {
+            "Clear": 0.7,
+            "Cloudy": 0.1,
+            "Foggy": 0.0,
+            "Rainy": 0.05,
+            "Stormy": 0.05,
+            "SandStorm": 0.1
+        },
+        "coastal": {
+            "Clear": 0.2,
+            "Cloudy": 0.3,
+            "Foggy": 0.3,
+            "Rainy": 0.15,
+            "Stormy": 0.05
+        },
+        "plains": {
+            "Clear": 0.4,
+            "Cloudy": 0.25,
+            "Foggy": 0.05,
+            "Rainy": 0.2,
+            "Stormy": 0.1
+        }
+    },
+    "weatherDescriptions": {
+        "Clear": {
+            "day": "The sky is a brilliant blue with barely a cloud in sight. The sun shines brightly, casting crisp shadows across the landscape.",
+            "night": "The night sky is clear and filled with countless stars. The moon casts a gentle silver light across the landscape.",
+            "dawn": "The first rays of sunlight streak across the horizon, illuminating a clear, promising sky.",
+            "dusk": "The setting sun paints the clear sky with breathtaking hues of orange, pink, and purple.",
+            "default": "The weather is clear, with bright sunshine and blue skies."
+        },
+        "Cloudy": {
+            "Light": "A few fluffy white clouds drift lazily across the sky, occasionally passing in front of the sun.",
+            "Moderate": "The sky is filled with a mix of white and gray clouds, allowing occasional patches of blue to peek through.",
+            "Heavy": "Thick gray clouds blanket the sky, diffusing the sunlight into a dull, even glow.",
+            "default": "The sky is overcast with clouds of varying thickness."
+        },
+        "Foggy": {
+            "Light": "A light mist hangs in the air, giving everything a soft, dreamlike quality.",
+            "Moderate": "A fog has settled in, reducing visibility and muffling sounds. Objects beyond fifty paces appear as vague silhouettes.",
+            "Heavy": "A thick fog envelops everything, limiting visibility to only a few paces. Familiar landmarks have become strange and mysterious.",
+            "Severe": "An impenetrable wall of fog surrounds you, so thick you can barely see your own hand stretched out before you. All sounds seem distant and distorted.",
+            "default": "Fog has rolled in, reducing visibility."
+        },
+        "Rainy": {
+            "Light": "A gentle drizzle falls, barely enough to dampen the ground but adding a fresh scent to the air.",
+            "Moderate": "Steady rain falls steadily from the gray sky, forming puddles on the ground and drumming pleasantly on rooftops.",
+            "Heavy": "Heavy rain pours down, forming rivulets that flow across the land. Thunder rumbles in the distance.",
+            "Severe": "Torrential rain hammers down, flooding low areas and making travel extremely difficult. The constant roar of rainfall drowns out most other sounds.",
+            "default": "Rain falls from the cloudy sky, dampening the ground."
+        },
+        "Stormy": {
+            "Light": "A storm brews on the horizon. Dark clouds gather and occasional flashes of lightning can be seen in the distance.",
+            "Moderate": "The storm has arrived with steady rainfall. Thunder booms overhead and lightning flashes across the sky.",
+            "Heavy": "A powerful storm rages with howling winds and sheets of rain. Lightning tears across the sky and thunder crashes immediately after.",
+            "Severe": "A violent tempest has engulfed the area. Powerful winds bend trees, torrential rain reduces visibility to nearly nothing, and lightning strikes dangerously close.",
+            "default": "A storm rages with rain, thunder, and lightning."
+        },
+        "Snowy": {
+            "Light": "Delicate snowflakes drift down lazily from the sky, barely beginning to dust the ground with white.",
+            "Moderate": "Snow falls steadily, accumulating on the ground and coating everything in a clean white blanket.",
+            "Heavy": "Thick snow falls heavily, muffling sounds and making travel increasingly difficult. The world is transforming into a white landscape.",
+            "Severe": "A heavy snowfall has blanketed everything in thick white. Drifts form in the wind, and traveling through the deep snow is exhausting.",
+            "default": "Snow falls from the gray sky, covering the ground in white."
+        },
+        "Blizzard": {
+            "Light": "Snow falls heavily as wind begins to pick up, starting to reduce visibility and making the cold bite deeper.",
+            "Moderate": "A blizzard has set in with driving snow and biting winds. Visibility is poor and the cold is dangerous.",
+            "Heavy": "A fierce blizzard rages with howling winds driving snow horizontally. Visibility is severely limited and the cold is life-threatening without proper protection.",
+            "Severe": "An extreme blizzard engulfs everything in white. The screaming winds and blinding snow make navigation nearly impossible, and the cold will kill anyone unprepared.",
+            "default": "A blizzard rages with driving snow and fierce winds."
+        },
+        "SandStorm": {
+            "Light": "The wind picks up, carrying dust and sand that stings exposed skin and gets into everything.",
+            "Moderate": "A sandstorm approaches, reducing visibility and forcing you to shield your eyes and mouth from the blowing sand.",
+            "Heavy": "A sandstorm envelops the area. The air is filled with stinging particles that reduce visibility drastically and make breathing difficult without protection.",
+            "Severe": "A massive sandstorm has engulfed everything. The roaring wind drives walls of sand that scour exposed skin and make travel nearly impossible.",
+            "default": "A sandstorm blows through the area, filling the air with dust and sand."
+        }
+    },
+    "weatherEvents": {
+        "Stormy": {
+            "Heavy": [
+                {
+                    "name": "Lightning Strike",
+                    "description": "A brilliant flash of lightning strikes nearby, followed immediately by a deafening clap of thunder that shakes the ground.",
+                    "probability": 0.15
+                },
+                {
+                    "name": "Flooding",
+                    "description": "The heavy rainfall has caused low-lying areas to flood, making certain paths impassable.",
+                    "probability": 0.1
+                }
+            ],
+            "Severe": [
+                {
+                    "name": "Lightning Strike",
+                    "description": "Lightning forks down from the sky with alarming frequency, striking dangerously close.",
+                    "probability": 0.25
+                },
+                {
+                    "name": "Flash Flood",
+                    "description": "A wall of water suddenly rushes through, carrying debris and flooding everything in its path.",
+                    "probability": 0.2
+                }
+            ]
+        },
+        "Foggy": {
+            "Heavy": [
+                {
+                    "name": "Strange Sounds",
+                    "description": "Eerie sounds echo through the fog, distorted and impossible to locate. Something moves in the mist just at the edge of vision.",
+                    "probability": 0.2
+                },
+                {
+                    "name": "Lost Path",
+                    "description": "The thick fog has obscured all landmarks, making it easy to become disoriented and lost.",
+                    "probability": 0.15
+                }
+            ]
+        },
+        "Blizzard": {
+            "Severe": [
+                {
+                    "name": "Avalanche Risk",
+                    "description": "The heavy snowfall has made slopes unstable. Loud sounds might trigger an avalanche in certain areas.",
+                    "probability": 0.1
+                },
+                {
+                    "name": "Frostbite Warning",
+                    "description": "The combination of extreme cold and wind makes frostbite a serious risk for any exposed skin.",
+                    "probability": 0.3
+                }
+            ]
+        }
+    },
+    "movementModifiers": {
+        "Clear": {
+            "default": 1.0
+        },
+        "Cloudy": {
+            "default": 1.0
+        },
+        "Foggy": {
+            "Light": 0.9,
+            "Moderate": 0.8,
+            "Heavy": 0.6,
+            "Severe": 0.4
+        },
+        "Rainy": {
+            "Light": 0.9,
+            "Moderate": 0.8,
+            "Heavy": 0.6,
+            "Severe": 0.4
+        },
+        "Stormy": {
+            "Light": 0.8,
+            "Moderate": 0.6,
+            "Heavy": 0.4,
+            "Severe": 0.2
+        },
+        "Snowy": {
+            "Light": 0.9,
+            "Moderate": 0.7,
+            "Heavy": 0.5,
+            "Severe": 0.3
+        },
+        "Blizzard": {
+            "Light": 0.7,
+            "Moderate": 0.5,
+            "Heavy": 0.3,
+            "Severe": 0.1
+        },
+        "SandStorm": {
+            "Light": 0.8,
+            "Moderate": 0.6,
+            "Heavy": 0.4,
+            "Severe": 0.2
+        }
+    },
+    "visibilityModifiers": {
+        "Clear": {
+            "default": 1.0
+        },
+        "Cloudy": {
+            "default": 0.9
+        },
+        "Foggy": {
+            "Light": 0.7,
+            "Moderate": 0.5,
+            "Heavy": 0.3,
+            "Severe": 0.1
+        },
+        "Rainy": {
+            "Light": 0.8,
+            "Moderate": 0.7,
+            "Heavy": 0.5,
+            "Severe": 0.3
+        },
+        "Stormy": {
+            "Light": 0.7,
+            "Moderate": 0.5,
+            "Heavy": 0.3,
+            "Severe": 0.1
+        },
+        "Snowy": {
+            "Light": 0.8,
+            "Moderate": 0.6,
+            "Heavy": 0.4,
+            "Severe": 0.2
+        },
+        "Blizzard": {
+            "Light": 0.6,
+            "Moderate": 0.4,
+            "Heavy": 0.2,
+            "Severe": 0.1
+        },
+        "SandStorm": {
+            "Light": 0.6,
+            "Moderate": 0.4,
+            "Heavy": 0.2,
+            "Severe": 0.1
+        }
+    },
+    "combatModifiers": {
+        "Clear": {
+            "default": 1.0
+        },
+        "Cloudy": {
+            "default": 1.0
+        },
+        "Foggy": {
+            "Light": 0.9,
+            "Moderate": 0.8,
+            "Heavy": 0.7,
+            "Severe": 0.6
+        },
+        "Rainy": {
+            "Light": 0.9,
+            "Moderate": 0.8,
+            "Heavy": 0.7,
+            "Severe": 0.6
+        },
+        "Stormy": {
+            "Light": 0.8,
+            "Moderate": 0.7,
+            "Heavy": 0.6,
+            "Severe": 0.5
+        },
+        "Snowy": {
+            "Light": 0.9,
+            "Moderate": 0.8,
+            "Heavy": 0.7,
+            "Severe": 0.6
+        },
+        "Blizzard": {
+            "Light": 0.8,
+            "Moderate": 0.7,
+            "Heavy": 0.6,
+            "Severe": 0.5
+        },
+        "SandStorm": {
+            "Light": 0.8,
+            "Moderate": 0.7,
+            "Heavy": 0.6,
+            "Severe": 0.5
+        }
+    }
+}

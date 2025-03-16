@@ -7,6 +7,7 @@
 #include "systems/dialogue/NPC.hpp"
 #include "systems/progression/SkillNode.hpp"
 #include "systems/quest/QuestNode.hpp"
+#include "systems/weather/WeatherSystemNode.hpp"
 #include "systems/world/TimeNode.hpp"
 #include "utils/JSONLoader.hpp"
 
@@ -29,6 +30,12 @@ int main()
         std::cerr << "Failed to load game data. Exiting." << std::endl;
         return 1;
     }
+
+    // Initialize weather system
+    initializeWeatherSystem(controller);
+
+    // Hook weather to time system
+    hookWeatherToTimeSystem(controller);
 
     std::cout << "\n___ GAME DATA LOADED SUCCESSFULLY ___\n"
               << std::endl;
