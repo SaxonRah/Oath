@@ -85,7 +85,7 @@ target_include_directories(Oath PRIVATE
 # Copy resource files to build directory
 add_custom_command(TARGET Oath POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/resources
+    ${CMAKE_SOURCE_DIR}/oath/resources
     $<TARGET_FILE_DIR:Oath>/resources
 )
 
