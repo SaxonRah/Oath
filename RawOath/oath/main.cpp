@@ -17,6 +17,57 @@
 #include <memory>
 #include <string>
 
+#include "core/TAController.hpp"
+#include "systems/crime/CrimeLawSystem.hpp"
+#include <iostream>
+
+/* ------------------------------------------- Initialize the Crime & Law System
+int main() {
+    try {
+        // Initialize main controller
+        TAController controller;
+        
+        // Initialize existing systems
+        // ... other system initializations ...
+        
+        // Initialize the Crime & Law System
+        CrimeLawSystem crimeSystem(&controller);
+        
+        // Register all systems with the controller (if not done in constructors)
+        // ...
+        
+        std::cout << "All systems initialized successfully." << std::endl;
+        
+        // Start the game loop
+        while (true) {
+            // Process player input
+            std::string input;
+            std::cout << "> ";
+            std::getline(std::cin, input);
+            
+            if (input == "quit" || input == "exit") {
+                break;
+            }
+            
+            // Parse input into TAInput structure
+            TAInput gameInput = parseInput(input);  // You'd have your own input parser
+            
+            // Process the input through the controller
+            controller.processInput(gameInput.type, gameInput);
+            
+            // Update game state
+            // ...
+        }
+        
+        return 0;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+}
+*/
+
 int main()
 {
     std::cout << "___ Starting Oath RPG Engine ___" << std::endl;

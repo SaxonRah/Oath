@@ -1,0 +1,139 @@
+{
+    "crimeTypes": {
+        "THEFT": "theft",
+        "ASSAULT": "assault",
+        "MURDER": "murder",
+        "TRESPASSING": "trespassing",
+        "VANDALISM": "vandalism",
+        "PICKPOCKETING": "pickpocketing",
+        "PRISON_BREAK": "prison break"
+    },
+    "guardResponseTypes": {
+        "ARREST": "arrest",
+        "ATTACK": "attack",
+        "FINE": "fine",
+        "WARN": "warn",
+        "IGNORE": "ignore"
+    },
+    "baseBounties": {
+        "theft": 50,
+        "assault": 100,
+        "murder": 1000,
+        "trespassing": 20,
+        "vandalism": 30,
+        "pickpocketing": 40,
+        "prison break": 500
+    },
+    "crimeConfig": {
+        "bountyWitnessMultiplier": 2,
+        "repLossBaseFactor": 5,
+        "witnessRepMultiplier": 2,
+        "wantedThreshold": 3,
+        "skillImprovementChance": 30
+    },
+    "jailConfig": {
+        "murderDaysPerPoint": 10,
+        "assaultDaysPerPoint": 5,
+        "theftDaysPerPoint": 3,
+        "minorCrimeDaysPerPoint": 1,
+        "maxJailSentence": 90,
+        "repGainPerDay": 2
+    },
+    "jailEscapeConfig": {
+        "baseChance": 20,
+        "stealthMultiplier": 2,
+        "lockpickingMultiplier": 3,
+        "sentencePenaltyDivisor": 5,
+        "minChance": 5,
+        "maxChance": 75,
+        "sentenceIncrease": 5
+    },
+    "bountyNegotiationConfig": {
+        "baseChance": 30,
+        "speechMultiplier": 3,
+        "charismaBaseValue": 5,
+        "charismaMultiplier": 2,
+        "reputationDivisor": 10,
+        "minChance": 10,
+        "maxChance": 80,
+        "discountPercent": 30
+    },
+    "witnessChances": {
+        "town": 70,
+        "village": 60,
+        "city": 80,
+        "forest": 30,
+        "wilderness": 20,
+        "dungeon": 25,
+        "cave": 15,
+        "default": 50
+    },
+    "regions": [
+        "Northshire",
+        "Westfall",
+        "Redridge",
+        "Duskwood"
+    ],
+    "theftTargets": [
+        {
+            "id": "small",
+            "name": "Small Valuables",
+            "value": 10,
+            "severity": 2
+        },
+        {
+            "id": "medium",
+            "name": "Merchant Goods",
+            "value": 50,
+            "severity": 5
+        },
+        {
+            "id": "large",
+            "name": "Noble's Treasures",
+            "value": 200,
+            "severity": 8
+        }
+    ],
+    "pickpocketTargets": [
+        {
+            "id": "peasant",
+            "name": "Peasant",
+            "difficulty": 2,
+            "gold": {
+                "min": 1,
+                "max": 5
+            },
+            "loot": "common trinket"
+        },
+        {
+            "id": "merchant",
+            "name": "Merchant",
+            "difficulty": 5,
+            "gold": {
+                "min": 10,
+                "max": 30
+            },
+            "loot": "market key"
+        },
+        {
+            "id": "nobleman",
+            "name": "Nobleman",
+            "difficulty": 8,
+            "gold": {
+                "min": 25,
+                "max": 100
+            },
+            "loot": "signet ring"
+        },
+        {
+            "id": "guard",
+            "name": "Guard",
+            "difficulty": 10,
+            "gold": {
+                "min": 5,
+                "max": 15
+            },
+            "loot": "guard badge"
+        }
+    ]
+}

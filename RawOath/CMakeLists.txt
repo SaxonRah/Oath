@@ -24,12 +24,35 @@ set(CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/core/TAController.cpp
 )
 
+
 set(DATA_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/data/CharacterStats.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/data/WorldState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/data/Inventory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/data/Item.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/data/Recipe.cpp
+)
+
+set(UTILS_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/utils/JSONLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/utils/JSONSerializer.cpp
+)
+
+set(SYSTEM_CRIME_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/BountyPaymentNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CrimeLawConfig.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CrimeLawContext.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CrimeLawSystem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CrimeRecord.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CrimeType.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CrimeSystemNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/CriminalRecord.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/GuardEncounterNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/GuardResponseType.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/JailNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/PickpocketNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/TheftExecutionNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crime/TheftNode.cpp
 )
 
 set(SYSTEM_QUEST_SOURCES
@@ -50,34 +73,32 @@ set(SYSTEM_CRAFTING_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/crafting/CraftingNode.cpp
 )
 
-set(SYSTEM_WORLD_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/LocationNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/RegionNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/TimeNode.cpp
-)
-
 set(SYSTEM_WEATHER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherTypes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherCondition.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/weather/WeatherSystemNode.cpp
 )
 
-set(UTILS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/utils/JSONLoader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/utils/JSONSerializer.cpp
+set(SYSTEM_WORLD_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/LocationNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/RegionNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/world/TimeNode.cpp
 )
+
+
 
 # Combine all source files
 set(SOURCES
     ${CORE_SOURCES}
     ${DATA_SOURCES}
+    ${UTILS_SOURCES}
+    ${SYSTEM_CRIME_SOURCES}
     ${SYSTEM_QUEST_SOURCES}
     ${SYSTEM_DIALOGUE_SOURCES}
     ${SYSTEM_PROGRESSION_SOURCES}
     ${SYSTEM_CRAFTING_SOURCES}
-    ${SYSTEM_WORLD_SOURCES}
     ${SYSTEM_WEATHER_SOURCES}
-    ${UTILS_SOURCES}
+    ${SYSTEM_WORLD_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/main.cpp
 )
 
