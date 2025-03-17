@@ -5,7 +5,7 @@
 
 class Mount;
 struct MountSystemConfig;
-class GameContext;
+struct GameContext;
 struct TAInput;
 struct TAAction;
 

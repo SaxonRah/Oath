@@ -1,4 +1,5 @@
 #include "LocationNode.hpp"
+#included "../crime/CrimeLawContext.hpp"
 
 #include <iostream>
 
@@ -48,6 +49,27 @@ void LocationNode::onEnter(GameContext* context)
     // Update world state
     if (context) {
         context->worldState.setLocationState(locationName, currentState);
+    }
+
+    // Get the crime law context (you might need to design a way to access this)
+    CrimeLawContext* lawContext = getLawContext(); // You'd need a function to access this
+
+    // Check if player is wanted
+    if (lawContext && lawContext->criminalRecord.isWanted(locationName)) {
+        // Determine if guards are present in this location
+        bool guardsPresent = (location.type == "town" || location.type == "city");
+
+        if (guardsPresent) {
+            // Random chance to encounter guards based on bounty amount
+            int bounty = lawContext->criminalRecord.getBounty(locationName);
+            int encounterChance = std::min(80, 20 + (bounty / 100));
+
+            if (rand() % 100 < encounterChance) {
+                // Transition to guard encounter
+                controller->transitionToNode("GuardEncounter");
+                return;
+            }
+        }
     }
 
     // List NPCs

@@ -230,7 +230,7 @@ bool SpellDesign::cast(GameContext* context)
     }
 
     if (!schoolsUsed.empty()) {
-        successChance += (totalSkillBonus / schoolsUsed.size()) * 3;
+        successChance += int((totalSkillBonus / schoolsUsed.size()) * 3);
     }
 
     // Cap success chance

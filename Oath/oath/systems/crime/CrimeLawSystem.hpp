@@ -25,6 +25,8 @@ private:
     PickpocketNode* pickpocketNode;
     std::map<std::string, TheftExecutionNode*> theftExecutionNodes;
 
+    static CrimeLawSystem* instance;
+
 public:
     CrimeLawSystem(TAController* controller);
 
@@ -37,4 +39,14 @@ public:
     void commitCrime(GameContext* context, const std::string& crimeType, int severity, const std::string& region, const std::string& location);
 
     CrimeLawContext* getLawContextFromController();
+
+    static CrimeLawSystem* getInstance()
+    {
+        return instance;
+    }
+
+    CrimeLawContext* getLawContext()
+    {
+        return getLawContextFromController();
+    }
 };

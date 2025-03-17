@@ -4,7 +4,7 @@
 #include <string>
 
 class MountStable;
-class GameContext;
+struct GameContext;
 struct TAInput;
 struct TAAction;
 

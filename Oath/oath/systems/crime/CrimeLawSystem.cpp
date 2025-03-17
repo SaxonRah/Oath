@@ -8,6 +8,7 @@
 CrimeLawSystem::CrimeLawSystem(TAController* controller)
     : controller(controller)
 {
+    instance = this;
     // Make sure config is loaded
     try {
         loadCrimeLawConfig();

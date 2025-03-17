@@ -5,7 +5,7 @@
 #include <vector>
 
 struct MountEquipment;
-class GameContext;
+struct GameContext;
 struct TAInput;
 struct TAAction;
 

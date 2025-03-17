@@ -88,6 +88,9 @@ int main()
     // Hook weather to time system
     hookWeatherToTimeSystem(controller);
 
+    // Initialize the Crime & Law System
+    CrimeLawSystem crimeSystem(&controller);
+
     std::cout << "\n___ GAME DATA LOADED SUCCESSFULLY ___\n"
               << std::endl;
 
@@ -382,6 +385,10 @@ int main()
                 std::cout << "Intelligence: " << controller.gameContext.playerStats.intelligence << std::endl;
                 std::cout << "Wisdom: " << controller.gameContext.playerStats.wisdom << std::endl;
                 std::cout << "Charisma: " << controller.gameContext.playerStats.charisma << std::endl;
+
+                std::cout << "Health: " << controller.gameContext.playerStats.health << std::endl;
+                std::cout << "Mana: " << controller.gameContext.playerStats.mana << std::endl;
+                std::cout << "Stamina: " << controller.gameContext.playerStats.stamina << std::endl;
 
                 std::cout << "\nSkills:" << std::endl;
                 for (const auto& [skill, level] : controller.gameContext.playerStats.skills) {

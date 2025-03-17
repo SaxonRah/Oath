@@ -4,7 +4,6 @@
 #include <set>
 #include <string>
 
-
 // Character stats structure for progression and dialogue systems
 struct CharacterStats {
     int strength = 10;
@@ -13,6 +12,10 @@ struct CharacterStats {
     int intelligence = 10;
     int wisdom = 10;
     int charisma = 10;
+
+    int health = 10;
+    int mana = 10;
+    int stamina = 10;
 
     std::map<std::string, int> skills;
     std::map<std::string, int> factionReputation;

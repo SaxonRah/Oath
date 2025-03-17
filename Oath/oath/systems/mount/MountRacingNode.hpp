@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 
 class Mount;
-class GameContext;
+struct GameContext;
 struct TAInput;
 struct TAAction;
 

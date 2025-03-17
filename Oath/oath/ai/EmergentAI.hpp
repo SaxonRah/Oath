@@ -10,12 +10,10 @@
 #include <string>
 #include <vector>
 
-
 using json = nlohmann::json;
 
 // Forward declarations
-class GameContext;
-class QuestSystem;
+struct GameContext;
 class DialogueSystem;
 class CharacterProgressionSystem;
 class CraftingSystem;
@@ -129,10 +127,10 @@ private:
 /**
  * @brief Context for game systems to interact
  */
-class GameContext {
-public:
-    GameContext();
-    ~GameContext() = default;
+struct FullGameContext {
+    struct GameContext
+    FullGameContext();
+    ~FullGameContext() = default;
 
     // System getters
     QuestSystem* getQuestSystem() { return m_questSystem.get(); }

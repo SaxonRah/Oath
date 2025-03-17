@@ -83,14 +83,16 @@ set(SYSTEM_FACTION_SOURCES
 )
 
 set(SYSTEM_HEALTH_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Symptom.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Immunity.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Disease.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealingMethod.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/DiseaseManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealingMethod.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthNodes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthSetup.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/HealthState.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Immunity.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/NutritionNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/NutritionState.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/oath/systems/health/Symptom.cpp
 )
 
 set(SYSTEM_MOUNT_SOURCES
@@ -180,7 +182,7 @@ set(SOURCES
     ${SYSTEM_CRIME_SOURCES}
     ${SYSTEM_DIALOGUE_SOURCES}
     ${SYSTEM_ECONOMY_SOURCES}
-    ${SYSTEM_FACTION_SOURCES}
+    # ${SYSTEM_FACTION_SOURCES}
     ${SYSTEM_HEALTH_SOURCES}
     ${SYSTEM_MOUNT_SOURCES}
     ${SYSTEM_PROGRESSION_SOURCES}

@@ -2,8 +2,9 @@
 #include "../../core/TAController.hpp"
 #include "DiseaseManager.hpp"
 #include "HealthNodes.hpp"
+#include "NutritionNode.hpp"
+#include "NutritionState.hpp"
 #include <iostream>
-
 
 // Main function to set up the disease and health system
 void setupDiseaseHealthSystem(TAController& controller)
@@ -21,6 +22,10 @@ void setupDiseaseHealthSystem(TAController& controller)
     // Create rest node
     RestNode* restNode = dynamic_cast<RestNode*>(
         controller.createNode<RestNode>("RestNode"));
+
+    // Create nutrition node
+    NutritionNode* nutritionNode = dynamic_cast<NutritionNode*>(
+        controller.createNode<NutritionNode>("NutritionNode"));
 
     // Set up transitions
     healthRoot->addTransition(
@@ -44,6 +49,13 @@ void setupDiseaseHealthSystem(TAController& controller)
     restNode->addTransition(
         [](const TAInput& input) {
             return input.type == "rest_action" && std::get<std::string>(input.parameters.at("action")) == "cancel";
+        },
+        healthRoot, "Back to Health");
+
+    // Add transition from nutrition node back to health
+    nutritionNode->addTransition(
+        [](const TAInput& input) {
+            return input.type == "nutrition_action" && std::get<std::string>(input.parameters.at("action")) == "back";
         },
         healthRoot, "Back to Health");
 
@@ -116,10 +128,25 @@ void setupDiseaseHealthSystem(TAController& controller)
         }
     }
 
+    // Initialize player nutrition state from JSON
+    if (&controller.gameContext.healthContext.playerNutrition) {
+        std::ifstream file("resources/json/nutrition.json");
+        if (file.is_open()) {
+            nlohmann::json j;
+            file >> j;
+            file.close();
+
+            controller.gameContext.healthContext.playerNutrition.initFromJson(j["defaultNutritionState"]);
+        } else {
+            // Use default values if file can't be loaded
+            controller.gameContext.healthContext.playerNutrition = NutritionState();
+        }
+    }
+
     // Add disease manager to game context
     controller.gameContext.diseaseManager = diseaseManager;
 
-    std::cout << "Disease and Health System initialized with "
+    std::cout << "Disease, Health, and Nutrition System initialized with "
               << diseaseManager.diseases.size() << " diseases and "
               << diseaseManager.healingMethods.size() << " healing methods." << std::endl;
 }

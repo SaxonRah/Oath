@@ -5,13 +5,12 @@
 #include <string>
 #include <vector>
 
-
 class Mount;
 class MountStable;
 struct MountBreed;
 struct MountEquipment;
 struct MountSystemConfig;
-class GameContext;
+struct GameContext;
 struct TAInput;
 struct TAAction;
 

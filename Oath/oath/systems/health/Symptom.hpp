@@ -8,6 +8,8 @@
 
 #include "../../data/GameContext.hpp"
 
+struct GameContext;
+
 // Enum for Symptom Severity
 enum class SymptomSeverity {
     NONE,

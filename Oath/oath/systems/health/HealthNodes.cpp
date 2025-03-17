@@ -1,8 +1,10 @@
 // /oath/systems/health/HealthNodes.cpp
 #include "HealthNodes.hpp"
+#include "../../data/GameContext.hpp"
 #include "DiseaseManager.hpp"
 #include "HealthState.hpp"
 #include <iostream>
+
 
 // HealthStateNode implementation
 HealthStateNode::HealthStateNode(const std::string& name)
@@ -87,6 +89,12 @@ std::vector<TAAction> HealthStateNode::getAvailableActions()
     actions.push_back({ "rest", "Rest to Recover",
         []() -> TAInput {
             return { "health_action", { { "action", std::string("rest") } } };
+        } });
+
+    // Add nutrition action
+    actions.push_back({ "nutrition", "Eat & Drink",
+        []() -> TAInput {
+            return { "health_action", { { "action", std::string("nutrition") } } };
         } });
 
     return actions;
@@ -486,23 +494,43 @@ void RestNode::applyRest(int hours, GameContext* context)
 
     HealthState* health = getHealthState(context);
     DiseaseManager* manager = getDiseaseManager(context);
+    NutritionState* nutrition = &context->healthContext.playerNutrition;
 
-    if (!health || !manager)
+    if (!health || !manager || !nutrition)
         return;
 
     // Calculate how many game hours have passed
     int gameHours = hours;
 
+    // Update nutrition based on time passed
+    nutrition->update(static_cast<float>(gameHours));
+
+    // Apply nutrition effects (could affect healing rates)
+    nutrition->applyEffects(context);
+
     // Update health based on the rest duration
     float healthRecovery = health->naturalHealRate * gameHours;
     float staminaRecovery = (health->maxStamina * 0.1f) * gameHours;
 
-    // Reduce recovery if sick
+    // Reduce recovery if sick or hungry/thirsty
+    float recoveryModifier = 1.0f;
+
+    // Check for sickness
     if (!health->activeDiseaseDays.empty()) {
-        float sicknessFactor = 0.5f; // Recover at 50% rate when sick
-        healthRecovery *= sicknessFactor;
-        staminaRecovery *= sicknessFactor;
+        recoveryModifier *= 0.5f; // Recover at 50% rate when sick
     }
+
+    // Check for hunger/thirst effects
+    if (nutrition->getHungerLevel() == NutritionLevel::STARVING || nutrition->getHungerLevel() == NutritionLevel::CRITICAL) {
+        recoveryModifier *= 0.7f; // Starving reduces recovery
+    }
+
+    if (nutrition->getThirstLevel() == HydrationLevel::DEHYDRATED || nutrition->getThirstLevel() == HydrationLevel::CRITICAL) {
+        recoveryModifier *= 0.6f; // Dehydration severely reduces recovery
+    }
+
+    healthRecovery *= recoveryModifier;
+    staminaRecovery *= recoveryModifier;
 
     health->heal(healthRecovery);
     health->restoreStamina(staminaRecovery);
@@ -518,11 +546,23 @@ void RestNode::applyRest(int hours, GameContext* context)
 
         // Update diseases
         manager->updateDiseases(context, context->worldState.daysPassed);
+
+        // For each day, apply a full day's worth of nutrition updates
+        nutrition->update(24.0f);
+    }
+
+    // Apply leftover hours
+    if (hoursLeftover > 0) {
+        nutrition->update(static_cast<float>(hoursLeftover));
     }
 
     // Show the results
     std::cout << "You rested for " << hours << " hours." << std::endl;
     std::cout << "Recovered " << healthRecovery << " health and " << staminaRecovery << " stamina." << std::endl;
+
+    // Show nutrition status changes
+    std::cout << "Hunger: " << nutrition->hunger << "/100 (" << nutrition->getHungerLevelString() << ")" << std::endl;
+    std::cout << "Thirst: " << nutrition->thirst << "/100 (" << nutrition->getThirstLevelString() << ")" << std::endl;
 
     if (daysPassed > 0) {
         std::cout << daysPassed << " days have passed." << std::endl;
@@ -590,6 +630,21 @@ void EpidemicNode::onEnter(GameContext* context)
 
     if (!context)
         return;
+
+    HealthState* health = getHealthState(context);
+    if (!health)
+        return;
+
+    std::cout << "==== Health Status ====" << std::endl;
+    std::cout << "Health: " << health->currentHealth << "/" << health->maxHealth << std::endl;
+    std::cout << "Stamina: " << health->stamina << "/" << health->maxStamina << std::endl;
+
+    // Add nutrition status
+    NutritionState* nutrition = &context->healthContext.playerNutrition;
+    if (nutrition) {
+        std::cout << "Hunger: " << nutrition->hunger << "/100 (" << nutrition->getHungerLevelString() << ")" << std::endl;
+        std::cout << "Thirst: " << nutrition->thirst << "/100 (" << nutrition->getThirstLevelString() << ")" << std::endl;
+    }
 
     DiseaseManager* manager = getDiseaseManager(context);
     if (!manager)
