@@ -1,5 +1,5 @@
 #include "LocationNode.hpp"
-#included "../crime/CrimeLawContext.hpp"
+// #include "../crime/CrimeLawContext.hpp"
 
 #include <iostream>
 
@@ -51,6 +51,7 @@ void LocationNode::onEnter(GameContext* context)
         context->worldState.setLocationState(locationName, currentState);
     }
 
+    /*
     // Get the crime law context (you might need to design a way to access this)
     CrimeLawContext* lawContext = getLawContext(); // You'd need a function to access this
 
@@ -71,6 +72,7 @@ void LocationNode::onEnter(GameContext* context)
             }
         }
     }
+    */
 
     // List NPCs
     if (!npcs.empty()) {

@@ -4,29 +4,29 @@
 #include "Inventory.hpp"
 #include "WorldState.hpp"
 
-#include "../core/TAController.hpp"
-#include "../systems/health/DiseaseManager.hpp"
-#include "../systems/health/HealthContext.hpp"
+// #include "../core/TAController.hpp"
+// #include "../systems/health/DiseaseManager.hpp"
+// #include "../systems/health/HealthContext.hpp"
 
 #include <map>
 #include <string>
 
-class TAController;
+// class TAController;
 struct CharacterStats;
 class Inventory;
 
-struct HealthContext;
-struct DiseaseManager;
+// struct HealthContext;
+// class DiseaseManager;
 struct WorldState;
 
 // Context for all systems
 struct GameContext {
-    TAController controller;
+    // TAController controller;
     CharacterStats playerStats;
     Inventory playerInventory;
 
-    HealthContext healthContext;
-    DiseaseManager diseaseManager;
+    // HealthContext healthContext;
+    // DiseaseManager diseaseManager;
 
     WorldState worldState;
 

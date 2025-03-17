@@ -7,6 +7,7 @@
 #include "systems/dialogue/NPC.hpp"
 #include "systems/progression/SkillNode.hpp"
 #include "systems/quest/QuestNode.hpp"
+#include "systems/weather/WeatherSystemNode.hpp"
 #include "systems/world/TimeNode.hpp"
 #include "utils/JSONLoader.hpp"
 
@@ -15,6 +16,57 @@
 #include <iostream>
 #include <memory>
 #include <string>
+
+#include "core/TAController.hpp"
+#include "systems/crime/CrimeLawSystem.hpp"
+#include <iostream>
+
+/* ------------------------------------------- Initialize the Crime & Law System
+int main() {
+    try {
+        // Initialize main controller
+        TAController controller;
+        
+        // Initialize existing systems
+        // ... other system initializations ...
+        
+        // Initialize the Crime & Law System
+        CrimeLawSystem crimeSystem(&controller);
+        
+        // Register all systems with the controller (if not done in constructors)
+        // ...
+        
+        std::cout << "All systems initialized successfully." << std::endl;
+        
+        // Start the game loop
+        while (true) {
+            // Process player input
+            std::string input;
+            std::cout << "> ";
+            std::getline(std::cin, input);
+            
+            if (input == "quit" || input == "exit") {
+                break;
+            }
+            
+            // Parse input into TAInput structure
+            TAInput gameInput = parseInput(input);  // You'd have your own input parser
+            
+            // Process the input through the controller
+            controller.processInput(gameInput.type, gameInput);
+            
+            // Update game state
+            // ...
+        }
+        
+        return 0;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+}
+*/
 
 int main()
 {
@@ -29,6 +81,15 @@ int main()
         std::cerr << "Failed to load game data. Exiting." << std::endl;
         return 1;
     }
+
+    // Initialize weather system
+    initializeWeatherSystem(controller);
+
+    // Hook weather to time system
+    hookWeatherToTimeSystem(controller);
+
+    // Initialize the Crime & Law System
+    CrimeLawSystem crimeSystem(&controller);
 
     std::cout << "\n___ GAME DATA LOADED SUCCESSFULLY ___\n"
               << std::endl;
@@ -324,6 +385,10 @@ int main()
                 std::cout << "Intelligence: " << controller.gameContext.playerStats.intelligence << std::endl;
                 std::cout << "Wisdom: " << controller.gameContext.playerStats.wisdom << std::endl;
                 std::cout << "Charisma: " << controller.gameContext.playerStats.charisma << std::endl;
+
+                std::cout << "Health: " << controller.gameContext.playerStats.health << std::endl;
+                std::cout << "Mana: " << controller.gameContext.playerStats.mana << std::endl;
+                std::cout << "Stamina: " << controller.gameContext.playerStats.stamina << std::endl;
 
                 std::cout << "\nSkills:" << std::endl;
                 for (const auto& [skill, level] : controller.gameContext.playerStats.skills) {
