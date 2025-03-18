@@ -1,5 +1,6 @@
 #include <ctime>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <random>
@@ -965,6 +966,10 @@ int main()
     // Craft a spell
     game.processAction("craft_spell", { { "type", 0 }, { "power", 5 }, { "complexity", 3 } });
     game.update();
+
+    // Add this pause before exiting
+    std::cout << "\nPress Enter to exit...";
+    std::cin.get();
 
     return 0;
 }
