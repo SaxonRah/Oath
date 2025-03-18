@@ -1,0 +1,108 @@
+{
+    "diseases": [
+        {
+            "id": "plague",
+            "name": "Plague",
+            "incubationPeriod": 3,
+            "naturalDuration": 14,
+            "contagiousness": 0.5,
+            "regions": [
+                "city",
+                "village"
+            ],
+            "vectors": [
+                "air",
+                "contact"
+            ],
+            "symptoms": [
+                {
+                    "name": "fever",
+                    "severity": 2,
+                    "healthDamage": 1
+                },
+                {
+                    "name": "cough",
+                    "severity": 1,
+                    "healthDamage": 0.5
+                }
+            ]
+        },
+        {
+            "id": "fever",
+            "name": "Mountain Fever",
+            "incubationPeriod": 1,
+            "naturalDuration": 7,
+            "contagiousness": 0.2,
+            "regions": [
+                "mountains"
+            ],
+            "vectors": [
+                "air"
+            ],
+            "symptoms": [
+                {
+                    "name": "fever",
+                    "severity": 3,
+                    "healthDamage": 2
+                },
+                {
+                    "name": "weakness",
+                    "severity": 2,
+                    "healthDamage": 1
+                }
+            ]
+        },
+        {
+            "id": "cough",
+            "name": "Forest Cough",
+            "incubationPeriod": 2,
+            "naturalDuration": 5,
+            "contagiousness": 0.3,
+            "regions": [
+                "forest"
+            ],
+            "vectors": [
+                "air"
+            ],
+            "symptoms": [
+                {
+                    "name": "cough",
+                    "severity": 2,
+                    "healthDamage": 0.5
+                }
+            ]
+        }
+    ],
+    "treatments": [
+        {
+            "id": "herbal_remedy",
+            "effectiveness": {
+                "cough": 0.8,
+                "fever": 0.5,
+                "plague": 0.2
+            },
+            "requiredItem": "healing_herbs",
+            "requiredAmount": 1
+        },
+        {
+            "id": "potion",
+            "effectiveness": {
+                "cough": 0.9,
+                "fever": 0.8,
+                "plague": 0.6
+            },
+            "requiredItem": "healing_potion",
+            "requiredAmount": 1
+        }
+    ],
+    "healingRates": {
+        "rest": 5.0,
+        "food": 1.0,
+        "potion": 20.0
+    },
+    "immunityDuration": {
+        "plague": 180,
+        "fever": 120,
+        "cough": 90
+    }
+}

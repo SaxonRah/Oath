@@ -1,0 +1,142 @@
+{
+    "markets": [
+        {
+            "id": "city_market",
+            "name": "City Central Market",
+            "type": "GENERAL",
+            "region": "city",
+            "wealthLevel": 1.2,
+            "taxRate": 0.08,
+            "isPrimaryMarket": true,
+            "restockDays": 7,
+            "commodities": [
+                "food",
+                "cloth",
+                "weapons",
+                "jewelry"
+            ]
+        },
+        {
+            "id": "village_market",
+            "name": "Village Square",
+            "type": "GENERAL",
+            "region": "village",
+            "wealthLevel": 0.8,
+            "taxRate": 0.05,
+            "isPrimaryMarket": true,
+            "restockDays": 14,
+            "commodities": [
+                "food",
+                "tools",
+                "cloth"
+            ]
+        }
+    ],
+    "commodities": [
+        {
+            "id": "food",
+            "name": "Food Supplies",
+            "basePrice": 10.0,
+            "supply": 100,
+            "demand": 100,
+            "baseSupply": 100,
+            "baseDemand": 100,
+            "origin": "village",
+            "isLuxury": false,
+            "volatility": 0.2
+        },
+        {
+            "id": "weapons",
+            "name": "Weapons",
+            "basePrice": 50.0,
+            "supply": 50,
+            "demand": 50,
+            "baseSupply": 50,
+            "baseDemand": 50,
+            "origin": "city",
+            "isLuxury": false,
+            "volatility": 0.1
+        },
+        {
+            "id": "cloth",
+            "name": "Cloth Goods",
+            "basePrice": 15.0,
+            "supply": 80,
+            "demand": 80,
+            "baseSupply": 80,
+            "baseDemand": 80,
+            "origin": "village",
+            "isLuxury": false,
+            "volatility": 0.15
+        },
+        {
+            "id": "jewelry",
+            "name": "Jewelry",
+            "basePrice": 100.0,
+            "supply": 20,
+            "demand": 20,
+            "baseSupply": 20,
+            "baseDemand": 20,
+            "origin": "city",
+            "isLuxury": true,
+            "volatility": 0.25
+        }
+    ],
+    "properties": [
+        {
+            "id": "small_house",
+            "name": "Small House",
+            "region": "village",
+            "cost": 500,
+            "income": 5,
+            "upkeep": 1
+        },
+        {
+            "id": "city_apartment",
+            "name": "City Apartment",
+            "region": "city",
+            "cost": 1000,
+            "income": 10,
+            "upkeep": 3
+        },
+        {
+            "id": "shop",
+            "name": "Small Shop",
+            "region": "city",
+            "cost": 2000,
+            "income": 20,
+            "upkeep": 5
+        }
+    ],
+    "investmentTypes": [
+        {
+            "id": "shop",
+            "name": "Retail Shop",
+            "baseReturn": 0.03,
+            "risk": 0.2,
+            "regionModifiers": {
+                "city": 1.2,
+                "village": 0.8
+            }
+        },
+        {
+            "id": "mine",
+            "name": "Mining Operation",
+            "baseReturn": 0.05,
+            "risk": 0.4,
+            "regionModifiers": {
+                "mountains": 1.5
+            }
+        },
+        {
+            "id": "farm",
+            "name": "Farm",
+            "baseReturn": 0.02,
+            "risk": 0.1,
+            "regionModifiers": {
+                "village": 1.3,
+                "forest": 0.9
+            }
+        }
+    ]
+}

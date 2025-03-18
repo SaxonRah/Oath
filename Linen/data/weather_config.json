@@ -1,0 +1,70 @@
+{
+    "weatherTypes": [
+        "clear",
+        "cloudy",
+        "rainy",
+        "stormy",
+        "snowy",
+        "foggy"
+    ],
+    "regionWeatherModifiers": {
+        "mountains": {
+            "snowy": 2.0,
+            "stormy": 1.5,
+            "clear": 0.5
+        },
+        "desert": {
+            "clear": 2.0,
+            "cloudy": 0.5,
+            "rainy": 0.2
+        },
+        "forest": {
+            "foggy": 1.5,
+            "rainy": 1.2
+        },
+        "swamp": {
+            "foggy": 2.0,
+            "rainy": 1.5
+        }
+    },
+    "weatherStatEffects": {
+        "stormy": {
+            "visibility": -2,
+            "rangedAccuracy": -15
+        },
+        "snowy": {
+            "mobility": -2,
+            "stamina_drain": 1.5
+        },
+        "foggy": {
+            "visibility": -3,
+            "stealth": 2
+        }
+    },
+    "seasonWeatherChances": {
+        "spring": {
+            "rainy": 0.4,
+            "cloudy": 0.3,
+            "clear": 0.2,
+            "foggy": 0.1
+        },
+        "summer": {
+            "clear": 0.5,
+            "cloudy": 0.2,
+            "stormy": 0.2,
+            "rainy": 0.1
+        },
+        "autumn": {
+            "cloudy": 0.4,
+            "rainy": 0.3,
+            "foggy": 0.2,
+            "clear": 0.1
+        },
+        "winter": {
+            "snowy": 0.4,
+            "cloudy": 0.3,
+            "clear": 0.2,
+            "foggy": 0.1
+        }
+    }
+}

@@ -1,0 +1,73 @@
+{
+    "crimeTypes": [
+        {
+            "id": "theft",
+            "baseDetectionChance": 30,
+            "severityRange": [
+                5,
+                20
+            ]
+        },
+        {
+            "id": "assault",
+            "baseDetectionChance": 40,
+            "severityRange": [
+                15,
+                30
+            ]
+        },
+        {
+            "id": "murder",
+            "baseDetectionChance": 60,
+            "severityRange": [
+                40,
+                80
+            ]
+        },
+        {
+            "id": "trespassing",
+            "baseDetectionChance": 25,
+            "severityRange": [
+                5,
+                15
+            ]
+        },
+        {
+            "id": "vandalism",
+            "baseDetectionChance": 35,
+            "severityRange": [
+                10,
+                20
+            ]
+        }
+    ],
+    "regionSecurityModifiers": {
+        "city": 1.5,
+        "village": 1.2,
+        "mountains": 0.6,
+        "forest": 0.7,
+        "wilderness": 0.4
+    },
+    "timeSecurityModifiers": {
+        "morning": 1.0,
+        "afternoon": 1.0,
+        "evening": 0.8,
+        "night": 0.5
+    },
+    "factionBountyResponses": {
+        "city_guard": {
+            "arrest_threshold": 50,
+            "attack_threshold": 100
+        },
+        "nobles": {
+            "arrest_threshold": 40,
+            "attack_threshold": 80
+        },
+        "thieves": {
+            "arrest_threshold": 100,
+            "attack_threshold": 150
+        }
+    },
+    "bountyDecayRate": 0.1,
+    "stealthSkillDetectionReduction": 2.0
+}
