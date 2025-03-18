@@ -29,16 +29,7 @@ GameContext::GameContext()
     worldState.setLocationState("village", "current");
 }
 
-// Implementation of template method
-template <typename T>
-T* GameContext::getSystem()
-{
-    if (!systemManager)
-        return nullptr;
-    return dynamic_cast<T*>(systemManager->getPlugin(T::SystemName));
-}
-
-std::string WorldState::getCurrentRegion() const
+std::string GameContext::getCurrentRegion() const
 {
     for (const auto& [location, state] : locationStates) {
         if (state == "current") {
@@ -48,7 +39,7 @@ std::string WorldState::getCurrentRegion() const
     return "unknown";
 }
 
-int WorldState::getTimeOfDay() const
+int GameContext::getTimeOfDay() const
 {
     return (daysPassed * 24) % 24; // Simple time calculation
 }

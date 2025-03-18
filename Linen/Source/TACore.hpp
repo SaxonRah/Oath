@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Include/nlohmann/json.hpp>
 #include <functional>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
@@ -20,6 +20,26 @@ public:
 
 private:
     std::string id_;
+};
+
+// Input structure for transitions
+struct TAInput {
+    std::string type;
+    std::map<std::string, std::variant<int, float, std::string, bool>> parameters;
+};
+
+// Action structure for user interface
+struct TAAction {
+    std::string id;
+    std::string description;
+    std::function<TAInput()> inputGenerator;
+};
+
+// Transition rule structure
+struct TATransitionRule {
+    std::function<bool(const TAInput&)> condition;
+    TANode* targetNode;
+    std::string description;
 };
 
 // Tree Automata Node - the foundation of our entire system
@@ -55,24 +75,4 @@ protected:
     NodeID id_;
     std::string nodeName;
     std::vector<TANode*> children_;
-};
-
-// Input structure for transitions
-struct TAInput {
-    std::string type;
-    std::map<std::string, std::variant<int, float, std::string, bool>> parameters;
-};
-
-// Action structure for user interface
-struct TAAction {
-    std::string id;
-    std::string description;
-    std::function<TAInput()> inputGenerator;
-};
-
-// Transition rule structure
-struct TATransitionRule {
-    std::function<bool(const TAInput&)> condition;
-    TANode* targetNode;
-    std::string description;
 };

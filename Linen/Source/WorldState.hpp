@@ -3,8 +3,6 @@
 #include <map>
 #include <string>
 
-namespace oath {
-
 // WorldState holds data about the game world
 class WorldState {
 public:
@@ -115,5 +113,3 @@ public:
             return "night";
     }
 };
-
-} // namespace oath

@@ -6,9 +6,6 @@
 #include <string>
 #include <vector>
 
-
-namespace oath {
-
 // Base Node ID class for all nodes in the system
 class NodeID {
 public:
@@ -136,628 +133,628 @@ protected:
 
 // Utility functions for random number generation
 namespace utils {
-    std::mt19937 rng(std::time(nullptr));
+std::mt19937 rng(std::time(nullptr));
 
-    int randomInt(int min, int max)
-    {
-        std::uniform_int_distribution<int> dist(min, max);
-        return dist(rng);
-    }
+int randomInt(int min, int max)
+{
+    std::uniform_int_distribution<int> dist(min, max);
+    return dist(rng);
+}
 
-    bool randomChance(double probability)
-    {
-        std::uniform_real_distribution<double> dist(0.0, 1.0);
-        return dist(rng) < probability;
-    }
+bool randomChance(double probability)
+{
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(rng) < probability;
+}
 }
 
 // Core modules for each system
 namespace systems {
 
-    // Weather system
-    class WeatherSystemNode : public SystemNode {
-    public:
-        WeatherSystemNode()
-            : SystemNode(NodeID("weather_system"))
-        {
+// Weather system
+class WeatherSystemNode : public SystemNode {
+public:
+    WeatherSystemNode()
+        : SystemNode(NodeID("weather_system"))
+    {
+    }
+
+protected:
+    void processSystem(WorldState* state) override
+    {
+        // Determine weather based on region and time
+        std::vector<std::string> weatherTypes = { "clear", "cloudy", "rainy", "stormy", "snowy" };
+        double seasonFactor = (state->time % 4) / 4.0; // Simple season calculation
+        int weatherIndex = utils::randomInt(0, 4);
+
+        // Region-specific adjustments
+        if (state->currentRegion == "mountains") {
+            weatherIndex = std::min(4, weatherIndex + 1); // More snow in mountains
+        } else if (state->currentRegion == "desert") {
+            weatherIndex = std::max(0, weatherIndex - 2); // More clear in desert
         }
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            // Determine weather based on region and time
-            std::vector<std::string> weatherTypes = { "clear", "cloudy", "rainy", "stormy", "snowy" };
-            double seasonFactor = (state->time % 4) / 4.0; // Simple season calculation
-            int weatherIndex = utils::randomInt(0, 4);
+        state->currentWeather = weatherTypes[weatherIndex];
 
-            // Region-specific adjustments
-            if (state->currentRegion == "mountains") {
-                weatherIndex = std::min(4, weatherIndex + 1); // More snow in mountains
-            } else if (state->currentRegion == "desert") {
-                weatherIndex = std::max(0, weatherIndex - 2); // More clear in desert
+        // Weather effects on player stats
+        if (state->currentWeather == "stormy") {
+            state->playerStats["visibility"] = std::max(0, state->playerStats["visibility"] - 2);
+        } else if (state->currentWeather == "snowy") {
+            state->playerStats["mobility"] = std::max(0, state->playerStats["mobility"] - 2);
+        }
+    }
+};
+
+// Crime system
+class CrimeSystemNode : public SystemNode {
+public:
+    CrimeSystemNode()
+        : SystemNode(NodeID("crime_system"))
+    {
+    }
+
+protected:
+    void processSystem(WorldState* state) override
+    {
+        // Process crime detection and bounty accumulation
+        if (state->playerStats.find("lastCrime") != state->playerStats.end()) {
+            int witnessChance = 30;
+
+            // Adjust witness chance based on region
+            if (state->currentRegion == "city")
+                witnessChance += 30;
+            else if (state->currentRegion == "wilderness")
+                witnessChance -= 20;
+
+            // Adjust based on time (night = lower chance)
+            if (state->time % 24 >= 22 || state->time % 24 <= 5)
+                witnessChance -= 15;
+
+            if (utils::randomChance(witnessChance / 100.0)) {
+                state->bounty += state->playerStats["lastCrime"];
             }
-
-            state->currentWeather = weatherTypes[weatherIndex];
-
-            // Weather effects on player stats
-            if (state->currentWeather == "stormy") {
-                state->playerStats["visibility"] = std::max(0, state->playerStats["visibility"] - 2);
-            } else if (state->currentWeather == "snowy") {
-                state->playerStats["mobility"] = std::max(0, state->playerStats["mobility"] - 2);
-            }
-        }
-    };
-
-    // Crime system
-    class CrimeSystemNode : public SystemNode {
-    public:
-        CrimeSystemNode()
-            : SystemNode(NodeID("crime_system"))
-        {
+            state->playerStats.erase("lastCrime");
         }
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            // Process crime detection and bounty accumulation
-            if (state->playerStats.find("lastCrime") != state->playerStats.end()) {
-                int witnessChance = 30;
-
-                // Adjust witness chance based on region
-                if (state->currentRegion == "city")
-                    witnessChance += 30;
-                else if (state->currentRegion == "wilderness")
-                    witnessChance -= 20;
-
-                // Adjust based on time (night = lower chance)
-                if (state->time % 24 >= 22 || state->time % 24 <= 5)
-                    witnessChance -= 15;
-
-                if (utils::randomChance(witnessChance / 100.0)) {
-                    state->bounty += state->playerStats["lastCrime"];
+        // Handle guard encounters based on bounty
+        if (state->bounty > 0 && state->currentRegion != "wilderness") {
+            double encounterChance = 0.05 * state->bounty;
+            if (utils::randomChance(std::min(0.8, encounterChance))) {
+                // Guard encounter logic would go here
+                // Option to pay bounty, resist arrest, flee, etc.
+                if (state->playerStats.find("resist") != state->playerStats.end()) {
+                    // Combat with guards
+                    state->bounty += 10; // Additional bounty for resisting
+                } else if (state->playerStats.find("pay") != state->playerStats.end()) {
+                    // Pay bounty
+                    state->playerStats["gold"] -= state->bounty;
+                    state->bounty = 0;
                 }
-                state->playerStats.erase("lastCrime");
-            }
-
-            // Handle guard encounters based on bounty
-            if (state->bounty > 0 && state->currentRegion != "wilderness") {
-                double encounterChance = 0.05 * state->bounty;
-                if (utils::randomChance(std::min(0.8, encounterChance))) {
-                    // Guard encounter logic would go here
-                    // Option to pay bounty, resist arrest, flee, etc.
-                    if (state->playerStats.find("resist") != state->playerStats.end()) {
-                        // Combat with guards
-                        state->bounty += 10; // Additional bounty for resisting
-                    } else if (state->playerStats.find("pay") != state->playerStats.end()) {
-                        // Pay bounty
-                        state->playerStats["gold"] -= state->bounty;
-                        state->bounty = 0;
-                    }
-                }
             }
         }
-    };
+    }
+};
 
-    // Health and disease system
-    class HealthSystemNode : public SystemNode {
-    public:
-        HealthSystemNode()
-            : SystemNode(NodeID("health_system"))
-        {
-        }
+// Health and disease system
+class HealthSystemNode : public SystemNode {
+public:
+    HealthSystemNode()
+        : SystemNode(NodeID("health_system"))
+    {
+    }
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            // Process active diseases
-            for (auto it = state->diseases.begin(); it != state->diseases.end();) {
-                // Disease progression
-                std::string disease = *it;
-                int severity = state->getStat("disease", disease);
+protected:
+    void processSystem(WorldState* state) override
+    {
+        // Process active diseases
+        for (auto it = state->diseases.begin(); it != state->diseases.end();) {
+            // Disease progression
+            std::string disease = *it;
+            int severity = state->getStat("disease", disease);
 
-                // Disease progresses if untreated
-                if (state->playerStats.find("treated_" + disease) == state->playerStats.end()) {
-                    state->setStat("disease", disease, severity + 1);
+            // Disease progresses if untreated
+            if (state->playerStats.find("treated_" + disease) == state->playerStats.end()) {
+                state->setStat("disease", disease, severity + 1);
 
-                    // Apply disease effects
-                    state->playerStats["health"] = std::max(0, state->playerStats["health"] - (severity / 10));
+                // Apply disease effects
+                state->playerStats["health"] = std::max(0, state->playerStats["health"] - (severity / 10));
 
-                    // Disease can be cured if treated or immunity develops
-                    if (utils::randomChance(0.1) || severity > 100) {
-                        // Develop immunity
-                        state->playerStats["immune_" + disease] = 1;
-                        it = state->diseases.erase(it);
-                    } else {
-                        ++it;
-                    }
+                // Disease can be cured if treated or immunity develops
+                if (utils::randomChance(0.1) || severity > 100) {
+                    // Develop immunity
+                    state->playerStats["immune_" + disease] = 1;
+                    it = state->diseases.erase(it);
                 } else {
-                    // Treatment helps recovery
-                    state->setStat("disease", disease, severity - 2);
-                    if (severity <= 0) {
-                        it = state->diseases.erase(it);
-                    } else {
-                        ++it;
-                    }
+                    ++it;
                 }
-            }
-
-            // Chance of contracting new diseases based on region
-            double diseaseChance = 0.01;
-            if (state->currentRegion == "swamp")
-                diseaseChance *= 3;
-            if (state->currentWeather == "rainy")
-                diseaseChance *= 1.5;
-
-            if (utils::randomChance(diseaseChance)) {
-                std::vector<std::string> possibleDiseases = { "plague", "fever", "cough" };
-                std::string newDisease = possibleDiseases[utils::randomInt(0, possibleDiseases.size() - 1)];
-
-                // Check for immunity
-                if (state->playerStats.find("immune_" + newDisease) == state->playerStats.end()) {
-                    state->diseases.push_back(newDisease);
-                    state->setStat("disease", newDisease, 1); // Initial severity
+            } else {
+                // Treatment helps recovery
+                state->setStat("disease", disease, severity - 2);
+                if (severity <= 0) {
+                    it = state->diseases.erase(it);
+                } else {
+                    ++it;
                 }
             }
         }
-    };
 
-    // Economy system
-    class EconomySystemNode : public SystemNode {
-    public:
-        EconomySystemNode()
-            : SystemNode(NodeID("economy_system"))
-        {
-        }
+        // Chance of contracting new diseases based on region
+        double diseaseChance = 0.01;
+        if (state->currentRegion == "swamp")
+            diseaseChance *= 3;
+        if (state->currentWeather == "rainy")
+            diseaseChance *= 1.5;
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            // Update market prices based on region and events
-            std::vector<std::string> goods = { "food", "weapons", "cloth", "medicine" };
+        if (utils::randomChance(diseaseChance)) {
+            std::vector<std::string> possibleDiseases = { "plague", "fever", "cough" };
+            std::string newDisease = possibleDiseases[utils::randomInt(0, possibleDiseases.size() - 1)];
 
-            for (const auto& good : goods) {
-                // Base price adjustment
-                double basePrice = 10.0;
-                double priceMultiplier = 1.0;
-
-                // Region-specific price adjustments
-                if (state->currentRegion == "city") {
-                    if (good == "food")
-                        priceMultiplier *= 1.2;
-                    if (good == "cloth")
-                        priceMultiplier *= 0.8;
-                } else if (state->currentRegion == "village") {
-                    if (good == "food")
-                        priceMultiplier *= 0.8;
-                    if (good == "weapons")
-                        priceMultiplier *= 1.3;
-                }
-
-                // Weather effects on economy
-                if (state->currentWeather == "stormy" && good == "food") {
-                    priceMultiplier *= 1.4; // Food more expensive during storms
-                }
-
-                // Random fluctuations
-                priceMultiplier *= (0.9 + utils::randomInt(0, 20) / 100.0);
-
-                // Store the price in the economy factors
-                state->economyFactors[good + "_price"] = basePrice * priceMultiplier;
-            }
-
-            // Process property income if player owns property
-            if (state->playerStats.find("owns_property") != state->playerStats.end()) {
-                int propertyIncome = 5 * state->playerStats["property_level"];
-                state->playerStats["gold"] += propertyIncome;
-            }
-
-            // Process investments
-            for (auto it = state->playerStats.begin(); it != state->playerStats.end(); ++it) {
-                if (it->first.find("invest_") == 0) {
-                    std::string business = it->first.substr(7);
-                    double returnRate = 0.03; // 3% return
-
-                    // Better returns for certain businesses in certain regions
-                    if (business == "mining" && state->currentRegion == "mountains") {
-                        returnRate *= 1.5;
-                    }
-
-                    int investmentReturn = static_cast<int>(it->second * returnRate);
-                    state->playerStats["gold"] += investmentReturn;
-                }
+            // Check for immunity
+            if (state->playerStats.find("immune_" + newDisease) == state->playerStats.end()) {
+                state->diseases.push_back(newDisease);
+                state->setStat("disease", newDisease, 1); // Initial severity
             }
         }
-    };
+    }
+};
 
-    // Faction system
-    class FactionSystemNode : public SystemNode {
-    public:
-        FactionSystemNode()
-            : SystemNode(NodeID("faction_system"))
-        {
+// Economy system
+class EconomySystemNode : public SystemNode {
+public:
+    EconomySystemNode()
+        : SystemNode(NodeID("economy_system"))
+    {
+    }
+
+protected:
+    void processSystem(WorldState* state) override
+    {
+        // Update market prices based on region and events
+        std::vector<std::string> goods = { "food", "weapons", "cloth", "medicine" };
+
+        for (const auto& good : goods) {
+            // Base price adjustment
+            double basePrice = 10.0;
+            double priceMultiplier = 1.0;
+
+            // Region-specific price adjustments
+            if (state->currentRegion == "city") {
+                if (good == "food")
+                    priceMultiplier *= 1.2;
+                if (good == "cloth")
+                    priceMultiplier *= 0.8;
+            } else if (state->currentRegion == "village") {
+                if (good == "food")
+                    priceMultiplier *= 0.8;
+                if (good == "weapons")
+                    priceMultiplier *= 1.3;
+            }
+
+            // Weather effects on economy
+            if (state->currentWeather == "stormy" && good == "food") {
+                priceMultiplier *= 1.4; // Food more expensive during storms
+            }
+
+            // Random fluctuations
+            priceMultiplier *= (0.9 + utils::randomInt(0, 20) / 100.0);
+
+            // Store the price in the economy factors
+            state->economyFactors[good + "_price"] = basePrice * priceMultiplier;
         }
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            std::vector<std::string> factions = { "traders", "nobles", "thieves", "mages" };
+        // Process property income if player owns property
+        if (state->playerStats.find("owns_property") != state->playerStats.end()) {
+            int propertyIncome = 5 * state->playerStats["property_level"];
+            state->playerStats["gold"] += propertyIncome;
+        }
 
-            // Process faction relations over time
-            for (const auto& faction : factions) {
-                int relation = state->getStat("faction", faction);
+        // Process investments
+        for (auto it = state->playerStats.begin(); it != state->playerStats.end(); ++it) {
+            if (it->first.find("invest_") == 0) {
+                std::string business = it->first.substr(7);
+                double returnRate = 0.03; // 3% return
 
-                // Factions have relationships with each other
-                for (const auto& otherFaction : factions) {
-                    if (faction != otherFaction) {
-                        // Rival factions
-                        if ((faction == "nobles" && otherFaction == "thieves") || (faction == "thieves" && otherFaction == "nobles") || (faction == "traders" && otherFaction == "mages")) {
-
-                            // If player helps one faction, the rival faction relation decreases
-                            if (state->playerStats.find("helped_" + faction) != state->playerStats.end()) {
-                                state->setStat("faction", otherFaction, relation - 1);
-                                state->playerStats.erase("helped_" + faction);
-                            }
-                        }
-                    }
+                // Better returns for certain businesses in certain regions
+                if (business == "mining" && state->currentRegion == "mountains") {
+                    returnRate *= 1.5;
                 }
 
-                // Factions control different areas - adjust prices and access
-                if (state->currentRegion == "city" && faction == "nobles") {
-                    // Nobles control cities
-                    if (relation < 0) {
-                        // Higher prices if disliked by nobles in the city
-                        state->economyFactors["tax_rate"] = 1.2;
-                    } else if (relation > 20) {
-                        // Discounts if well-liked
-                        state->economyFactors["tax_rate"] = 0.9;
-                    }
-                }
+                int investmentReturn = static_cast<int>(it->second * returnRate);
+                state->playerStats["gold"] += investmentReturn;
+            }
+        }
+    }
+};
 
-                // Political shifts happen over time
-                if (state->time % 720 == 0) { // Monthly shift
-                    // Random political changes
-                    if (utils::randomChance(0.3)) {
-                        int shift = utils::randomInt(-5, 5);
-                        for (const auto& f : factions) {
-                            state->setStat("faction", f, state->getStat("faction", f) + shift);
+// Faction system
+class FactionSystemNode : public SystemNode {
+public:
+    FactionSystemNode()
+        : SystemNode(NodeID("faction_system"))
+    {
+    }
+
+protected:
+    void processSystem(WorldState* state) override
+    {
+        std::vector<std::string> factions = { "traders", "nobles", "thieves", "mages" };
+
+        // Process faction relations over time
+        for (const auto& faction : factions) {
+            int relation = state->getStat("faction", faction);
+
+            // Factions have relationships with each other
+            for (const auto& otherFaction : factions) {
+                if (faction != otherFaction) {
+                    // Rival factions
+                    if ((faction == "nobles" && otherFaction == "thieves") || (faction == "thieves" && otherFaction == "nobles") || (faction == "traders" && otherFaction == "mages")) {
+
+                        // If player helps one faction, the rival faction relation decreases
+                        if (state->playerStats.find("helped_" + faction) != state->playerStats.end()) {
+                            state->setStat("faction", otherFaction, relation - 1);
+                            state->playerStats.erase("helped_" + faction);
                         }
                     }
                 }
             }
-        }
-    };
 
-    // Mount system
-    class MountSystemNode : public SystemNode {
-    public:
-        MountSystemNode()
-            : SystemNode(NodeID("mount_system"))
-        {
-        }
-
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            // Check if player has a mount
-            if (state->playerStats.find("has_mount") != state->playerStats.end()) {
-                // Mount stats
-                int mountSpeed = state->playerStats["mount_speed"];
-                int mountStamina = state->playerStats["mount_stamina"];
-                int mountHealth = state->playerStats["mount_health"];
-
-                // Mount gets tired during travel
-                if (state->playerStats.find("traveling") != state->playerStats.end()) {
-                    mountStamina = std::max(0, mountStamina - 1);
-                    state->playerStats["mount_stamina"] = mountStamina;
-
-                    // Speed bonus from mount, reduced when tired
-                    double staminaFactor = std::max(0.5, mountStamina / 100.0);
-                    state->playerStats["travel_speed"] += static_cast<int>(mountSpeed * staminaFactor);
-
-                    // Special movement abilities
-                    if (state->currentRegion == "mountains" && mountStamina > 50) {
-                        state->playerStats["can_climb"] = 1;
-                    }
-
-                    if (mountStamina > 75) {
-                        state->playerStats["can_jump_ravines"] = 1;
-                    }
+            // Factions control different areas - adjust prices and access
+            if (state->currentRegion == "city" && faction == "nobles") {
+                // Nobles control cities
+                if (relation < 0) {
+                    // Higher prices if disliked by nobles in the city
+                    state->economyFactors["tax_rate"] = 1.2;
+                } else if (relation > 20) {
+                    // Discounts if well-liked
+                    state->economyFactors["tax_rate"] = 0.9;
                 }
+            }
 
-                // Mount care - feeding
-                if (state->playerStats.find("fed_mount") != state->playerStats.end()) {
-                    mountStamina = std::min(100, mountStamina + 20);
-                    state->playerStats["mount_stamina"] = mountStamina;
-                    state->playerStats.erase("fed_mount");
-                }
-
-                // Mount training
-                if (state->playerStats.find("training_mount") != state->playerStats.end()) {
-                    int trainingType = state->playerStats["training_type"];
-                    if (trainingType == 0) {
-                        // Speed training
-                        state->playerStats["mount_speed"] += 1;
-                    } else if (trainingType == 1) {
-                        // Stamina training
-                        state->playerStats["mount_stamina_max"] += 2;
-                    } else if (trainingType == 2) {
-                        // Combat training
-                        state->playerStats["mount_combat"] += 1;
+            // Political shifts happen over time
+            if (state->time % 720 == 0) { // Monthly shift
+                // Random political changes
+                if (utils::randomChance(0.3)) {
+                    int shift = utils::randomInt(-5, 5);
+                    for (const auto& f : factions) {
+                        state->setStat("faction", f, state->getStat("faction", f) + shift);
                     }
-                    state->playerStats.erase("training_mount");
-                }
-
-                // Weather effects on mount
-                if (state->currentWeather == "stormy" || state->currentWeather == "snowy") {
-                    // Mount moves slower in bad weather
-                    state->playerStats["travel_speed"] = std::max(1, state->playerStats["travel_speed"] - 2);
                 }
             }
         }
-    };
+    }
+};
 
-    // Relationship system
-    class RelationshipSystemNode : public SystemNode {
-    public:
-        RelationshipSystemNode()
-            : SystemNode(NodeID("relationship_system"))
-        {
-        }
+// Mount system
+class MountSystemNode : public SystemNode {
+public:
+    MountSystemNode()
+        : SystemNode(NodeID("mount_system"))
+    {
+    }
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            std::vector<std::string> npcs = { "merchant", "guard", "innkeeper", "mage" };
+protected:
+    void processSystem(WorldState* state) override
+    {
+        // Check if player has a mount
+        if (state->playerStats.find("has_mount") != state->playerStats.end()) {
+            // Mount stats
+            int mountSpeed = state->playerStats["mount_speed"];
+            int mountStamina = state->playerStats["mount_stamina"];
+            int mountHealth = state->playerStats["mount_health"];
 
-            // Process NPC relationships
-            for (const auto& npc : npcs) {
-                int relation = state->getStat("npc", npc);
+            // Mount gets tired during travel
+            if (state->playerStats.find("traveling") != state->playerStats.end()) {
+                mountStamina = std::max(0, mountStamina - 1);
+                state->playerStats["mount_stamina"] = mountStamina;
 
-                // Gift effects
-                if (state->playerStats.find("gift_to_" + npc) != state->playerStats.end()) {
-                    int giftValue = state->playerStats["gift_to_" + npc];
+                // Speed bonus from mount, reduced when tired
+                double staminaFactor = std::max(0.5, mountStamina / 100.0);
+                state->playerStats["travel_speed"] += static_cast<int>(mountSpeed * staminaFactor);
 
-                    // Different NPCs prefer different gifts
-                    double giftMultiplier = 1.0;
-                    if (npc == "merchant" && state->playerStats.find("gift_type") != state->playerStats.end()
-                        && state->playerStats["gift_type"] == 0) {
-                        // Merchant prefers valuable items
-                        giftMultiplier = 1.5;
-                    } else if (npc == "mage" && state->playerStats.find("gift_type") != state->playerStats.end()
-                        && state->playerStats["gift_type"] == 1) {
-                        // Mage prefers magical items
-                        giftMultiplier = 1.5;
-                    }
-
-                    int relationshipIncrease = static_cast<int>(giftValue * giftMultiplier / 10);
-                    state->setStat("npc", npc, relation + relationshipIncrease);
-
-                    state->playerStats.erase("gift_to_" + npc);
-                    if (state->playerStats.find("gift_type") != state->playerStats.end()) {
-                        state->playerStats.erase("gift_type");
-                    }
+                // Special movement abilities
+                if (state->currentRegion == "mountains" && mountStamina > 50) {
+                    state->playerStats["can_climb"] = 1;
                 }
 
-                // Conversation effects
-                if (state->playerStats.find("talked_to_" + npc) != state->playerStats.end()) {
-                    // Success depends on charisma and previous relationship
-                    double successChance = 0.5 + (state->playerStats["charisma"] / 100.0)
-                        + (relation / 200.0);
-
-                    if (utils::randomChance(successChance)) {
-                        state->setStat("npc", npc, relation + 1);
-                    }
-                    state->playerStats.erase("talked_to_" + npc);
-                }
-
-                // Companion system
-                if (state->playerStats.find("companion_" + npc) != state->playerStats.end()) {
-                    // Loyalty based on relationship
-                    int loyalty = relation / 10;
-
-                    // Companions may leave if loyalty is too low
-                    if (loyalty < 3 && utils::randomChance(0.1)) {
-                        state->playerStats.erase("companion_" + npc);
-                    }
-
-                    // Companions provide bonuses
-                    if (npc == "merchant")
-                        state->economyFactors["shop_discount"] = 0.1;
-                    else if (npc == "guard")
-                        state->playerStats["combat"] += 2;
-                    else if (npc == "mage")
-                        state->playerStats["magic"] += 2;
-                }
-
-                // NPCs have schedules
-                int hourOfDay = state->time % 24;
-                if (npc == "merchant" && (hourOfDay < 8 || hourOfDay > 18)) {
-                    state->playerStats["merchant_available"] = 0;
-                } else if (npc == "merchant") {
-                    state->playerStats["merchant_available"] = 1;
+                if (mountStamina > 75) {
+                    state->playerStats["can_jump_ravines"] = 1;
                 }
             }
+
+            // Mount care - feeding
+            if (state->playerStats.find("fed_mount") != state->playerStats.end()) {
+                mountStamina = std::min(100, mountStamina + 20);
+                state->playerStats["mount_stamina"] = mountStamina;
+                state->playerStats.erase("fed_mount");
+            }
+
+            // Mount training
+            if (state->playerStats.find("training_mount") != state->playerStats.end()) {
+                int trainingType = state->playerStats["training_type"];
+                if (trainingType == 0) {
+                    // Speed training
+                    state->playerStats["mount_speed"] += 1;
+                } else if (trainingType == 1) {
+                    // Stamina training
+                    state->playerStats["mount_stamina_max"] += 2;
+                } else if (trainingType == 2) {
+                    // Combat training
+                    state->playerStats["mount_combat"] += 1;
+                }
+                state->playerStats.erase("training_mount");
+            }
+
+            // Weather effects on mount
+            if (state->currentWeather == "stormy" || state->currentWeather == "snowy") {
+                // Mount moves slower in bad weather
+                state->playerStats["travel_speed"] = std::max(1, state->playerStats["travel_speed"] - 2);
+            }
         }
-    };
+    }
+};
 
-    // Religion system
-    class ReligionSystemNode : public SystemNode {
-    public:
-        ReligionSystemNode()
-            : SystemNode(NodeID("religion_system"))
-        {
+// Relationship system
+class RelationshipSystemNode : public SystemNode {
+public:
+    RelationshipSystemNode()
+        : SystemNode(NodeID("relationship_system"))
+    {
+    }
+
+protected:
+    void processSystem(WorldState* state) override
+    {
+        std::vector<std::string> npcs = { "merchant", "guard", "innkeeper", "mage" };
+
+        // Process NPC relationships
+        for (const auto& npc : npcs) {
+            int relation = state->getStat("npc", npc);
+
+            // Gift effects
+            if (state->playerStats.find("gift_to_" + npc) != state->playerStats.end()) {
+                int giftValue = state->playerStats["gift_to_" + npc];
+
+                // Different NPCs prefer different gifts
+                double giftMultiplier = 1.0;
+                if (npc == "merchant" && state->playerStats.find("gift_type") != state->playerStats.end()
+                    && state->playerStats["gift_type"] == 0) {
+                    // Merchant prefers valuable items
+                    giftMultiplier = 1.5;
+                } else if (npc == "mage" && state->playerStats.find("gift_type") != state->playerStats.end()
+                    && state->playerStats["gift_type"] == 1) {
+                    // Mage prefers magical items
+                    giftMultiplier = 1.5;
+                }
+
+                int relationshipIncrease = static_cast<int>(giftValue * giftMultiplier / 10);
+                state->setStat("npc", npc, relation + relationshipIncrease);
+
+                state->playerStats.erase("gift_to_" + npc);
+                if (state->playerStats.find("gift_type") != state->playerStats.end()) {
+                    state->playerStats.erase("gift_type");
+                }
+            }
+
+            // Conversation effects
+            if (state->playerStats.find("talked_to_" + npc) != state->playerStats.end()) {
+                // Success depends on charisma and previous relationship
+                double successChance = 0.5 + (state->playerStats["charisma"] / 100.0)
+                    + (relation / 200.0);
+
+                if (utils::randomChance(successChance)) {
+                    state->setStat("npc", npc, relation + 1);
+                }
+                state->playerStats.erase("talked_to_" + npc);
+            }
+
+            // Companion system
+            if (state->playerStats.find("companion_" + npc) != state->playerStats.end()) {
+                // Loyalty based on relationship
+                int loyalty = relation / 10;
+
+                // Companions may leave if loyalty is too low
+                if (loyalty < 3 && utils::randomChance(0.1)) {
+                    state->playerStats.erase("companion_" + npc);
+                }
+
+                // Companions provide bonuses
+                if (npc == "merchant")
+                    state->economyFactors["shop_discount"] = 0.1;
+                else if (npc == "guard")
+                    state->playerStats["combat"] += 2;
+                else if (npc == "mage")
+                    state->playerStats["magic"] += 2;
+            }
+
+            // NPCs have schedules
+            int hourOfDay = state->time % 24;
+            if (npc == "merchant" && (hourOfDay < 8 || hourOfDay > 18)) {
+                state->playerStats["merchant_available"] = 0;
+            } else if (npc == "merchant") {
+                state->playerStats["merchant_available"] = 1;
+            }
         }
+    }
+};
 
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            std::vector<std::string> deities = { "sun_god", "moon_goddess", "war_god", "harvest_goddess" };
+// Religion system
+class ReligionSystemNode : public SystemNode {
+public:
+    ReligionSystemNode()
+        : SystemNode(NodeID("religion_system"))
+    {
+    }
 
-            // Process deity favor
-            for (const auto& deity : deities) {
-                int favor = state->getStat("deity", deity);
+protected:
+    void processSystem(WorldState* state) override
+    {
+        std::vector<std::string> deities = { "sun_god", "moon_goddess", "war_god", "harvest_goddess" };
 
-                // Prayer effects
-                if (state->playerStats.find("prayed_to_" + deity) != state->playerStats.end()) {
-                    // Prayer increases favor
-                    state->setStat("deity", deity, favor + 1);
-                    state->playerStats.erase("prayed_to_" + deity);
+        // Process deity favor
+        for (const auto& deity : deities) {
+            int favor = state->getStat("deity", deity);
 
-                    // Prayer benefits
+            // Prayer effects
+            if (state->playerStats.find("prayed_to_" + deity) != state->playerStats.end()) {
+                // Prayer increases favor
+                state->setStat("deity", deity, favor + 1);
+                state->playerStats.erase("prayed_to_" + deity);
+
+                // Prayer benefits
+                if (deity == "sun_god") {
+                    // Sun god provides combat bonuses
+                    state->playerStats["combat"] += favor / 10;
+                } else if (deity == "moon_goddess") {
+                    // Moon goddess provides magic bonuses
+                    state->playerStats["magic"] += favor / 10;
+                } else if (deity == "war_god") {
+                    // War god provides health bonuses
+                    state->playerStats["max_health"] += favor / 20;
+                } else if (deity == "harvest_goddess") {
+                    // Harvest goddess provides food bonuses
+                    state->playerStats["food"] += favor / 5;
+                }
+            }
+
+            // Temple quests
+            if (state->playerStats.find("temple_quest_" + deity) != state->playerStats.end()) {
+                int questProgress = state->playerStats["temple_quest_" + deity];
+
+                if (questProgress >= 100) {
+                    // Quest completed
+                    state->setStat("deity", deity, favor + 10);
+                    state->playerStats.erase("temple_quest_" + deity);
+
+                    // Special blessings
                     if (deity == "sun_god") {
-                        // Sun god provides combat bonuses
-                        state->playerStats["combat"] += favor / 10;
+                        state->playerStats["blessed_weapon"] = 1;
                     } else if (deity == "moon_goddess") {
-                        // Moon goddess provides magic bonuses
-                        state->playerStats["magic"] += favor / 10;
-                    } else if (deity == "war_god") {
-                        // War god provides health bonuses
-                        state->playerStats["max_health"] += favor / 20;
-                    } else if (deity == "harvest_goddess") {
-                        // Harvest goddess provides food bonuses
-                        state->playerStats["food"] += favor / 5;
-                    }
-                }
-
-                // Temple quests
-                if (state->playerStats.find("temple_quest_" + deity) != state->playerStats.end()) {
-                    int questProgress = state->playerStats["temple_quest_" + deity];
-
-                    if (questProgress >= 100) {
-                        // Quest completed
-                        state->setStat("deity", deity, favor + 10);
-                        state->playerStats.erase("temple_quest_" + deity);
-
-                        // Special blessings
-                        if (deity == "sun_god") {
-                            state->playerStats["blessed_weapon"] = 1;
-                        } else if (deity == "moon_goddess") {
-                            state->playerStats["blessed_magic"] = 1;
-                        }
-                    }
-                }
-
-                // Divine intervention
-                if (favor > 50 && state->playerStats["health"] < 10 && utils::randomChance(favor / 200.0)) {
-                    // Deity intervenes to save player
-                    state->playerStats["health"] = state->playerStats["max_health"] / 2;
-                    state->setStat("deity", deity, favor - 10); // Costs favor
-                }
-
-                // Religious conflicts
-                for (const auto& otherDeity : deities) {
-                    if (deity != otherDeity) {
-                        // Rival deities
-                        if ((deity == "sun_god" && otherDeity == "moon_goddess") || (deity == "moon_goddess" && otherDeity == "sun_god")) {
-
-                            // Helping one deity displeases the other
-                            if (state->playerStats.find("helped_" + deity) != state->playerStats.end()) {
-                                int otherFavor = state->getStat("deity", otherDeity);
-                                state->setStat("deity", otherDeity, otherFavor - 2);
-                                state->playerStats.erase("helped_" + deity);
-                            }
-                        }
-                    }
-                }
-
-                // Sacred days
-                int dayOfYear = (state->time / 24) % 365;
-                if (deity == "sun_god" && dayOfYear == 172) { // Summer solstice
-                    // Sun god festival
-                    state->setStat("deity", deity, favor + 5);
-                    state->playerStats["sun_blessing"] = 1; // Temporary blessing
-                }
-            }
-        }
-    };
-
-    // Spell crafting system
-    class SpellCraftingSystemNode : public SystemNode {
-    public:
-        SpellCraftingSystemNode()
-            : SystemNode(NodeID("spellcrafting_system"))
-        {
-        }
-
-    protected:
-        void processSystem(WorldState* state) override
-        {
-            // Process spell crafting if player is working on a spell
-            if (state->playerStats.find("crafting_spell") != state->playerStats.end()) {
-                int spellType = state->playerStats["spell_type"];
-                int spellPower = state->playerStats["spell_power"];
-                int spellComplexity = state->playerStats["spell_complexity"];
-                int spellProgress = state->playerStats["spell_progress"];
-
-                // Components increase spell progress
-                if (state->playerStats.find("used_component") != state->playerStats.end()) {
-                    int componentQuality = state->playerStats["component_quality"];
-                    spellProgress += componentQuality;
-                    state->playerStats["spell_progress"] = spellProgress;
-                    state->playerStats.erase("used_component");
-                }
-
-                // Magic skill affects success rate
-                double successChance = 0.4 + (state->playerStats["magic"] / 100.0) - (spellComplexity / 50.0);
-
-                // Spell completion
-                if (spellProgress >= 100) {
-                    if (utils::randomChance(successChance)) {
-                        // Spell successfully created
-                        std::string spellName;
-                        if (spellType == 0)
-                            spellName = "fireball";
-                        else if (spellType == 1)
-                            spellName = "healing";
-                        else if (spellType == 2)
-                            spellName = "shield";
-
-                        state->playerStats["spell_" + spellName] = spellPower;
-                    } else {
-                        // Spell failure
-                        int backfireDamage = spellComplexity / 5;
-                        state->playerStats["health"] = std::max(1, state->playerStats["health"] - backfireDamage);
-                    }
-
-                    // Reset spell crafting
-                    state->playerStats.erase("crafting_spell");
-                    state->playerStats.erase("spell_type");
-                    state->playerStats.erase("spell_power");
-                    state->playerStats.erase("spell_complexity");
-                    state->playerStats.erase("spell_progress");
-                }
-
-                // Magical research
-                if (state->playerStats.find("researching_magic") != state->playerStats.end()) {
-                    int researchType = state->playerStats["research_type"];
-                    int researchProgress = state->playerStats["research_progress"];
-
-                    // Research progresses over time
-                    researchProgress += 1 + (state->playerStats["intelligence"] / 20);
-                    state->playerStats["research_progress"] = researchProgress;
-
-                    if (researchProgress >= 100) {
-                        // Research completed
-                        if (researchType == 0) {
-                            // Fire magic research
-                            state->playerStats["fire_magic"] += 5;
-                        } else if (researchType == 1) {
-                            // Healing magic research
-                            state->playerStats["healing_magic"] += 5;
-                        } else if (researchType == 2) {
-                            // Protection magic research
-                            state->playerStats["protection_magic"] += 5;
-                        }
-
-                        // Reset research
-                        state->playerStats.erase("researching_magic");
-                        state->playerStats.erase("research_type");
-                        state->playerStats.erase("research_progress");
+                        state->playerStats["blessed_magic"] = 1;
                     }
                 }
             }
+
+            // Divine intervention
+            if (favor > 50 && state->playerStats["health"] < 10 && utils::randomChance(favor / 200.0)) {
+                // Deity intervenes to save player
+                state->playerStats["health"] = state->playerStats["max_health"] / 2;
+                state->setStat("deity", deity, favor - 10); // Costs favor
+            }
+
+            // Religious conflicts
+            for (const auto& otherDeity : deities) {
+                if (deity != otherDeity) {
+                    // Rival deities
+                    if ((deity == "sun_god" && otherDeity == "moon_goddess") || (deity == "moon_goddess" && otherDeity == "sun_god")) {
+
+                        // Helping one deity displeases the other
+                        if (state->playerStats.find("helped_" + deity) != state->playerStats.end()) {
+                            int otherFavor = state->getStat("deity", otherDeity);
+                            state->setStat("deity", otherDeity, otherFavor - 2);
+                            state->playerStats.erase("helped_" + deity);
+                        }
+                    }
+                }
+            }
+
+            // Sacred days
+            int dayOfYear = (state->time / 24) % 365;
+            if (deity == "sun_god" && dayOfYear == 172) { // Summer solstice
+                // Sun god festival
+                state->setStat("deity", deity, favor + 5);
+                state->playerStats["sun_blessing"] = 1; // Temporary blessing
+            }
         }
-    };
+    }
+};
+
+// Spell crafting system
+class SpellCraftingSystemNode : public SystemNode {
+public:
+    SpellCraftingSystemNode()
+        : SystemNode(NodeID("spellcrafting_system"))
+    {
+    }
+
+protected:
+    void processSystem(WorldState* state) override
+    {
+        // Process spell crafting if player is working on a spell
+        if (state->playerStats.find("crafting_spell") != state->playerStats.end()) {
+            int spellType = state->playerStats["spell_type"];
+            int spellPower = state->playerStats["spell_power"];
+            int spellComplexity = state->playerStats["spell_complexity"];
+            int spellProgress = state->playerStats["spell_progress"];
+
+            // Components increase spell progress
+            if (state->playerStats.find("used_component") != state->playerStats.end()) {
+                int componentQuality = state->playerStats["component_quality"];
+                spellProgress += componentQuality;
+                state->playerStats["spell_progress"] = spellProgress;
+                state->playerStats.erase("used_component");
+            }
+
+            // Magic skill affects success rate
+            double successChance = 0.4 + (state->playerStats["magic"] / 100.0) - (spellComplexity / 50.0);
+
+            // Spell completion
+            if (spellProgress >= 100) {
+                if (utils::randomChance(successChance)) {
+                    // Spell successfully created
+                    std::string spellName;
+                    if (spellType == 0)
+                        spellName = "fireball";
+                    else if (spellType == 1)
+                        spellName = "healing";
+                    else if (spellType == 2)
+                        spellName = "shield";
+
+                    state->playerStats["spell_" + spellName] = spellPower;
+                } else {
+                    // Spell failure
+                    int backfireDamage = spellComplexity / 5;
+                    state->playerStats["health"] = std::max(1, state->playerStats["health"] - backfireDamage);
+                }
+
+                // Reset spell crafting
+                state->playerStats.erase("crafting_spell");
+                state->playerStats.erase("spell_type");
+                state->playerStats.erase("spell_power");
+                state->playerStats.erase("spell_complexity");
+                state->playerStats.erase("spell_progress");
+            }
+
+            // Magical research
+            if (state->playerStats.find("researching_magic") != state->playerStats.end()) {
+                int researchType = state->playerStats["research_type"];
+                int researchProgress = state->playerStats["research_progress"];
+
+                // Research progresses over time
+                researchProgress += 1 + (state->playerStats["intelligence"] / 20);
+                state->playerStats["research_progress"] = researchProgress;
+
+                if (researchProgress >= 100) {
+                    // Research completed
+                    if (researchType == 0) {
+                        // Fire magic research
+                        state->playerStats["fire_magic"] += 5;
+                    } else if (researchType == 1) {
+                        // Healing magic research
+                        state->playerStats["healing_magic"] += 5;
+                    } else if (researchType == 2) {
+                        // Protection magic research
+                        state->playerStats["protection_magic"] += 5;
+                    }
+
+                    // Reset research
+                    state->playerStats.erase("researching_magic");
+                    state->playerStats.erase("research_type");
+                    state->playerStats.erase("research_progress");
+                }
+            }
+        }
+    }
+};
 }
 
 // Create a unified system controller that incorporates all subsystems
@@ -971,4 +968,3 @@ int main()
 
     return 0;
 }
-} // namespace oath

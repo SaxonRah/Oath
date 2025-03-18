@@ -10,19 +10,20 @@ include_directories(${CMAKE_SOURCE_DIR}/Source)
 include_directories(${CMAKE_SOURCE_DIR})
 
 # Set source files by directory
-set(CORE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameContext.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameSystemManager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/TAController.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/TACore.cpp
-)
+# set(CORE_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameContext.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameSystemManager.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Source/TAController.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Source/TACore.cpp
+# )
 
 
 # Combine all source files
 set(SOURCES
-    ${CORE_SOURCES}
+    # ${CORE_SOURCES}
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/CodeGolf_Linen.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CodeGolf_RPGSystems.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/CodeGolf_Linen.cpp
 )
 
 # Create executable
@@ -36,7 +37,7 @@ target_include_directories(Linen PRIVATE
 # Copy resource files to build directory
 add_custom_command(TARGET Linen POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/Linen/data
+    ${CMAKE_SOURCE_DIR}/data
     $<TARGET_FILE_DIR:Linen>/data
 )
 

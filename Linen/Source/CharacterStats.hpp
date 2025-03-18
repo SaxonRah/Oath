@@ -4,8 +4,6 @@
 #include <set>
 #include <string>
 
-namespace oath {
-
 // Character stats structure
 class CharacterStats {
 public:
@@ -125,5 +123,3 @@ public:
         return it != modifiers.end() ? base + it->second : base;
     }
 };
-
-} // namespace oath
