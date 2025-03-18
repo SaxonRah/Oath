@@ -1,0 +1,929 @@
+{
+    "relationshipConstants": {
+        "minRelationship": -100,
+        "maxRelationship": 100,
+        "thresholds": {
+            "hatred": -75,
+            "dislike": -30,
+            "neutral": -10,
+            "friendly": 30,
+            "close": 60,
+            "intimate": 80
+        },
+        "traitInfluence": {
+            "sharedTraitBonus": 0.2,
+            "opposingTraitPenalty": 0.1
+        },
+        "giftMultipliers": {
+            "favorite": 2.0,
+            "liked": 1.5,
+            "disliked": 0.5,
+            "hated": -1.0
+        },
+        "timeConstants": {
+            "dailyDecayAmount": -1,
+            "minDaysBetweenGifts": 3
+        }
+    },
+    "opposingTraits": [
+        {
+            "trait1": "Introverted",
+            "trait2": "Extroverted"
+        },
+        {
+            "trait1": "Cautious",
+            "trait2": "Brave"
+        },
+        {
+            "trait1": "Practical",
+            "trait2": "Romantic"
+        },
+        {
+            "trait1": "Rational",
+            "trait2": "Spiritual"
+        },
+        {
+            "trait1": "Merciful",
+            "trait2": "Vengeful"
+        },
+        {
+            "trait1": "Modest",
+            "trait2": "Materialistic"
+        },
+        {
+            "trait1": "Traditional",
+            "trait2": "Curious"
+        }
+    ],
+    "personalityTraits": [
+        "Agreeable",
+        "Ambitious",
+        "Brave",
+        "Cautious",
+        "Cheerful",
+        "Curious",
+        "Disciplined",
+        "Generous",
+        "Honest",
+        "Introverted",
+        "Extroverted",
+        "Loyal",
+        "Materialistic",
+        "Merciful",
+        "Modest",
+        "Practical",
+        "Rational",
+        "Religious",
+        "Romantic",
+        "Scholarly",
+        "Spiritual",
+        "Stubborn",
+        "Traditional",
+        "Trustworthy",
+        "Vengeful",
+        "Wise",
+        "Independent",
+        "Intelligent",
+        "Diplomatic",
+        "Suspicious"
+    ],
+    "relationshipTypes": [
+        "None",
+        "Acquaintance",
+        "Friend",
+        "CloseFriend",
+        "BestFriend",
+        "Rival",
+        "Enemy",
+        "Family",
+        "Mentor",
+        "Student",
+        "RomanticInterest",
+        "Partner",
+        "Spouse"
+    ],
+    "relationshipStates": [
+        "Neutral",
+        "Happy",
+        "Sad",
+        "Angry",
+        "Fearful",
+        "Trusting",
+        "Suspicious",
+        "Grateful",
+        "Jealous",
+        "Impressed",
+        "Disappointed",
+        "Forgiving",
+        "Resentful"
+    ],
+    "giftCategories": [
+        "Weapon",
+        "Armor",
+        "Jewelry",
+        "Book",
+        "Food",
+        "Drink",
+        "Potion",
+        "Clothing",
+        "Crafting",
+        "Decoration",
+        "Tool",
+        "Magic",
+        "ReligiousItem",
+        "Trophy",
+        "Luxury"
+    ],
+    "npcs": [
+        {
+            "id": "elderMarius",
+            "name": "Elder Marius",
+            "occupation": "Village Elder",
+            "age": 68,
+            "gender": "Male",
+            "race": "Human",
+            "faction": "Village Council",
+            "homeLocation": "Elder's Cottage",
+            "personalityTraits": [
+                "Wise",
+                "Traditional",
+                "Cautious"
+            ],
+            "giftPreferences": {
+                "Book": 0.8,
+                "ReligiousItem": 0.6,
+                "Weapon": -0.7
+            },
+            "favoriteItems": [
+                "ancient_tome"
+            ],
+            "dislikedItems": [
+                "cheap_ale"
+            ],
+            "conversationTopics": [
+                "village_history",
+                "traditions",
+                "spirituality"
+            ],
+            "tabooTopics": [
+                "illegal_activities",
+                "dark_magic"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 6,
+                        "endHour": 9,
+                        "location": "Elder's Cottage",
+                        "activity": "morning prayer"
+                    },
+                    {
+                        "startHour": 9,
+                        "endHour": 12,
+                        "location": "Village Center",
+                        "activity": "council duties"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 13,
+                        "location": "Village Inn",
+                        "activity": "lunch"
+                    },
+                    {
+                        "startHour": 13,
+                        "endHour": 18,
+                        "location": "Village Center",
+                        "activity": "meeting villagers"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 22,
+                        "location": "Elder's Cottage",
+                        "activity": "reading"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 6,
+                        "location": "Elder's Cottage",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 7,
+                        "endHour": 10,
+                        "location": "Elder's Cottage",
+                        "activity": "morning prayer"
+                    },
+                    {
+                        "startHour": 10,
+                        "endHour": 14,
+                        "location": "Temple",
+                        "activity": "religious service"
+                    },
+                    {
+                        "startHour": 14,
+                        "endHour": 18,
+                        "location": "Elder's Cottage",
+                        "activity": "meeting visitors"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 22,
+                        "location": "Village Inn",
+                        "activity": "community dinner"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 7,
+                        "location": "Elder's Cottage",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "tavernKeeper",
+            "name": "Hilda the Tavern Keeper",
+            "occupation": "Innkeeper",
+            "age": 42,
+            "gender": "Female",
+            "race": "Human",
+            "faction": "Merchants Guild",
+            "homeLocation": "Village Inn",
+            "personalityTraits": [
+                "Cheerful",
+                "Extroverted",
+                "Generous"
+            ],
+            "giftPreferences": {
+                "Food": 0.9,
+                "Drink": 0.7,
+                "Book": -0.5
+            },
+            "favoriteItems": [
+                "exotic_spices"
+            ],
+            "dislikedItems": [
+                "raw_meat"
+            ],
+            "conversationTopics": [
+                "cooking",
+                "gossip",
+                "travelers_tales"
+            ],
+            "tabooTopics": [
+                "noble_politics",
+                "personal_finances"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 5,
+                        "endHour": 8,
+                        "location": "Village Inn",
+                        "activity": "preparing breakfast"
+                    },
+                    {
+                        "startHour": 8,
+                        "endHour": 14,
+                        "location": "Village Inn",
+                        "activity": "serving customers"
+                    },
+                    {
+                        "startHour": 14,
+                        "endHour": 16,
+                        "location": "Village Inn",
+                        "activity": "cleaning and inventory"
+                    },
+                    {
+                        "startHour": 16,
+                        "endHour": 23,
+                        "location": "Village Inn",
+                        "activity": "serving dinner and drinks"
+                    },
+                    {
+                        "startHour": 23,
+                        "endHour": 5,
+                        "location": "Village Inn",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 6,
+                        "endHour": 9,
+                        "location": "Village Inn",
+                        "activity": "preparing breakfast"
+                    },
+                    {
+                        "startHour": 9,
+                        "endHour": 12,
+                        "location": "Village Market",
+                        "activity": "buying supplies"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 24,
+                        "location": "Village Inn",
+                        "activity": "hosting weekend festivities"
+                    },
+                    {
+                        "startHour": 0,
+                        "endHour": 6,
+                        "location": "Village Inn",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "blacksmith",
+            "name": "Gareth the Blacksmith",
+            "occupation": "Blacksmith",
+            "age": 38,
+            "gender": "Male",
+            "race": "Human",
+            "faction": "Craftsmen Guild",
+            "homeLocation": "Blacksmith's House",
+            "personalityTraits": [
+                "Disciplined",
+                "Honest",
+                "Practical"
+            ],
+            "giftPreferences": {
+                "Tool": 0.9,
+                "Crafting": 0.8,
+                "Luxury": -0.6
+            },
+            "favoriteItems": [
+                "rare_metal"
+            ],
+            "dislikedItems": [
+                "fragile_ornament"
+            ],
+            "conversationTopics": [
+                "metalworking",
+                "weapons",
+                "tools"
+            ],
+            "tabooTopics": [
+                "magic",
+                "gossip"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 5,
+                        "endHour": 7,
+                        "location": "Blacksmith's House",
+                        "activity": "early breakfast"
+                    },
+                    {
+                        "startHour": 7,
+                        "endHour": 12,
+                        "location": "Village Forge",
+                        "activity": "smithing work"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 13,
+                        "location": "Blacksmith's House",
+                        "activity": "lunch"
+                    },
+                    {
+                        "startHour": 13,
+                        "endHour": 19,
+                        "location": "Village Forge",
+                        "activity": "smithing work"
+                    },
+                    {
+                        "startHour": 19,
+                        "endHour": 21,
+                        "location": "Village Inn",
+                        "activity": "evening meal"
+                    },
+                    {
+                        "startHour": 21,
+                        "endHour": 5,
+                        "location": "Blacksmith's House",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 6,
+                        "endHour": 8,
+                        "location": "Blacksmith's House",
+                        "activity": "breakfast"
+                    },
+                    {
+                        "startHour": 8,
+                        "endHour": 14,
+                        "location": "Village Forge",
+                        "activity": "smithing work"
+                    },
+                    {
+                        "startHour": 14,
+                        "endHour": 18,
+                        "location": "Blacksmith's House",
+                        "activity": "personal projects"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 22,
+                        "location": "Village Inn",
+                        "activity": "relaxing"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 6,
+                        "location": "Blacksmith's House",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "villageGuard",
+            "name": "Sergeant Bram",
+            "occupation": "Village Guard Captain",
+            "age": 35,
+            "gender": "Male",
+            "race": "Human",
+            "faction": "Village Guard",
+            "homeLocation": "Guard Barracks",
+            "personalityTraits": [
+                "Disciplined",
+                "Stubborn",
+                "Suspicious"
+            ],
+            "giftPreferences": {
+                "Weapon": 0.7,
+                "Armor": 0.6,
+                "Book": -0.4
+            },
+            "favoriteItems": [
+                "fine_sword"
+            ],
+            "dislikedItems": [
+                "contraband"
+            ],
+            "conversationTopics": [
+                "military",
+                "security",
+                "village_defense"
+            ],
+            "tabooTopics": [
+                "smuggling",
+                "lawbreaking"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 5,
+                        "endHour": 6,
+                        "location": "Guard Barracks",
+                        "activity": "waking up"
+                    },
+                    {
+                        "startHour": 6,
+                        "endHour": 8,
+                        "location": "Training Grounds",
+                        "activity": "morning drills"
+                    },
+                    {
+                        "startHour": 8,
+                        "endHour": 12,
+                        "location": "Village Gates",
+                        "activity": "guard duty"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 13,
+                        "location": "Guard Barracks",
+                        "activity": "lunch"
+                    },
+                    {
+                        "startHour": 13,
+                        "endHour": 18,
+                        "location": "Village Center",
+                        "activity": "patrol"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 19,
+                        "location": "Guard Barracks",
+                        "activity": "dinner"
+                    },
+                    {
+                        "startHour": 19,
+                        "endHour": 22,
+                        "location": "Village Inn",
+                        "activity": "off-duty"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 5,
+                        "location": "Guard Barracks",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 5,
+                        "endHour": 6,
+                        "location": "Guard Barracks",
+                        "activity": "waking up"
+                    },
+                    {
+                        "startHour": 6,
+                        "endHour": 8,
+                        "location": "Training Grounds",
+                        "activity": "training recruits"
+                    },
+                    {
+                        "startHour": 8,
+                        "endHour": 12,
+                        "location": "Village Center",
+                        "activity": "patrol"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 13,
+                        "location": "Guard Barracks",
+                        "activity": "lunch"
+                    },
+                    {
+                        "startHour": 13,
+                        "endHour": 19,
+                        "location": "Village Gates",
+                        "activity": "guard duty"
+                    },
+                    {
+                        "startHour": 19,
+                        "endHour": 23,
+                        "location": "Village Inn",
+                        "activity": "off-duty"
+                    },
+                    {
+                        "startHour": 23,
+                        "endHour": 5,
+                        "location": "Guard Barracks",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "companion1",
+            "name": "Lyra the Huntress",
+            "occupation": "Hunter",
+            "age": 27,
+            "gender": "Female",
+            "race": "Elf",
+            "faction": "Forest Guardians",
+            "homeLocation": "Forest Cabin",
+            "personalityTraits": [
+                "Brave",
+                "Loyal",
+                "Independent"
+            ],
+            "giftPreferences": {
+                "Weapon": 0.8,
+                "Food": 0.6,
+                "Luxury": -0.5
+            },
+            "favoriteItems": [
+                "fine_bow"
+            ],
+            "dislikedItems": [
+                "fancy_clothes"
+            ],
+            "conversationTopics": [
+                "hunting",
+                "nature",
+                "wilderness_survival"
+            ],
+            "tabooTopics": [
+                "animal_cruelty",
+                "deforestation"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 4,
+                        "endHour": 8,
+                        "location": "Forest",
+                        "activity": "early hunting"
+                    },
+                    {
+                        "startHour": 8,
+                        "endHour": 10,
+                        "location": "Forest Cabin",
+                        "activity": "preparing game"
+                    },
+                    {
+                        "startHour": 10,
+                        "endHour": 14,
+                        "location": "Village Market",
+                        "activity": "selling game"
+                    },
+                    {
+                        "startHour": 14,
+                        "endHour": 18,
+                        "location": "Forest",
+                        "activity": "afternoon hunting"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 21,
+                        "location": "Village Inn",
+                        "activity": "relaxing"
+                    },
+                    {
+                        "startHour": 21,
+                        "endHour": 4,
+                        "location": "Forest Cabin",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 5,
+                        "endHour": 12,
+                        "location": "Deep Forest",
+                        "activity": "extended hunting trip"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 16,
+                        "location": "Forest Cabin",
+                        "activity": "crafting arrows and traps"
+                    },
+                    {
+                        "startHour": 16,
+                        "endHour": 22,
+                        "location": "Village Inn",
+                        "activity": "socializing"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 5,
+                        "location": "Forest Cabin",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "noblewoman",
+            "name": "Lady Eleanor",
+            "occupation": "Noble",
+            "age": 26,
+            "gender": "Female",
+            "race": "Human",
+            "faction": "Nobility",
+            "homeLocation": "Manor House",
+            "personalityTraits": [
+                "Ambitious",
+                "Intelligent",
+                "Diplomatic"
+            ],
+            "giftPreferences": {
+                "Jewelry": 0.9,
+                "Book": 0.7,
+                "Tool": -0.6
+            },
+            "favoriteItems": [
+                "gold_necklace"
+            ],
+            "dislikedItems": [
+                "common_tools"
+            ],
+            "conversationTopics": [
+                "art",
+                "literature",
+                "politics"
+            ],
+            "tabooTopics": [
+                "common_gossip",
+                "vulgar_topics"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 7,
+                        "endHour": 9,
+                        "location": "Manor House",
+                        "activity": "breakfast"
+                    },
+                    {
+                        "startHour": 9,
+                        "endHour": 12,
+                        "location": "Manor Library",
+                        "activity": "reading"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 14,
+                        "location": "Manor Garden",
+                        "activity": "lunch and walk"
+                    },
+                    {
+                        "startHour": 14,
+                        "endHour": 17,
+                        "location": "Village Center",
+                        "activity": "social calls"
+                    },
+                    {
+                        "startHour": 17,
+                        "endHour": 19,
+                        "location": "Manor House",
+                        "activity": "preparing for dinner"
+                    },
+                    {
+                        "startHour": 19,
+                        "endHour": 22,
+                        "location": "Manor House",
+                        "activity": "hosting dinner"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 7,
+                        "location": "Manor House",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 8,
+                        "endHour": 10,
+                        "location": "Manor House",
+                        "activity": "breakfast"
+                    },
+                    {
+                        "startHour": 10,
+                        "endHour": 13,
+                        "location": "Temple",
+                        "activity": "religious service"
+                    },
+                    {
+                        "startHour": 13,
+                        "endHour": 16,
+                        "location": "Manor Garden",
+                        "activity": "tea with guests"
+                    },
+                    {
+                        "startHour": 16,
+                        "endHour": 19,
+                        "location": "Village Center",
+                        "activity": "charity work"
+                    },
+                    {
+                        "startHour": 19,
+                        "endHour": 23,
+                        "location": "Manor House",
+                        "activity": "hosting evening entertainment"
+                    },
+                    {
+                        "startHour": 23,
+                        "endHour": 8,
+                        "location": "Manor House",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "uncle",
+            "name": "Uncle Tomas",
+            "occupation": "Retired Soldier",
+            "age": 58,
+            "gender": "Male",
+            "race": "Human",
+            "faction": "Village Council",
+            "homeLocation": "Farm Outside Village",
+            "personalityTraits": [
+                "Brave",
+                "Loyal",
+                "Traditional"
+            ],
+            "giftPreferences": {
+                "Weapon": 0.7,
+                "Drink": 0.8,
+                "Luxury": -0.4
+            },
+            "favoriteItems": [
+                "aged_whiskey"
+            ],
+            "dislikedItems": [
+                "fancy_perfume"
+            ],
+            "conversationTopics": [
+                "war_stories",
+                "farming",
+                "family"
+            ],
+            "tabooTopics": [
+                "nobility",
+                "politics"
+            ],
+            "schedule": {
+                "weekday": [
+                    {
+                        "startHour": 5,
+                        "endHour": 8,
+                        "location": "Farm",
+                        "activity": "morning chores"
+                    },
+                    {
+                        "startHour": 8,
+                        "endHour": 12,
+                        "location": "Farm",
+                        "activity": "tending fields"
+                    },
+                    {
+                        "startHour": 12,
+                        "endHour": 13,
+                        "location": "Farm",
+                        "activity": "lunch"
+                    },
+                    {
+                        "startHour": 13,
+                        "endHour": 16,
+                        "location": "Farm",
+                        "activity": "afternoon work"
+                    },
+                    {
+                        "startHour": 16,
+                        "endHour": 18,
+                        "location": "Village Center",
+                        "activity": "errands"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 22,
+                        "location": "Village Inn",
+                        "activity": "socializing"
+                    },
+                    {
+                        "startHour": 22,
+                        "endHour": 5,
+                        "location": "Farm",
+                        "activity": "sleeping"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "startHour": 6,
+                        "endHour": 10,
+                        "location": "Farm",
+                        "activity": "light chores"
+                    },
+                    {
+                        "startHour": 10,
+                        "endHour": 14,
+                        "location": "Temple",
+                        "activity": "religious service"
+                    },
+                    {
+                        "startHour": 14,
+                        "endHour": 18,
+                        "location": "Village Center",
+                        "activity": "visiting family"
+                    },
+                    {
+                        "startHour": 18,
+                        "endHour": 23,
+                        "location": "Village Inn",
+                        "activity": "drinking and telling war stories"
+                    },
+                    {
+                        "startHour": 23,
+                        "endHour": 6,
+                        "location": "Farm",
+                        "activity": "sleeping"
+                    }
+                ]
+            }
+        }
+    ],
+    "defaultRelationships": [
+        {
+            "npcId": "companion1",
+            "value": 65,
+            "type": "CloseFriend"
+        },
+        {
+            "npcId": "noblewoman",
+            "value": 40,
+            "type": "RomanticInterest"
+        },
+        {
+            "npcId": "uncle",
+            "value": 70,
+            "type": "Family"
+        }
+    ]
+}

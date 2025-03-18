@@ -1,0 +1,195 @@
+{
+    "names": {
+        "first_names": {
+            "human_male": [
+                "John",
+                "William",
+                "James",
+                "Robert",
+                "Michael",
+                "David",
+                "Joseph",
+                "Thomas"
+            ],
+            "human_female": [
+                "Mary",
+                "Elizabeth",
+                "Patricia",
+                "Jennifer",
+                "Linda",
+                "Sarah",
+                "Karen",
+                "Nancy"
+            ],
+            "elf_male": [
+                "Aerion",
+                "Faelyn",
+                "Caladorn",
+                "Eldrin",
+                "Zaren",
+                "Thaelar"
+            ],
+            "elf_female": [
+                "Arwen",
+                "Lyriael",
+                "Eowyn",
+                "Caladwen",
+                "Miriel",
+                "Luthien"
+            ],
+            "dwarf_male": [
+                "Durgan",
+                "Thrain",
+                "Thorin",
+                "Balin",
+                "Gimli",
+                "Dwalin"
+            ],
+            "dwarf_female": [
+                "Brenna",
+                "Helga",
+                "Dagny",
+                "Sigrid",
+                "Freya",
+                "Astrid"
+            ]
+        },
+        "last_names": {
+            "human": [
+                "Smith",
+                "Johnson",
+                "Williams",
+                "Brown",
+                "Jones",
+                "Miller",
+                "Davis",
+                "Garcia"
+            ],
+            "elf": [
+                "Starweaver",
+                "Moonwhisper",
+                "Starblade",
+                "Silvermist",
+                "Dawnshadow"
+            ],
+            "dwarf": [
+                "Ironforge",
+                "Stonehammer",
+                "Goldbeard",
+                "Anvilcraft",
+                "Stoneaxe"
+            ]
+        }
+    },
+    "skill_ranges": {
+        "combat": [
+            1,
+            8
+        ],
+        "persuasion": [
+            1,
+            7
+        ],
+        "survival": [
+            1,
+            6
+        ],
+        "crafting": [
+            1,
+            6
+        ],
+        "magic": [
+            0,
+            5
+        ],
+        "stealth": [
+            1,
+            6
+        ],
+        "lore": [
+            1,
+            5
+        ]
+    },
+    "background_elements": {
+        "locations": [
+            "small village",
+            "bustling city",
+            "remote town",
+            "border settlement"
+        ],
+        "upbringing": [
+            "parents",
+            "grandparents",
+            "extended family",
+            "single parent"
+        ],
+        "experiences": [
+            "hardship",
+            "prosperity",
+            "adventure",
+            "conflict"
+        ]
+    },
+    "personality_traits": [
+        "honest",
+        "cunning",
+        "brave",
+        "cautious",
+        "optimistic",
+        "pessimistic",
+        "loyal",
+        "ambitious",
+        "compassionate",
+        "stern",
+        "curious",
+        "reserved"
+    ],
+    "life_events": [
+        "Survived a dangerous journey",
+        "Learned a valuable skill",
+        "Lost a close friend",
+        "Inherited a small fortune",
+        "Worked as a mercenary",
+        "Studied under a master",
+        "Traveled to distant lands",
+        "Overcame a significant challenge"
+    ],
+    "occupations": [
+        "Farmer",
+        "Merchant",
+        "Soldier",
+        "Craftsman",
+        "Adventurer",
+        "Scholar",
+        "Artisan",
+        "Sailor",
+        "Trader",
+        "Hunter"
+    ],
+    "social_classes": [
+        "Lower Class",
+        "Middle Class",
+        "Upper Middle Class",
+        "Noble"
+    ],
+    "build_types": [
+        "lean",
+        "muscular",
+        "stocky",
+        "average"
+    ],
+    "hair_colors": [
+        "brown",
+        "black",
+        "blonde",
+        "red",
+        "gray"
+    ],
+    "eye_colors": [
+        "blue",
+        "green",
+        "brown",
+        "hazel"
+    ]
+}

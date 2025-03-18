@@ -1,0 +1,411 @@
+{
+    "breeds": {
+        "standard_horse": {
+            "id": "standard_horse",
+            "name": "Standard Horse",
+            "description": "A common, reliable horse suitable for general riding",
+            "baseSpeed": 100,
+            "baseStamina": 100,
+            "baseCarryCapacity": 50,
+            "baseTrainability": 50,
+            "naturalSwimmer": false,
+            "naturalJumper": false,
+            "naturalClimber": false,
+            "specialAbility": ""
+        },
+        "war_horse": {
+            "id": "war_horse",
+            "name": "War Horse",
+            "description": "A powerful horse bred for battle and heavy loads",
+            "baseSpeed": 90,
+            "baseStamina": 120,
+            "baseCarryCapacity": 70,
+            "baseTrainability": 60,
+            "naturalSwimmer": false,
+            "naturalJumper": true,
+            "naturalClimber": false,
+            "specialAbility": "combat_charge"
+        },
+        "racing_horse": {
+            "id": "racing_horse",
+            "name": "Racing Horse",
+            "description": "A sleek, fast horse bred for speed and stamina",
+            "baseSpeed": 140,
+            "baseStamina": 110,
+            "baseCarryCapacity": 30,
+            "baseTrainability": 70,
+            "naturalSwimmer": false,
+            "naturalJumper": false,
+            "naturalClimber": false,
+            "specialAbility": "sprint_burst"
+        },
+        "pack_horse": {
+            "id": "pack_horse",
+            "name": "Pack Horse",
+            "description": "A sturdy horse specialized for carrying heavy loads",
+            "baseSpeed": 80,
+            "baseStamina": 130,
+            "baseCarryCapacity": 100,
+            "baseTrainability": 40,
+            "naturalSwimmer": false,
+            "naturalJumper": false,
+            "naturalClimber": false,
+            "specialAbility": ""
+        },
+        "mountain_pony": {
+            "id": "mountain_pony",
+            "name": "Mountain Pony",
+            "description": "A small but agile pony adept at navigating difficult terrain",
+            "baseSpeed": 90,
+            "baseStamina": 120,
+            "baseCarryCapacity": 40,
+            "baseTrainability": 60,
+            "naturalSwimmer": false,
+            "naturalJumper": false,
+            "naturalClimber": true,
+            "specialAbility": "sure_footed"
+        },
+        "river_horse": {
+            "id": "river_horse",
+            "name": "River Horse",
+            "description": "A horse comfortable with water crossings",
+            "baseSpeed": 100,
+            "baseStamina": 110,
+            "baseCarryCapacity": 50,
+            "baseTrainability": 55,
+            "naturalSwimmer": true,
+            "naturalJumper": false,
+            "naturalClimber": false,
+            "specialAbility": "water_dash"
+        }
+    },
+    "equipment": {
+        "basic_saddle": {
+            "id": "basic_saddle",
+            "name": "Basic Saddle",
+            "description": "A simple leather saddle.",
+            "slot": "Saddle",
+            "quality": 50,
+            "durability": 100,
+            "maxDurability": 100,
+            "price": 75,
+            "statModifiers": {
+                "speed": 5
+            }
+        },
+        "racing_saddle": {
+            "id": "racing_saddle",
+            "name": "Racing Saddle",
+            "description": "A lightweight saddle designed for racing.",
+            "slot": "Saddle",
+            "quality": 70,
+            "durability": 80,
+            "maxDurability": 80,
+            "price": 150,
+            "statModifiers": {
+                "speed": 15,
+                "stamina": -5
+            }
+        },
+        "heavy_armor": {
+            "id": "heavy_armor",
+            "name": "Heavy Barding",
+            "description": "Heavy armor plating to protect your mount in combat.",
+            "slot": "Armor",
+            "quality": 65,
+            "durability": 120,
+            "maxDurability": 120,
+            "price": 200,
+            "statModifiers": {
+                "speed": -15,
+                "stamina": -10
+            }
+        },
+        "saddlebags": {
+            "id": "saddlebags",
+            "name": "Leather Saddlebags",
+            "description": "Bags that attach to your saddle for additional storage.",
+            "slot": "Bags",
+            "quality": 55,
+            "durability": 90,
+            "maxDurability": 90,
+            "price": 100,
+            "statModifiers": {
+                "carryCapacity": 20,
+                "speed": -5
+            }
+        },
+        "steel_shoes": {
+            "id": "steel_shoes",
+            "name": "Steel Horseshoes",
+            "description": "Durable metal shoes that protect hooves on rough terrain.",
+            "slot": "Shoes",
+            "quality": 60,
+            "durability": 150,
+            "maxDurability": 150,
+            "price": 120,
+            "statModifiers": {
+                "speed": 5
+            }
+        },
+        "endurance_bridle": {
+            "id": "endurance_bridle",
+            "name": "Endurance Bridle",
+            "description": "A special bridle that helps manage mount stamina during long rides.",
+            "slot": "Accessory",
+            "quality": 65,
+            "durability": 100,
+            "maxDurability": 100,
+            "price": 180,
+            "statModifiers": {
+                "staminaRegen": 3
+            }
+        }
+    },
+    "stables": {
+        "village_stable": {
+            "id": "village_stable",
+            "name": "Village Stables",
+            "location": "Oakvale Village",
+            "capacity": 6,
+            "dailyFeedCost": 5,
+            "dailyCareCost": 3,
+            "availableMounts": [
+                {
+                    "templateId": "standard_horse",
+                    "name": "Thunder",
+                    "color": "Bay",
+                    "age": 36,
+                    "price": 250
+                },
+                {
+                    "templateId": "mountain_pony",
+                    "name": "Swift",
+                    "color": "Dappled Gray",
+                    "age": 48,
+                    "price": 300
+                }
+            ]
+        },
+        "city_stable": {
+            "id": "city_stable",
+            "name": "Royal Stables",
+            "location": "Capital City",
+            "capacity": 10,
+            "dailyFeedCost": 8,
+            "dailyCareCost": 5,
+            "availableMounts": [
+                {
+                    "templateId": "war_horse",
+                    "name": "Valor",
+                    "color": "Black",
+                    "age": 60,
+                    "trainingLevel": 40,
+                    "specialTraining": {
+                        "combat": 50
+                    },
+                    "price": 600
+                },
+                {
+                    "templateId": "racing_horse",
+                    "name": "Arrow",
+                    "color": "Chestnut",
+                    "age": 42,
+                    "trainingLevel": 45,
+                    "specialTraining": {
+                        "racing": 60
+                    },
+                    "price": 700
+                }
+            ]
+        },
+        "outpost_stable": {
+            "id": "outpost_stable",
+            "name": "Frontier Stables",
+            "location": "Northern Outpost",
+            "capacity": 4,
+            "dailyFeedCost": 6,
+            "dailyCareCost": 4,
+            "availableMounts": [
+                {
+                    "templateId": "river_horse",
+                    "name": "River",
+                    "color": "Palomino",
+                    "age": 36,
+                    "specialAbilities": [
+                        "swim"
+                    ],
+                    "price": 450
+                }
+            ]
+        }
+    },
+    "breedingCenter": {
+        "name": "Royal Breeding Grounds",
+        "fee": 200,
+        "breedingStock": [
+            {
+                "templateId": "racing_horse",
+                "name": "Champion",
+                "color": "Bay",
+                "age": 48,
+                "trainingLevel": 70,
+                "specialTraining": {
+                    "racing": 80
+                }
+            },
+            {
+                "templateId": "war_horse",
+                "name": "Warrior",
+                "color": "Black",
+                "age": 60,
+                "trainingLevel": 65,
+                "specialTraining": {
+                    "combat": 75
+                },
+                "specialAbilities": [
+                    "jump"
+                ]
+            }
+        ]
+    },
+    "racetrack": {
+        "name": "Country Fair Races",
+        "length": 500.0,
+        "difficulty": 50,
+        "entryFee": 100,
+        "prizes": {
+            "first": 500,
+            "second": 250,
+            "third": 100
+        },
+        "competitorNames": [
+            "Thunder",
+            "Lightning",
+            "Shadow",
+            "Storm",
+            "Arrow",
+            "Wind",
+            "Blaze",
+            "Whisper",
+            "Flash",
+            "Midnight"
+        ],
+        "competitorLastNames": [
+            "Runner",
+            "Galloper",
+            "Dasher",
+            "Swift",
+            "Racer",
+            "Hooves",
+            "Striker",
+            "Chaser",
+            "Bolt",
+            "Charge"
+        ]
+    },
+    "trainingTypes": [
+        {
+            "id": "combat",
+            "name": "Combat",
+            "description": "Fighting from mountback and defensive maneuvers",
+            "staminaCost": 15,
+            "skillRequired": 30
+        },
+        {
+            "id": "endurance",
+            "name": "Endurance",
+            "description": "Long-distance travel and stamina management",
+            "staminaCost": 15,
+            "skillRequired": 30
+        },
+        {
+            "id": "agility",
+            "name": "Agility",
+            "description": "Jumping, balance, and difficult terrain navigation",
+            "staminaCost": 25,
+            "skillRequired": 30
+        },
+        {
+            "id": "racing",
+            "name": "Racing",
+            "description": "Burst speed and racing techniques",
+            "staminaCost": 20,
+            "skillRequired": 30
+        }
+    ],
+    "specialAbilities": {
+        "jump": {
+            "id": "jump",
+            "name": "Jump",
+            "description": "Jump over obstacles",
+            "staminaCost": 25,
+            "skillRequired": 30,
+            "trainingType": "agility",
+            "unlockThreshold": 50
+        },
+        "swim": {
+            "id": "swim",
+            "name": "Swim",
+            "description": "Swim across water",
+            "staminaCost": 15,
+            "skillRequired": 30,
+            "trainingType": "endurance",
+            "unlockThreshold": 60
+        },
+        "climb": {
+            "id": "climb",
+            "name": "Climb",
+            "description": "Climb steep slopes",
+            "staminaCost": 30,
+            "skillRequired": 30,
+            "trainingType": "agility",
+            "unlockThreshold": 80
+        },
+        "sprint": {
+            "id": "sprint",
+            "name": "Sprint",
+            "description": "Gallop at full speed",
+            "staminaCost": 20,
+            "skillRequired": 30,
+            "trainingType": "racing",
+            "unlockThreshold": 0
+        },
+        "kick": {
+            "id": "kick",
+            "name": "Kick",
+            "description": "Attack with a powerful kick",
+            "staminaCost": 15,
+            "skillRequired": 30,
+            "trainingType": "combat",
+            "unlockThreshold": 0
+        }
+    },
+    "colors": [
+        "Bay",
+        "Chestnut",
+        "Black",
+        "Gray",
+        "White",
+        "Palomino",
+        "Buckskin",
+        "Dun",
+        "Roan",
+        "Pinto"
+    ],
+    "mountStats": {
+        "default": {
+            "stamina": 100,
+            "maxStamina": 100,
+            "staminaRegen": 5,
+            "speed": 100,
+            "carryCapacity": 50,
+            "loyalty": 50,
+            "training": 0,
+            "hunger": 0,
+            "fatigue": 0,
+            "health": 100,
+            "maxHealth": 100
+        }
+    }
+}
