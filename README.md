@@ -1,5 +1,6 @@
 # TODO List
 - _TODO_Main.md
+- _TODO_AI.md
 - _TODO_CrimeLaw.md
 - _TODO_Economy.md
 - _TODO_Faction.md
@@ -11,6 +12,7 @@
 ```
 oath/
 ├─ ai/
+│  ├─ _TODO_AI.md
 │  ├─ EmergentAI.cpp
 │  ├─ EmergentAI.hpp
 │  ├─ EmergentAI.json
@@ -157,6 +159,10 @@ oath/
 │  │  ├─ HealthState.hpp
 │  │  ├─ Immunity.cpp
 │  │  ├─ Immunity.hpp
+│  │  ├─ NutritionNode.cpp
+│  │  ├─ NutritionNode.hpp
+│  │  ├─ NutritionState.cpp
+│  │  ├─ NutritionState.hpp
 │  │  ├─ Symptom.cpp
 │  │  ├─ Symptom.hpp
 │  │  └─ TODO_DiseaseHealth.md
@@ -281,5 +287,6 @@ oath/
 │  ├─ JSONSerializer.cpp
 │  └─ JSONSerializer.hpp
 ├─ _TODO_Main.md
-└─ main.cpp
+├─ main.cpp
+└─ new_main.cpp
 ```
